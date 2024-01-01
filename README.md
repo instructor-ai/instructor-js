@@ -7,7 +7,8 @@ The simple goal of this project is to provide a simple, type-safe, and easy to u
 
 ```ts
 import { z } from "zod";
-import { Instructor } from "instructor";
+import { instruct } from "instructor";
+import OpenAI from "openai";
 
 const UserSchema = z.object({
   age: z.number(),
@@ -18,7 +19,10 @@ const UserSchema = z.object({
 
 type User = z.infer<typeof UserSchema>;
 
-const client = Instructor.from_client(OpenAI());
+const client = instruct.patch({
+  client: OpenAI(process.env.OPENAI_API_KEY, process.env.OPENAI_ORG_ID),
+  mode: instruct.MODES.TOOLS,
+});
 
 const user: User = await client.chat.completions.create({
   messages: [{ role: "user", content: "Jason Liu is 30 years old" }],
