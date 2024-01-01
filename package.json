@@ -21,5 +21,9 @@
   "bugs": {
     "url": "https://github.com/jxnl/instructor-js/issues"
   },
-  "homepage": "https://github.com/jxnl/instructor-js#readme"
+  "homepage": "https://github.com/jxnl/instructor-js#readme",
+  "dependencies": {
+    "openai": "^4.24.1",
+    "zod": "^3.22.4"
+  }
 }
