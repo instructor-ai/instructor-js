@@ -181,6 +181,7 @@ export const patch = ({
       );
       delete args[0].response_model;
       delete args[0].max_retries;
+
       while (retries < max_retries) {
         try {
           response = (await target.apply(

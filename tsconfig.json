@@ -10,5 +10,6 @@
     "experimentalDecorators": true,
     "strictPropertyInitialization": false,
     "declaration": true
-  }
+  },
+  "exclude": [ "examples", "dist" ]
 }
