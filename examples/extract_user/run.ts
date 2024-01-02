@@ -1,11 +1,11 @@
-import OpenAI from "openai";
-import { instructor } from "../../src";
-import { z } from "zod";
+import { instructor } from "@/"
+import OpenAI from "openai"
+import { z } from "zod"
 
 const client = instructor.patch({
   client: new OpenAI(),
-  mode: instructor.MODE.TOOLS,
-});
+  mode: instructor.MODE.TOOLS
+})
 
 client.chat.completions
   .create({
@@ -15,10 +15,10 @@ client.chat.completions
     response_model: z.object({
       age: z.number(),
       // name should be uppercase, or
-      name: z.string().refine((name) => name === name.toUpperCase(), {
-        message: "name should have uppercase",
-      }),
+      name: z.string().refine(name => name === name.toUpperCase(), {
+        message: "name should have uppercase"
+      })
     }),
-    max_retries: 3,
+    max_retries: 3
   })
-  .then(console.log);
+  .then(console.log)

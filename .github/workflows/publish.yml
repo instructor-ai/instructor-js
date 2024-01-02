@@ -1,0 +1,61 @@
+name: Publish changesets
+
+on:
+  pull_request:
+    types:
+      - closed
+
+concurrency: ${{ github.workflow }}-${{ github.ref }}
+permissions: {} #reset
+jobs:
+  publish:
+    if: github.repository == 'jxnl/instructor-js' && github.event.pull_request.merged == true && (startsWith(github.head_ref, 'changeset-release/main') || startsWith(github.head_ref, '_publish-trigger'))
+    permissions:
+      contents: write
+      pull-requests: write
+
+    name: Publish packages
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8.6.9
+
+      - name: Setup bun
+        uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: latest
+
+      - name: Setup Node.js 18
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18.16.0
+
+      - name: Install Dependencies
+        run: bun i
+
+      - name: Creating .npmrc
+        run: |
+          cat << EOF > "$HOME/.npmrc"
+            //registry.npmjs.org/:_authToken=$NPM_TOKEN
+          EOF
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Publish packages & create release
+        id: changesets
+        uses: changesets/action@v1
+        with:
+          publish: pnpm publish-packages
+          createGithubReleases: true
+
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}

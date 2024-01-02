@@ -1,13 +1,19 @@
 {
-  "name": "instructor",
+  "name": "instructor-js",
   "version": "0.0.1",
   "description": "structured outputs for llms",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "prepublish": "tsc",
-    "build": "tsc"
+    "build": "tsup",
+    "lint": "eslint src/",
+    "type-check": "tsc --noEmit",
+    "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist",
+    "changeset": "changeset",
+    "version-packages": "changeset version",
+    "publish-packages": "tsup && changeset publish"
   },
   "repository": {
     "type": "git",
@@ -31,7 +37,20 @@
     "zod-to-json-schema": "^3.22.3"
   },
   "devDependencies": {
+    "@changesets/changelog-github": "^0.5.0",
+    "@changesets/cli": "^2.27.1",
+    "@ianvs/prettier-plugin-sort-imports": "4.1.0",
     "@types/node": "^20.10.6",
+    "@typescript-eslint/eslint-plugin": "6.5.0",
+    "@typescript-eslint/parser": "6.5.0",
+    "eslint": "^8.40.0",
+    "eslint-config-prettier": "9.0.0",
+    "eslint-import-resolver-typescript": "^3.5.5",
+    "eslint-plugin-import": "^2.27.5",
+    "eslint-plugin-prettier": "^5.0.0",
+    "husky": "^8.0.3",
+    "prettier": "3.0.0",
+    "tsup": "^8.0.1",
     "typescript": "^5.3.3"
   }
 }

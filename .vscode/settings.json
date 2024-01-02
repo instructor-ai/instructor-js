@@ -1,0 +1,77 @@
+{
+  "editor.defaultFormatter": "GitHub.copilot",
+  "editor.tabSize": 2,
+  "editor.formatOnSave": false,
+  "editor.formatOnType": false,
+  "editor.formatOnPaste": false,
+  "editor.trimAutoWhitespace": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": true,
+  },
+  "[html]": {
+    "editor.defaultFormatter": "GitHub.copilot"
+  },
+  "[javascript]": {
+    "editor.defaultFormatter": "vscode.typescript-language-features"
+  },
+  "[json]": {
+    "editor.defaultFormatter": "vscode.json-language-features",
+    "editor.autoIndent": "advanced"
+  },
+  "[yaml]": {
+    "editor.defaultFormatter": "redhat.vscode-yaml",
+    "editor.autoIndent": "advanced",
+    "editor.tabSize": 2,
+    "editor.formatOnSave": true,
+    "editor.formatOnType": false,
+    "editor.formatOnPaste": true,
+  },
+  "eslint.validate": [
+    "javascript",
+    "typescript",
+    "typescriptreact",
+  ],
+  "eslint.debug": true,
+  "eslint.workingDirectories": [
+    // Monorepo directories
+    {
+      "pattern": "./apps/*/"
+    },
+    {
+      "pattern": "./functions/*/"
+    },
+    {
+      "pattern": "./infra/*/"
+    },
+    {
+      "pattern": "./packages/*/"
+    }
+  ],
+  "github-actions.workflows.pinned.workflows": [
+    ".github/workflows/release.yml"
+  ],
+  "typescript.tsdk": "./node_modules/typescript/lib",
+  "typescript.enablePromptUseWorkspaceTsdk": true,
+  "typescript.validate.enable": true,
+  "editor.quickSuggestions": {
+    "strings": true
+  },
+  "css.validate": false,
+  "editor.inlineSuggest.enabled": true,
+  "[typescriptreact]": {
+    "editor.defaultFormatter": "vscode.typescript-language-features"
+  },
+  "[jsonc]": {
+    "editor.defaultFormatter": "vscode.json-language-features"
+  },
+  "[typescript]": {
+    "editor.defaultFormatter": "vscode.typescript-language-features",
+  },
+  "yaml.schemas": {
+    "openapi:v2": "file:///Users/beast/dev/image-gen/gcp/functions/chat/openapi.yaml",
+    "https://json.schemastore.org/workflows.json": "file:///Users/beast/dev/image-gen/infra/gcp/workflows/dataset-processing-workflow.yml",
+  },
+  "yaml.format.enable": true,
+  "yaml.schemaStore.enable": true,
+  "yaml.validate": true
+}

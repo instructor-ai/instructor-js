@@ -1,0 +1,162 @@
+import { createSchemaFunction } from "@/oai/fns/schema"
+import OpenAI from "openai"
+import { ChatCompletion, ChatCompletionCreateParamsNonStreaming } from "openai/resources/index.mjs"
+import { ZodObject } from "zod"
+
+import { MODE } from "@/constants/modes"
+
+import {
+  OAIBuildFunctionParams,
+  OAIBuildMessageBasedParams,
+  OAIBuildToolFunctionParams
+} from "./oai/params"
+import {
+  OAIResponseFnArgsParser,
+  OAIResponseTextParser,
+  OAIResponseToolArgsParser
+} from "./oai/parser"
+
+const MODE_TO_PARSER = {
+  [MODE.FUNCTIONS]: OAIResponseFnArgsParser,
+  [MODE.TOOLS]: OAIResponseToolArgsParser,
+  [MODE.JSON]: OAIResponseTextParser,
+  [MODE.MD_JSON]: OAIResponseTextParser,
+  [MODE.JSON_SCHEMA]: OAIResponseTextParser
+}
+
+const MODE_TO_PARAMS = {
+  [MODE.FUNCTIONS]: OAIBuildFunctionParams,
+  [MODE.TOOLS]: OAIBuildToolFunctionParams,
+  [MODE.JSON]: OAIBuildMessageBasedParams,
+  [MODE.MD_JSON]: OAIBuildMessageBasedParams,
+  [MODE.JSON_SCHEMA]: OAIBuildMessageBasedParams
+}
+
+type PatchedChatCompletionCreateParams = ChatCompletionCreateParamsNonStreaming & {
+  //eslint-disable-next-line @typescript-eslint/no-explicit-any
+  response_model?: ZodObject<any>
+  max_retries?: number
+}
+
+export class Instruct {
+  private client: OpenAI
+  private mode: MODE
+
+  /**
+   * Creates an instance of the `Instruct` class.
+   * @param {OpenAI} client - The OpenAI client.
+   * @param {string} mode - The mode of operation.
+   */
+  constructor({ client, mode }: { client: OpenAI; mode: MODE }) {
+    this.client = client
+    this.mode = mode
+  }
+
+  /**
+   * Handles chat completion with retries.
+   * @param {PatchedChatCompletionCreateParams} params - The parameters for chat completion.
+   * @returns {Promise<any>} The response from the chat completion.
+   */
+  private chatCompletion = async ({
+    response_model,
+    max_retries = 3,
+    ...params
+  }: PatchedChatCompletionCreateParams) => {
+    let attempts = 0
+
+    const functionConfig = this.generateSchemaFunction({
+      schema: response_model
+    })
+
+    const makeCompletionCall = async () => {
+      try {
+        const completion = await this.client.chat.completions.create({
+          stream: false,
+          ...params,
+          ...functionConfig
+        })
+
+        const response = this.parseOAIResponse(completion)
+
+        return response
+      } catch (error) {
+        throw error
+      }
+    }
+
+    const makeCompletionCallWithRetries = async () => {
+      try {
+        return await makeCompletionCall()
+      } catch (error) {
+        if (attempts < max_retries) {
+          attempts++
+          return await makeCompletionCallWithRetries()
+        } else {
+          throw error
+        }
+      }
+    }
+
+    return await makeCompletionCallWithRetries()
+  }
+
+  private buildChatCompletionParams = ({
+    response_model,
+    ...params
+  }: PatchedChatCompletionCreateParams) => {
+    const { definition } = createSchemaFunction({ schema: response_model })
+
+    const paramsForMode = MODE_TO_PARAMS[this.mode](definition, params)
+
+    return {
+      stream: false, //TODO: not sure what streaming support looks like TBH
+      ...paramsForMode
+    }
+  }
+
+  /**
+   * Parses the OAI response.
+   * @param {ChatCompletion} response - The response from the chat completion.
+   * @returns {any} The parsed response.
+   */
+  private parseOAIResponse = (response: ChatCompletion) => {
+    const parser = MODE_TO_PARSER[this.mode]
+
+    return parser(response)
+  }
+
+  /**
+   * Generates a schema function.
+   * @param {ZodSchema<unknown>} schema - The schema to generate the function from.
+   * @returns {Object} The generated function configuration.
+   */
+  private generateSchemaFunction({ schema }) {
+    const { definition } = createSchemaFunction({ schema })
+
+    return {
+      function_call: {
+        name: definition.name
+      },
+      functions: [
+        {
+          name: definition.name,
+          description: definition.description,
+          parameters: {
+            type: "object",
+            properties: definition.parameters,
+            required: definition.required
+          }
+        }
+      ]
+    }
+  }
+
+  /**
+   * Public chat interface.
+   */
+  public chat = {
+    completions: {
+      create: this.chatCompletion
+    }
+  }
+}
