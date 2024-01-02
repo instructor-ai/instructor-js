@@ -1,7 +1,7 @@
-import { createSchemaFunction } from "@/oai/fns/schema"
 import OpenAI from "openai"
 import { ChatCompletion, ChatCompletionCreateParamsNonStreaming } from "openai/resources/index.mjs"
 import { ZodObject } from "zod"
+import zodToJsonSchema from "zod-to-json-schema"
 
 import { MODE } from "@/constants/modes"
 
@@ -138,12 +138,17 @@ export default class Instructor {
     response_model,
     ...params
   }: PatchedChatCompletionCreateParams): ChatCompletionCreateParamsNonStreaming => {
-    const { definition } = createSchemaFunction({ schema: response_model })
+    const jsonSchema = zodToJsonSchema(response_model, "response_model")
+
+    const definition = {
+      name: "response_model",
+      ...jsonSchema.definitions.response_model
+    }
 
     const paramsForMode = MODE_TO_PARAMS[this.mode](definition, params)
 
     return {
-      stream: false, //TODO: not sure what streaming support looks like TBH
+      stream: false,
       ...paramsForMode
     }
   }

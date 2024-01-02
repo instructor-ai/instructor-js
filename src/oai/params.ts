@@ -1,52 +1,25 @@
-import { FunctionPayload } from "./fns"
-
-export function OAIBuildFunctionParams(definition: FunctionPayload, params) {
+export function OAIBuildFunctionParams(definition, params) {
   return {
     ...params,
     function_call: {
       name: definition.name
     },
-    functions: [
-      ...(params?.functions ?? []),
-      {
-        name: definition.name,
-        description: definition.description,
-        parameters: {
-          type: "object",
-          properties: definition.parameters,
-          required: definition.required
-        }
-      }
-    ]
+    functions: [...(params?.functions ?? []), definition]
   }
 }
 
-export function OAIBuildToolFunctionParams(definition: FunctionPayload, params) {
+export function OAIBuildToolFunctionParams(definition, params) {
   return {
     ...params,
     tool_choice: {
       type: "function",
       function: { name: definition.name }
     },
-    tools: [
-      ...(params?.tools ?? []),
-      {
-        type: "function",
-        function: {
-          name: definition.name,
-          description: definition.description,
-          parameters: {
-            type: "object",
-            properties: definition.parameters,
-            required: definition.required
-          }
-        }
-      }
-    ]
+    tools: [...(params?.tools ?? []), definition]
   }
 }
 
-export function OAIBuildMessageBasedParams(definition: FunctionPayload, params) {
+export function OAIBuildMessageBasedParams(definition, params) {
   return {
     ...params,
     messages: [
@@ -58,8 +31,8 @@ export function OAIBuildMessageBasedParams(definition: FunctionPayload, params) 
           You will return no other prose. You will take into account the descriptions for each paramater within the schema
           and return a valid JSON object that matches the schema and those instructions.
 
-          description: ${definition.description}
-          paramaters: ${JSON.stringify(definition.parameters)}
+          description: ${definition?.description}
+          json schema: ${JSON.stringify(definition)}
         `
       }
     ]
