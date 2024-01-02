@@ -11,7 +11,6 @@ client.chat.completions
   .create({
     messages: [{ role: "user", content: "Jason Liu is 30 years old" }],
     model: "gpt-3.5-turbo",
-    // @ts-ignore TODO fix type issue
     response_model: z.object({
       age: z.number(),
       // name should be uppercase, or

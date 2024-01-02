@@ -1,4 +1,6 @@
 import OpenAI from "openai";
+import assert from "assert";
+
 import { ZodSchema } from "zod";
 import { JsonSchema7Type, zodToJsonSchema } from "zod-to-json-schema";
 
@@ -7,8 +9,21 @@ import {
   ChatCompletionCreateParams,
   ChatCompletionMessage,
 } from "openai/resources";
+import { ChatCompletionCreateParamsBase } from "openai/resources/chat/completions";
 
-import assert = require("assert");
+declare module 'openai/resources' {
+  interface ChatCompletionCreateParamsNonStreaming extends ChatCompletionCreateParamsBase {
+    stream?: false | null;
+    max_retries?: number
+    response_model?: any
+  }
+  interface ChatCompletionCreateParamsStreaming extends ChatCompletionCreateParamsBase {
+    stream: true;
+    max_retries?: number;
+    response_model?: any
+  }
+  type ChatCompletionCreateParams = ChatCompletionCreateParamsStreaming | ChatCompletionCreateParamsNonStreaming
+}
 
 export enum MODE {
   FUNCTIONS,
@@ -41,8 +56,7 @@ export class OpenAISchema {
       name: this.responseModel["title"] || "schema",
       description:
         this.responseModel["description"] ||
-        `Correctly extracted \`${
-          this.responseModel["title"] || "schema"
+        `Correctly extracted \`${this.responseModel["title"] || "schema"
         }\` with all the required parameters with correct types`,
       parameters: Object.keys(this.responseModel).reduce(
         (acc, curr) => {
@@ -62,16 +76,11 @@ export class OpenAISchema {
   }
 }
 
-type PatchedChatCompletionCreateParams = ChatCompletionCreateParams & {
-  responseModel?: ZodSchema | OpenAISchema;
-  maxRetries?: number;
-};
-
 function handleResponseModel(
   responseModel: ZodSchema | OpenAISchema,
-  args: PatchedChatCompletionCreateParams[],
+  args: ChatCompletionCreateParams[],
   mode: MODE = MODE.FUNCTIONS
-): [OpenAISchema, PatchedChatCompletionCreateParams[], MODE] {
+): [OpenAISchema, ChatCompletionCreateParams[], MODE] {
   if (!(responseModel instanceof OpenAISchema)) {
     responseModel = new OpenAISchema(responseModel);
   }
@@ -179,23 +188,23 @@ export const patch = ({
   mode?: MODE;
 }): OpenAI => {
   client.chat.completions.create = new Proxy(client.chat.completions.create, {
-    async apply(target, ctx, args: PatchedChatCompletionCreateParams[]) {
+    async apply(target, ctx, args: ChatCompletionCreateParams[]) {
       let retries = 0,
-        max_retries = args[0].maxRetries || 1,
+        max_retries = args[0].max_retries || 1,
         response: ChatCompletion | undefined = undefined,
-        responseModel = args[0].responseModel;
+        responseModel = args[0].response_model;
       [responseModel, args, mode] = handleResponseModel(
         responseModel!,
         args,
         mode
       );
-      delete args[0].responseModel;
-      delete args[0].maxRetries;
+      delete args[0].response_model;
+      delete args[0].max_retries;
       while (retries < max_retries) {
         try {
           response = (await target.apply(
             ctx,
-            args as [PatchedChatCompletionCreateParams]
+            args as [ChatCompletionCreateParams]
           )) as ChatCompletion;
           return processResponse(response, responseModel as OpenAISchema, mode);
         } catch (error: any) {
