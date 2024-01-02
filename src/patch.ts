@@ -7,6 +7,7 @@ import {
   ChatCompletionCreateParams,
   ChatCompletionMessage,
 } from "openai/resources";
+
 import assert = require("assert");
 
 export enum MODE {
@@ -18,35 +19,39 @@ export enum MODE {
 }
 
 export class OpenAISchema {
-  private response_model: ReturnType<typeof zodToJsonSchema> | any;
+  private responseModel: ReturnType<typeof zodToJsonSchema> | any;
   constructor(public zod_schema: ZodSchema) {
-    this.response_model = zodToJsonSchema(zod_schema);
+    this.responseModel = zodToJsonSchema(zod_schema);
   }
 
   get definitions() {
-    return this.response_model["definitions"];
+    return this.responseModel["definitions"];
   }
 
   get properties() {
-    return this.response_model["properties"];
+    return this.responseModel["properties"];
   }
 
-  get openai_schema() {
+  get schema() {
+    return this.responseModel;
+  }
+
+  get openaiSchema() {
     return {
-      name: this.response_model["title"] || "schema",
+      name: this.responseModel["title"] || "schema",
       description:
-        this.response_model["description"] ||
+        this.responseModel["description"] ||
         `Correctly extracted \`${
-          this.response_model["title"] || "schema"
+          this.responseModel["title"] || "schema"
         }\` with all the required parameters with correct types`,
-      parameters: Object.keys(this.response_model).reduce(
+      parameters: Object.keys(this.responseModel).reduce(
         (acc, curr) => {
           if (
             curr.startsWith("$") ||
             ["title", "description", "additionalProperties"].includes(curr)
           )
             return acc;
-          acc[curr] = this.response_model[curr];
+          acc[curr] = this.responseModel[curr];
           return acc;
         },
         {} as {
@@ -58,43 +63,48 @@ export class OpenAISchema {
 }
 
 type PatchedChatCompletionCreateParams = ChatCompletionCreateParams & {
-  response_model?: ZodSchema | OpenAISchema;
-  max_retries?: number;
+  responseModel?: ZodSchema | OpenAISchema;
+  maxRetries?: number;
 };
 
 function handleResponseModel(
-  response_model: ZodSchema | OpenAISchema,
+  responseModel: ZodSchema | OpenAISchema,
   args: PatchedChatCompletionCreateParams[],
   mode: MODE = MODE.FUNCTIONS
 ): [OpenAISchema, PatchedChatCompletionCreateParams[], MODE] {
-  if (!(response_model instanceof OpenAISchema)) {
-    response_model = new OpenAISchema(response_model);
+  if (!(responseModel instanceof OpenAISchema)) {
+    responseModel = new OpenAISchema(responseModel);
   }
 
   if (mode === MODE.FUNCTIONS) {
-    args[0].functions = [response_model.openai_schema];
-    args[0].function_call = { name: response_model.openai_schema.name };
+    args[0].functions = [responseModel.openaiSchema];
+    args[0].function_call = { name: responseModel.openaiSchema.name };
   } else if (mode === MODE.TOOLS) {
     args[0].tools = [
-      { type: "function", function: response_model.openai_schema },
+      { type: "function", function: responseModel.openaiSchema },
     ];
     args[0].tool_choice = {
       type: "function",
-      function: { name: response_model.openai_schema.name },
+      function: { name: responseModel.openaiSchema.name },
     };
   } else if ([MODE.JSON, MODE.MD_JSON, MODE.JSON_SCHEMA].includes(mode)) {
     let message: string = `As a genius expert, your task is to understand the content and provide the parsed objects in json that match the following json_schema: \n${JSON.stringify(
-      response_model.properties
+      responseModel.properties
     )}`;
-    if (response_model["definitions"]) {
+    if (responseModel["definitions"]) {
       message += `Here are some more definitions to adhere to: \n${JSON.stringify(
-        response_model.definitions
+        responseModel.definitions
       )}`;
     }
     if (mode === MODE.JSON) {
       args[0].response_format = { type: "json_object" };
     } else if (mode == MODE.JSON_SCHEMA) {
-      args[0].response_format = { type: "json_object" };
+      // ! TODO: include json schema in the response
+      args[0].response_format = {
+        type: "json_object",
+        // This is supported my Anyscale but not OpenAI
+        // schema: responseModel.schema,
+      };
     } else if (mode === MODE.MD_JSON) {
       args[0].messages.push({
         role: "assistant",
@@ -110,36 +120,36 @@ function handleResponseModel(
   } else {
     console.error("unknown mode", mode);
   }
-  return [response_model, args, mode];
+  return [responseModel, args, mode];
 }
 
 function processResponse(
   response: OpenAI.Chat.Completions.ChatCompletion,
-  response_model: OpenAISchema,
+  responseModel: OpenAISchema,
   mode: MODE = MODE.FUNCTIONS
 ) {
   const message = response.choices[0].message;
   if (mode === MODE.FUNCTIONS) {
     assert.equal(
       message.function_call!.name,
-      response_model.openai_schema.name,
+      responseModel.openaiSchema.name,
       "Function name does not match"
     );
-    return response_model.zod_schema.parse(
+    return responseModel.zod_schema.parse(
       JSON.parse(message.function_call!.arguments)
     );
   } else if (mode === MODE.TOOLS) {
     const tool_call = message.tool_calls![0];
     assert.equal(
       tool_call.function.name,
-      response_model.openai_schema.name,
+      responseModel.openaiSchema.name,
       "Tool name does not match"
     );
-    return response_model.zod_schema.parse(
+    return responseModel.zod_schema.parse(
       JSON.parse(tool_call.function.arguments)
     );
   } else if ([MODE.JSON, MODE.MD_JSON, MODE.JSON_SCHEMA].includes(mode)) {
-    return response_model.zod_schema.parse(JSON.parse(message.content!));
+    return responseModel.zod_schema.parse(JSON.parse(message.content!));
   } else {
     console.error("unknown mode", mode);
   }
@@ -164,34 +174,30 @@ export const patch = ({
   mode,
 }: {
   client: OpenAI;
-  response_model?: ZodSchema | OpenAISchema;
+  responseModel?: ZodSchema | OpenAISchema;
   max_retries?: number;
   mode?: MODE;
 }): OpenAI => {
   client.chat.completions.create = new Proxy(client.chat.completions.create, {
     async apply(target, ctx, args: PatchedChatCompletionCreateParams[]) {
       let retries = 0,
-        max_retries = args[0].max_retries || 1,
+        max_retries = args[0].maxRetries || 1,
         response: ChatCompletion | undefined = undefined,
-        response_model = args[0].response_model;
-      [response_model, args, mode] = handleResponseModel(
-        response_model!,
+        responseModel = args[0].responseModel;
+      [responseModel, args, mode] = handleResponseModel(
+        responseModel!,
         args,
         mode
       );
-      delete args[0].response_model;
-      delete args[0].max_retries;
+      delete args[0].responseModel;
+      delete args[0].maxRetries;
       while (retries < max_retries) {
         try {
           response = (await target.apply(
             ctx,
             args as [PatchedChatCompletionCreateParams]
           )) as ChatCompletion;
-          return processResponse(
-            response,
-            response_model as OpenAISchema,
-            mode
-          );
+          return processResponse(response, responseModel as OpenAISchema, mode);
         } catch (error: any) {
           console.error(error.errors || error);
           if (!response) {
