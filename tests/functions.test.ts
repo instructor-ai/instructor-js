@@ -18,7 +18,7 @@ async function extractUser() {
     organization: process.env.OPENAI_ORG_ID ?? undefined
   })
 
-  const client = new Instructor({
+  const client = Instructor({
     client: oai,
     mode: "FUNCTIONS"
   })

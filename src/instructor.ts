@@ -37,9 +37,9 @@ type PatchedChatCompletionCreateParams = ChatCompletionCreateParamsNonStreaming 
   max_retries?: number
 }
 
-export default class Instructor {
-  private client: OpenAI
-  private mode: MODE
+class Instructor {
+  readonly client: OpenAI
+  readonly mode: MODE
 
   /**
    * Creates an instance of the `Instructor` class.
@@ -56,10 +56,7 @@ export default class Instructor {
    * @param {PatchedChatCompletionCreateParams} params - The parameters for chat completion.
    * @returns {Promise<any>} The response from the chat completion.
    */
-  private chatCompletion = async ({
-    max_retries = 3,
-    ...params
-  }: PatchedChatCompletionCreateParams) => {
+  chatCompletion = async ({ max_retries = 3, ...params }: PatchedChatCompletionCreateParams) => {
     let attempts = 0
     let validationIssues = []
     let lastMessage = null
@@ -162,13 +159,38 @@ export default class Instructor {
 
     return parser(response)
   }
+}
 
-  /**
-   * Public chat interface.
-   */
-  public chat = {
-    completions: {
-      create: this.chatCompletion
+type OAIClientExtended = OpenAI &
+  Instructor & {
+    chat: {
+      completions: {
+        create: (args: PatchedChatCompletionCreateParams) => Promise<unknown>
+      }
     }
   }
+
+export default function (args: { client: OpenAI; mode: MODE }): OAIClientExtended {
+  const instructor = new Instructor(args)
+
+  const instructorWithProxy = new Proxy(instructor, {
+    get: (target, prop, receiver) => {
+      if (prop === "chat") {
+        return {
+          completions: {
+            create: target.chatCompletion.bind(target)
+          },
+          ...target.client.chat
+        }
+      }
+
+      if (prop in target) {
+        return Reflect.get(target, prop, receiver)
+      }
+
+      return Reflect.get(target.client, prop, receiver)
+    }
+  })
+
+  return instructorWithProxy as OAIClientExtended
 }
