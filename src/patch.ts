@@ -1,12 +1,11 @@
 import OpenAI from "openai";
-import { ZodSchema, z } from "zod";
+import { ZodSchema } from "zod";
 import { JsonSchema7Type, zodToJsonSchema } from "zod-to-json-schema";
 
 import {
   ChatCompletion,
   ChatCompletionCreateParams,
   ChatCompletionMessage,
-  Completions,
 } from "openai/resources";
 import assert = require("assert");
 

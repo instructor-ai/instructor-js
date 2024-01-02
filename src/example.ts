@@ -14,7 +14,10 @@ client.chat.completions
     // @ts-ignore TODO fix type issue
     response_model: z.object({
       age: z.number(),
-      name: z.string(),
+      // name should be uppercase, or
+      name: z.string().refine((name) => name === name.toUpperCase(), {
+        message: "name should have uppercase",
+      }),
     }),
     max_retries: 3,
   })
