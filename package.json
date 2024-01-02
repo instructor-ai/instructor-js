@@ -1,9 +1,15 @@
 {
-  "name": "instructor",
+  "name": "instructor-js",
   "version": "0.0.1",
   "description": "structured outputs for llms",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": "./dist/index.js"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "prepublish": "tsc",
@@ -26,7 +32,7 @@
   },
   "homepage": "https://github.com/jxnl/instructor-js#readme",
   "dependencies": {
-    "openai": "^4.24.1",
+    "openai": "^4.24.1", 
     "zod": "^3.22.4",
     "zod-to-json-schema": "^3.22.3"
   },
