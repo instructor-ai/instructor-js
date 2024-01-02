@@ -9,7 +9,7 @@ import {
 } from "openai/resources";
 import assert = require("assert");
 
-export enum MODES {
+export enum MODE {
   FUNCTIONS,
   TOOLS,
   JSON,
@@ -65,16 +65,16 @@ type PatchedChatCompletionCreateParams = ChatCompletionCreateParams & {
 function handleResponseModel(
   response_model: ZodSchema | OpenAISchema,
   args: PatchedChatCompletionCreateParams[],
-  mode: MODES = MODES.FUNCTIONS
-): [OpenAISchema, PatchedChatCompletionCreateParams[], MODES] {
+  mode: MODE = MODE.FUNCTIONS
+): [OpenAISchema, PatchedChatCompletionCreateParams[], MODE] {
   if (!(response_model instanceof OpenAISchema)) {
     response_model = new OpenAISchema(response_model);
   }
 
-  if (mode === MODES.FUNCTIONS) {
+  if (mode === MODE.FUNCTIONS) {
     args[0].functions = [response_model.openai_schema];
     args[0].function_call = { name: response_model.openai_schema.name };
-  } else if (mode === MODES.TOOLS) {
+  } else if (mode === MODE.TOOLS) {
     args[0].tools = [
       { type: "function", function: response_model.openai_schema },
     ];
@@ -82,7 +82,7 @@ function handleResponseModel(
       type: "function",
       function: { name: response_model.openai_schema.name },
     };
-  } else if ([MODES.JSON, MODES.MD_JSON, MODES.JSON_SCHEMA].includes(mode)) {
+  } else if ([MODE.JSON, MODE.MD_JSON, MODE.JSON_SCHEMA].includes(mode)) {
     let message: string = `As a genius expert, your task is to understand the content and provide the parsed objects in json that match the following json_schema: \n${JSON.stringify(
       response_model.properties
     )}`;
@@ -91,11 +91,11 @@ function handleResponseModel(
         response_model.definitions
       )}`;
     }
-    if (mode === MODES.JSON) {
+    if (mode === MODE.JSON) {
       args[0].response_format = { type: "json_object" };
-    } else if (mode == MODES.JSON_SCHEMA) {
+    } else if (mode == MODE.JSON_SCHEMA) {
       args[0].response_format = { type: "json_object" };
-    } else if (mode === MODES.MD_JSON) {
+    } else if (mode === MODE.MD_JSON) {
       args[0].messages.push({
         role: "assistant",
         content: "```json",
@@ -116,10 +116,10 @@ function handleResponseModel(
 function processResponse(
   response: OpenAI.Chat.Completions.ChatCompletion,
   response_model: OpenAISchema,
-  mode: MODES = MODES.FUNCTIONS
+  mode: MODE = MODE.FUNCTIONS
 ) {
   const message = response.choices[0].message;
-  if (mode === MODES.FUNCTIONS) {
+  if (mode === MODE.FUNCTIONS) {
     assert.equal(
       message.function_call!.name,
       response_model.openai_schema.name,
@@ -128,7 +128,7 @@ function processResponse(
     return response_model.zod_schema.parse(
       JSON.parse(message.function_call!.arguments)
     );
-  } else if (mode === MODES.TOOLS) {
+  } else if (mode === MODE.TOOLS) {
     const tool_call = message.tool_calls![0];
     assert.equal(
       tool_call.function.name,
@@ -138,7 +138,7 @@ function processResponse(
     return response_model.zod_schema.parse(
       JSON.parse(tool_call.function.arguments)
     );
-  } else if ([MODES.JSON, MODES.MD_JSON, MODES.JSON_SCHEMA].includes(mode)) {
+  } else if ([MODE.JSON, MODE.MD_JSON, MODE.JSON_SCHEMA].includes(mode)) {
     return response_model.zod_schema.parse(JSON.parse(message.content!));
   } else {
     console.error("unknown mode", mode);
@@ -166,7 +166,7 @@ export const patch = ({
   client: OpenAI;
   response_model?: ZodSchema | OpenAISchema;
   max_retries?: number;
-  mode?: MODES;
+  mode?: MODE;
 }): OpenAI => {
   client.chat.completions.create = new Proxy(client.chat.completions.create, {
     async apply(target, ctx, args: PatchedChatCompletionCreateParams[]) {
@@ -202,7 +202,7 @@ export const patch = ({
             role: "user",
             content: `Recall the function correctly, fix the errors, exceptions found\n${error}`,
           });
-          if (mode == MODES.MD_JSON) {
+          if (mode == MODE.MD_JSON) {
             args[0].messages.push({ role: "assistant", content: "```json" });
           }
           retries++;

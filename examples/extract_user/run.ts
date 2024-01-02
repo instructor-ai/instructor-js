@@ -1,10 +1,10 @@
 import OpenAI from "openai";
-import { instruct } from ".";
+import { instructor } from "../../src";
 import { z } from "zod";
 
-const client = instruct.patch({
+const client = instructor.patch({
   client: new OpenAI(),
-  mode: instruct.MODES.TOOLS,
+  mode: instructor.MODE.TOOLS,
 });
 
 client.chat.completions
