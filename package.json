@@ -2,9 +2,12 @@
   "name": "instructor",
   "version": "0.0.1",
   "description": "structured outputs for llms",
-  "main": "index.js",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prepublish": "tsc",
+    "build": "tsc"
   },
   "repository": {
     "type": "git",
@@ -24,6 +27,11 @@
   "homepage": "https://github.com/jxnl/instructor-js#readme",
   "dependencies": {
     "openai": "^4.24.1",
-    "zod": "^3.22.4"
+    "zod": "^3.22.4",
+    "zod-to-json-schema": "^3.22.3"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.6",
+    "typescript": "^5.3.3"
   }
 }
