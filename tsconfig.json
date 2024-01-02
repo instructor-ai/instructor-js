@@ -2,7 +2,6 @@
   "compilerOptions": {
     "target": "es6",
     "module": "commonjs",
-    "rootDir": "./src",
     "outDir": "./dist",
     "esModuleInterop": true,
     "strict": true,
@@ -10,5 +9,7 @@
     "experimentalDecorators": true,
     "strictPropertyInitialization": false,
     "declaration": true
-  }
+  },
+  "include": ["src/**/*"],
+  "exclude": ["examples", "node_modules", "dist"]
 }
