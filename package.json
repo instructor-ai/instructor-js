@@ -10,6 +10,7 @@
       "import": "./dist/instructor.mjs",
       "require": "./dist/instructor.js"
     }
+  },
   "publishConfig": {
     "access": "public"
   },
