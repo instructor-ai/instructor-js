@@ -8,11 +8,11 @@ enum CLASIFICATION_LABELS {
   "NOT_SPAM" = "NOT_SPAM"
 }
 
-const SimgpleClasificationSchema = z.object({
+const SimpleClasificationSchema = z.object({
   class_label: z.nativeEnum(CLASIFICATION_LABELS)
 })
 
-type SimpleClasification = z.infer<typeof SimgpleClasificationSchema>
+type SimpleClasification = z.infer<typeof SimpleClasificationSchema>
 
 const oai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY ?? undefined,
