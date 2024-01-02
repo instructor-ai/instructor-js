@@ -1,4 +1,27 @@
-/node_modules
+node_modules
+.next
+build
+dist
+*.tsbuildinfo
+*.gitignore
+*.svg
+*.lock
+*.npmignore
+*.sql
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.ico
+*.sh
+Dockerfile
+Dockerfile.*
+.env
+.env.*
+LICENSE
+*.log
+.DS_Store
+.dockerignore
+*.patch
+*.toml
 
-# don't format tsc output, will break source maps
-/dist

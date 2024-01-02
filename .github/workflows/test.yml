@@ -1,0 +1,34 @@
+name: test-wf
+on: [push]
+
+jobs:
+
+  test:
+    name: run-tests
+    runs-on: ubuntu-latest
+    environment: OPENAI
+    env:
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Setup bun
+        uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: latest
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20.9.0
+
+      - name: Install Dependencies
+        run: bun i
+
+      - run: bun run type-check
+      - run: bun run lint
+
+      - run: bun test
