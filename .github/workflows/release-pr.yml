@@ -26,12 +26,15 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: setup node.js
+      - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: 18.16.0
-      
-      - uses: oven-sh/setup-bun@v1
+          node-version: 20.9.0
+          
+      - name: Setup bun
+        uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: latest
 
       - name: Setup npmrc
         run: echo "//npm.pkg.github.com/:_authToken=$NPM_TOKEN" > .npmrc

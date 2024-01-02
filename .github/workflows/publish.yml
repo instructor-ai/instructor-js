@@ -23,20 +23,15 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v2
-        with:
-          version: 8.6.9
-
       - name: Setup bun
         uses: oven-sh/setup-bun@v1
         with:
           bun-version: latest
 
-      - name: Setup Node.js 18
+      - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: 18.16.0
+          node-version: 20.9.0
 
       - name: Install Dependencies
         run: bun i
