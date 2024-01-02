@@ -1,2 +1,2 @@
-export * as instruct from './patch'
-export * from './patch'
+export * as instruct from "./patch";
+export * from "./patch";
