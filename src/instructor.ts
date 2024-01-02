@@ -159,6 +159,15 @@ class Instructor {
 
     return parser(response)
   }
+
+  /**
+   * Public chat interface.
+   */
+  public chat = {
+    completions: {
+      create: this.chatCompletion
+    }
+  }
 }
 
 type OAIClientExtended = OpenAI &
@@ -175,15 +184,6 @@ export default function (args: { client: OpenAI; mode: MODE }): OAIClientExtende
 
   const instructorWithProxy = new Proxy(instructor, {
     get: (target, prop, receiver) => {
-      if (prop === "chat") {
-        return {
-          completions: {
-            create: target.chatCompletion.bind(target)
-          },
-          ...target.client.chat
-        }
-      }
-
       if (prop in target) {
         return Reflect.get(target, prop, receiver)
       }
