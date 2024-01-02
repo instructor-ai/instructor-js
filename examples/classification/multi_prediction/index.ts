@@ -3,17 +3,17 @@ import Instructor from "@/instructor"
 import OpenAI from "openai"
 import { z } from "zod"
 
-enum MULTI_CLASIFICATION_LABELS {
+enum MULTI_CLASSIFICATION_LABELS {
   "BILLING" = "billing",
   "GENERAL_QUERY" = "general_query",
   "HARDWARE" = "hardware"
 }
 
-const MultiClasificationSchema = z.object({
-  predicted_labels: z.array(z.nativeEnum(MULTI_CLASIFICATION_LABELS))
+const MultiClassificationSchema = z.object({
+  predicted_labels: z.array(z.nativeEnum(MULTI_CLASSIFICATION_LABELS))
 })
 
-type MultiClasification = z.infer<typeof MultiClasificationSchema>
+type MultiClassification = z.infer<typeof MultiClassificationSchema>
 
 const oai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY ?? undefined,
@@ -25,26 +25,26 @@ const client = Instructor({
   mode: "FUNCTIONS"
 })
 
-const createClasification = async (data: string): Promise<MultiClasification | undefined> => {
-  const clasification: MultiClasification = await client.chat.completions.create({
+const createClassification = async (data: string): Promise<MultiClassification | undefined> => {
+  const classification: MultiClassification = await client.chat.completions.create({
     messages: [{ role: "user", content: `"Classify the following support ticket: ${data}` }],
     model: "gpt-3.5-turbo",
-    response_model: MultiClasificationSchema,
+    response_model: MultiClassificationSchema,
     max_retries: 3
   })
 
-  return clasification || undefined
+  return classification || undefined
 }
 
-const clasification = await createClasification(
+const classification = await createClassification(
   "My account is locked and I can't access my billing info. Phone is also broken"
 )
 // OUTPUT: { predicted_labels: [ 'billing', 'hardware' ] }
 
-console.log({ clasification })
+console.log({ classification })
 
 assert(
-  clasification.predicted_labels.includes(MULTI_CLASIFICATION_LABELS.BILLING) &&
-    clasification.predicted_labels.includes(MULTI_CLASIFICATION_LABELS.HARDWARE),
-  `Expected ${clasification.predicted_labels} to include ${MULTI_CLASIFICATION_LABELS.BILLING} and ${MULTI_CLASIFICATION_LABELS.HARDWARE}`
+  classification.predicted_labels.includes(MULTI_CLASSIFICATION_LABELS.BILLING) &&
+    classification.predicted_labels.includes(MULTI_CLASSIFICATION_LABELS.HARDWARE),
+  `Expected ${classification.predicted_labels} to include ${MULTI_CLASSIFICATION_LABELS.BILLING} and ${MULTI_CLASSIFICATION_LABELS.HARDWARE}`
 )

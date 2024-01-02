@@ -3,16 +3,16 @@ import Instructor from "@/instructor"
 import OpenAI from "openai"
 import { z } from "zod"
 
-enum CLASIFICATION_LABELS {
+enum CLASSIFICATION_LABELS {
   "SPAM" = "SPAM",
   "NOT_SPAM" = "NOT_SPAM"
 }
 
-const SimpleClasificationSchema = z.object({
-  class_label: z.nativeEnum(CLASIFICATION_LABELS)
+const SimpleClassificationSchema = z.object({
+  class_label: z.nativeEnum(CLASSIFICATION_LABELS)
 })
 
-type SimpleClasification = z.infer<typeof SimpleClasificationSchema>
+type SimpleClassification = z.infer<typeof SimpleClassificationSchema>
 
 const oai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY ?? undefined,
@@ -24,25 +24,25 @@ const client = Instructor({
   mode: "FUNCTIONS"
 })
 
-const createClasification = async (data: string): Promise<SimpleClasification | undefined> => {
-  const clasification: SimpleClasification = await client.chat.completions.create({
+const createClassification = async (data: string): Promise<SimpleClassification | undefined> => {
+  const classification: SimpleClassification = await client.chat.completions.create({
     messages: [{ role: "user", content: `"Classify the following text: ${data}` }],
     model: "gpt-3.5-turbo",
-    response_model: SimpleClasificationSchema,
+    response_model: SimpleClassificationSchema,
     max_retries: 3
   })
 
-  return clasification || undefined
+  return classification || undefined
 }
 
-const clasification = await createClasification(
+const classification = await createClassification(
   "Hello there I'm a nigerian prince and I want to give you money"
 )
 // OUTPUT: { class_label: 'SPAM' }
 
-console.log({ clasification })
+console.log({ classification })
 
 assert(
-  clasification.class_label === CLASIFICATION_LABELS.SPAM,
-  `Expected ${clasification.class_label} to be ${CLASIFICATION_LABELS.SPAM}`
+  classification.class_label === CLASSIFICATION_LABELS.SPAM,
+  `Expected ${classification.class_label} to be ${CLASSIFICATION_LABELS.SPAM}`
 )
