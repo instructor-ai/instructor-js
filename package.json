@@ -2,9 +2,15 @@
   "name": "instructor-js",
   "version": "0.0.1",
   "description": "structured outputs for llms",
-  "main": "./dist/index.js",
-  "module": "./dist/index.mjs",
-  "types": "./dist/index.d.ts",
+  "main": "./dist/instructor.js",
+  "module": "./dist/instructor.mjs",
+  "types": "./dist/instructor.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/instructor.mjs",
+      "require": "./dist/instructor.js"
+    }
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsup",

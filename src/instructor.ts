@@ -38,12 +38,12 @@ type PatchedChatCompletionCreateParams = ChatCompletionCreateParamsNonStreaming 
   max_retries?: number
 }
 
-export class Instruct {
+export default class Instructor {
   private client: OpenAI
   private mode: MODE
 
   /**
-   * Creates an instance of the `Instruct` class.
+   * Creates an instance of the `Instructor` class.
    * @param {OpenAI} client - The OpenAI client.
    * @param {string} mode - The mode of operation.
    */

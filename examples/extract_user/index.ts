@@ -1,4 +1,4 @@
-import { Instruct } from "@/instructor"
+import Instructor from "@/instructor"
 import OpenAI from "openai"
 import { z } from "zod"
 
@@ -16,7 +16,7 @@ const oai = new OpenAI({
   organization: process.env.OPENAI_ORG_ID ?? undefined
 })
 
-const client = new Instruct({
+const client = new Instructor({
   client: oai,
   mode: "FUNCTIONS"
 })

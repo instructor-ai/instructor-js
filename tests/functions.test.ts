@@ -1,4 +1,4 @@
-import { Instruct } from "@/instructor"
+import Instructor from "@/instructor"
 import { describe, expect, test } from "bun:test"
 import OpenAI from "openai"
 import { z } from "zod"
@@ -18,7 +18,7 @@ async function extractUser() {
     organization: process.env.OPENAI_ORG_ID ?? undefined
   })
 
-  const client = new Instruct({
+  const client = new Instructor({
     client: oai,
     mode: "FUNCTIONS"
   })
