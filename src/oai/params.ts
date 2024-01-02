@@ -1,3 +1,5 @@
+import { MODE } from "@/constants/modes"
+
 export function OAIBuildFunctionParams(definition, params) {
   return {
     ...params,
@@ -19,9 +21,21 @@ export function OAIBuildToolFunctionParams(definition, params) {
   }
 }
 
-export function OAIBuildMessageBasedParams(definition, params) {
+export function OAIBuildMessageBasedParams(definition, params, mode) {
+  const MODE_SPECIFIC_CONFIGS = {
+    [MODE.JSON]: {
+      response_format: { type: "json_object" }
+    },
+    [MODE.JSON_SCHEMA]: {
+      response_format: { type: "json_object", schema: definition }
+    }
+  }
+
+  const modeConfig = MODE_SPECIFIC_CONFIGS[mode] ?? {}
+
   return {
     ...params,
+    ...modeConfig,
     messages: [
       ...(params?.messages ?? []),
       {

@@ -145,7 +145,7 @@ export default class Instructor {
       ...jsonSchema.definitions.response_model
     }
 
-    const paramsForMode = MODE_TO_PARAMS[this.mode](definition, params)
+    const paramsForMode = MODE_TO_PARAMS[this.mode](definition, params, this.mode)
 
     return {
       stream: false,
