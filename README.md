@@ -1,8 +1,8 @@
 # instructor-js
 
-This is a WIP of the [instructor](https://github.com/jxnl/instructor) project implemented in JavaScript.
-I am not a JavaScript developer, so this is a learning project for me, if you're interested in contributing seriously to this project, please contact me on [Twitter](https://twitter.com/jxnlco)
-
+This is a WIP of the port of the [Instructor Python Library](https://github.com/jxnl/instructor) by [@jxnlco](https://twitter.com/jxnlco).
+This library brings structured prompting to LLMs. Instead of receiving text as output, Instructor will coax the LLM to output valid JSON that maps directly to the provided Ecto schema.
+If the LLM fails to do so, or provides values that do not pass your validations, it will provide you utilities to automatically retry with the LLM to correct errors.
 The simple goal of this project is to provide a simple, type-safe, and easy to use interface for the OpenAI API.
 
 ```ts
