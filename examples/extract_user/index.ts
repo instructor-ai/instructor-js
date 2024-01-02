@@ -16,14 +16,16 @@ const oai = new OpenAI({
   organization: process.env.OPENAI_ORG_ID ?? undefined
 })
 
-const client = new Instructor({
+const client = Instructor({
   client: oai,
   mode: "FUNCTIONS"
 })
 
+//@ts-expect-error these types wont work since were using a proxy and just returning the OAI instance type
 const user: User = await client.chat.completions.create({
   messages: [{ role: "user", content: "Jason Liu is 30 years old" }],
   model: "gpt-3.5-turbo",
+  //@ts-expect-error same as above
   response_model: UserSchema,
   max_retries: 3
 })
