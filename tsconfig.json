@@ -10,5 +10,11 @@
     "experimentalDecorators": true,
     "strictPropertyInitialization": false,
     "declaration": true
-  }
+  },
+  "include": [
+    "src/**/*"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
 }
