@@ -1,5 +1,5 @@
 {
-  "name": "instructor-placeholder",
+  "name": "instructor-js",
   "version": "0.0.1",
   "description": "structured outputs for llms",
   "main": "./dist/index.js",
