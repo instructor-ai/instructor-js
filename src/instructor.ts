@@ -62,12 +62,32 @@ export class Instruct {
     ...params
   }: PatchedChatCompletionCreateParams) => {
     let attempts = 0
+    let validationIssues = []
+    let lastMessage = null
 
     const completionParams = this.buildChatCompletionParams(params)
 
     const makeCompletionCall = async () => {
+      let resolvedParams = completionParams
+
       try {
-        const completion = await this.client.chat.completions.create(completionParams)
+        if (validationIssues.length > 0) {
+          resolvedParams = {
+            ...completionParams,
+            messages: [
+              ...completionParams.messages,
+              ...(lastMessage ? [lastMessage] : []),
+              {
+                role: "system",
+                content: `Your last response had the following validation issues, please try again: ${validationIssues.join(
+                  ", "
+                )}`
+              }
+            ]
+          }
+        }
+
+        const completion = await this.client.chat.completions.create(resolvedParams)
         const response = this.parseOAIResponse(completion)
 
         return response
@@ -78,7 +98,24 @@ export class Instruct {
 
     const makeCompletionCallWithRetries = async () => {
       try {
-        return await makeCompletionCall()
+        const data = await makeCompletionCall()
+        const validation = params.response_model.safeParse(data)
+
+        if (!validation.success) {
+          if ("error" in validation) {
+            lastMessage = {
+              role: "assistant",
+              content: JSON.stringify(data)
+            }
+
+            validationIssues = validation.error.issues.map(issue => issue.message)
+            throw validation.error
+          } else {
+            throw new Error("Validation failed.")
+          }
+        }
+
+        return data
       } catch (error) {
         if (attempts < max_retries) {
           attempts++
