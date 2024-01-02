@@ -24,4 +24,4 @@ LICENSE
 .dockerignore
 *.patch
 *.toml
-*.prisma
+
