@@ -46,5 +46,5 @@ console.log({ clasification })
 assert(
   clasification.predicted_labels.includes(MULTI_CLASIFICATION_LABELS.BILLING) &&
     clasification.predicted_labels.includes(MULTI_CLASIFICATION_LABELS.HARDWARE),
-  `Expected ${clasification.predicted_labels} to be include ${MULTI_CLASIFICATION_LABELS.BILLING} and ${MULTI_CLASIFICATION_LABELS.HARDWARE}`
+  `Expected ${clasification.predicted_labels} to include ${MULTI_CLASIFICATION_LABELS.BILLING} and ${MULTI_CLASIFICATION_LABELS.HARDWARE}`
 )
