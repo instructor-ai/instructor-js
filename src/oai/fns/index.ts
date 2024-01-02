@@ -1,5 +1,4 @@
 import { z } from "zod"
-import { zodToJsonSchema } from "zod-to-json-schema"
 
 export type FunctionPayload = {
   name: string
@@ -9,7 +8,6 @@ export type FunctionPayload = {
 }
 
 export type FunctionDefinitionParams<P extends z.ZodType<unknown>, R extends z.ZodType<unknown>> = {
-  paramsSchema: P
   jsonSchema?: object
   name: string
   description: string
@@ -42,7 +40,6 @@ export type FunctionDefinitionInterface = {
  * };
  *
  * const functionDefinition = createFunctionDefinition({
- *   paramsSchema,
  *   name: 'greet',
  *   description: 'Greets a person.',
  *   execute
@@ -50,7 +47,6 @@ export type FunctionDefinitionInterface = {
  *
  */
 function createFunctionDefinition<P extends z.ZodType<unknown>, R extends z.ZodType<unknown>>({
-  paramsSchema,
   jsonSchema,
   name,
   description,
@@ -59,8 +55,7 @@ function createFunctionDefinition<P extends z.ZodType<unknown>, R extends z.ZodT
 }: FunctionDefinitionParams<P, R>): FunctionDefinitionInterface {
   const run = async (params: unknown): Promise<unknown> => {
     try {
-      const validatedParams = paramsSchema.parse(params)
-      return await execute(validatedParams)
+      return await execute(params)
     } catch (error) {
       console.error(`Error executing function ${name}:`, error)
       throw error
@@ -72,7 +67,7 @@ function createFunctionDefinition<P extends z.ZodType<unknown>, R extends z.ZodT
     definition: {
       name: name,
       description: description,
-      parameters: jsonSchema ?? zodToJsonSchema(paramsSchema),
+      parameters: jsonSchema,
       required
     }
   }

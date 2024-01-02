@@ -18,7 +18,7 @@ const oai = new OpenAI({
 
 const client = new Instruct({
   client: oai,
-  mode: ""
+  mode: "FUNCTIONS"
 })
 
 const user: User = await client.chat.completions.create({

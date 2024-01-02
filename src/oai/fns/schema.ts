@@ -109,7 +109,6 @@ export function createSchemaFunction({
   }
 
   return createFunctionDefinition({
-    paramsSchema: schema,
     jsonSchema: propertiesMapping,
     name,
     description,

@@ -12,16 +12,16 @@ import {
 } from "./oai/params"
 import {
   OAIResponseFnArgsParser,
-  OAIResponseTextParser,
+  OAIResponseJSONStringParser,
   OAIResponseToolArgsParser
 } from "./oai/parser"
 
 const MODE_TO_PARSER = {
   [MODE.FUNCTIONS]: OAIResponseFnArgsParser,
   [MODE.TOOLS]: OAIResponseToolArgsParser,
-  [MODE.JSON]: OAIResponseTextParser,
-  [MODE.MD_JSON]: OAIResponseTextParser,
-  [MODE.JSON_SCHEMA]: OAIResponseTextParser
+  [MODE.JSON]: OAIResponseJSONStringParser,
+  [MODE.MD_JSON]: OAIResponseJSONStringParser,
+  [MODE.JSON_SCHEMA]: OAIResponseJSONStringParser
 }
 
 const MODE_TO_PARAMS = {
@@ -58,24 +58,16 @@ export class Instruct {
    * @returns {Promise<any>} The response from the chat completion.
    */
   private chatCompletion = async ({
-    response_model,
     max_retries = 3,
     ...params
   }: PatchedChatCompletionCreateParams) => {
     let attempts = 0
 
-    const functionConfig = this.generateSchemaFunction({
-      schema: response_model
-    })
+    const completionParams = this.buildChatCompletionParams(params)
 
     const makeCompletionCall = async () => {
       try {
-        const completion = await this.client.chat.completions.create({
-          stream: false,
-          ...params,
-          ...functionConfig
-        })
-
+        const completion = await this.client.chat.completions.create(completionParams)
         const response = this.parseOAIResponse(completion)
 
         return response
@@ -100,10 +92,15 @@ export class Instruct {
     return await makeCompletionCallWithRetries()
   }
 
+  /**
+   * Builds the chat completion parameters.
+   * @param {PatchedChatCompletionCreateParams} params - The parameters for chat completion.
+   * @returns {ChatCompletionCreateParamsNonStreaming} The chat completion parameters.
+   */
   private buildChatCompletionParams = ({
     response_model,
     ...params
-  }: PatchedChatCompletionCreateParams) => {
+  }: PatchedChatCompletionCreateParams): ChatCompletionCreateParamsNonStreaming => {
     const { definition } = createSchemaFunction({ schema: response_model })
 
     const paramsForMode = MODE_TO_PARAMS[this.mode](definition, params)
@@ -123,32 +120,6 @@ export class Instruct {
     const parser = MODE_TO_PARSER[this.mode]
 
     return parser(response)
-  }
-
-  /**
-   * Generates a schema function.
-   * @param {ZodSchema<unknown>} schema - The schema to generate the function from.
-   * @returns {Object} The generated function configuration.
-   */
-  private generateSchemaFunction({ schema }) {
-    const { definition } = createSchemaFunction({ schema })
-
-    return {
-      function_call: {
-        name: definition.name
-      },
-      functions: [
-        {
-          name: definition.name,
-          description: definition.description,
-          parameters: {
-            type: "object",
-            properties: definition.parameters,
-            required: definition.required
-          }
-        }
-      ]
-    }
   }
 
   /**
