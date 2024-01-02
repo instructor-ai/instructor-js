@@ -3,7 +3,7 @@ import { describe, expect, test } from "bun:test";
 import OpenAI from "openai";
 import { z } from "zod";
 
-const models = ["gpt-3.5-turbo", "gpt-4"];
+const models = ["gpt-3.5-turbo-1106", "gpt-4-1106-preview"];
 const modes = ["FUNCTIONS", "JSON", "TOOLS"];
 
 const createTestCases = () => {
