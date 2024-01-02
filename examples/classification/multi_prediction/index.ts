@@ -26,13 +26,12 @@ const client = Instructor({
 })
 
 const createClasification = async (data: string): Promise<MultiClasification | undefined> => {
-  const clasification = (await client.chat.completions.create({
+  const clasification: MultiClasification = await client.chat.completions.create({
     messages: [{ role: "user", content: `"Classify the following support ticket: ${data}` }],
     model: "gpt-3.5-turbo",
-    //@ts-expect-error same as above
     response_model: MultiClasificationSchema,
     max_retries: 3
-  })) as MultiClasification
+  })
 
   return clasification || undefined
 }
@@ -40,6 +39,7 @@ const createClasification = async (data: string): Promise<MultiClasification | u
 const clasification = await createClasification(
   "My account is locked and I can't access my billing info. Phone is also broken"
 )
+// OUTPUT: { predicted_labels: [ 'billing', 'hardware' ] }
 
 console.log({ clasification })
 

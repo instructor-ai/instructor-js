@@ -25,13 +25,12 @@ const client = Instructor({
 })
 
 const createClasification = async (data: string): Promise<SimpleClasification | undefined> => {
-  const clasification = (await client.chat.completions.create({
+  const clasification: SimpleClasification = await client.chat.completions.create({
     messages: [{ role: "user", content: `"Classify the following text: ${data}` }],
     model: "gpt-3.5-turbo",
-    //@ts-expect-error same as above
-    response_model: SimgpleClasificationSchema,
+    response_model: SimpleClasificationSchema,
     max_retries: 3
-  })) as SimpleClasification
+  })
 
   return clasification || undefined
 }
@@ -39,6 +38,7 @@ const createClasification = async (data: string): Promise<SimpleClasification | 
 const clasification = await createClasification(
   "Hello there I'm a nigerian prince and I want to give you money"
 )
+// OUTPUT: { class_label: 'SPAM' }
 
 console.log({ clasification })
 
@@ -46,5 +46,3 @@ assert(
   clasification.class_label === CLASIFICATION_LABELS.SPAM,
   `Expected ${clasification.class_label} to be ${CLASIFICATION_LABELS.SPAM}`
 )
-
-console.log(clasification)
