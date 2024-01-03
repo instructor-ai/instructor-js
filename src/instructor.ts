@@ -32,7 +32,7 @@ const MODE_TO_PARAMS = {
   [MODE.JSON_SCHEMA]: OAIBuildMessageBasedParams
 }
 
-interface PatchedChatCompletionCreateParams<Model extends ZodObject<any>> extends ChatCompletionCreateParamsNonStreaming {
+interface PatchedChatCompletionCreateParams<Model extends ZodObject<any> | undefined> extends ChatCompletionCreateParamsNonStreaming {
   //eslint-disable-next-line @typescript-eslint/no-explicit-any
   response_model?: Model
   max_retries?: number
@@ -53,11 +53,19 @@ class Instructor {
   }
 
   /**
-   * Handles chat completion with retries.
-   * @param {PatchedChatCompletionCreateParams} params - The parameters for chat completion.
-   * @returns {Promise<any>} The response from the chat completion.
+   * Handles chat completion with retries and parses the response if a response model is provided.
+   *
+   * @param params - The parameters for chat completion.
+   * @returns The parsed response model if {@link PatchedChatCompletionCreateParams.response_model} is provided, otherwise the original chat completion.
    */
-  async chatCompletion<Model extends ZodObject<any>>({ max_retries = 3, ...params }: PatchedChatCompletionCreateParams<Model>): Promise<z.infer<Model>> {
+  async chatCompletion<Model extends ZodObject<any> | undefined = undefined>({ 
+    max_retries = 3, 
+    ...params
+  }: PatchedChatCompletionCreateParams<Model>): 
+    Promise<Model extends ZodObject<any>
+      ? z.infer<Model> 
+      :  OpenAI.Chat.Completions.ChatCompletion > {
+
     let attempts = 0
     let validationIssues = ""
     let lastMessage: ChatCompletionMessage | null = null
@@ -83,8 +91,10 @@ class Instructor {
         }
 
         const completion = await this.client.chat.completions.create(resolvedParams)
+        if (params.response_model === undefined) {
+          return completion;
+        }
         const response = this.parseOAIResponse(completion)
-
         return response
       } catch (error) {
         throw error
@@ -94,22 +104,20 @@ class Instructor {
     const makeCompletionCallWithRetries = async () => {
       try {
         const data = await makeCompletionCall()
-        if (params.response_model === undefined) {
-          // what do?
-          throw new Error(`TODO: define logic when response_model is undefined or require it`);
-        }
-        const validation = params.response_model.safeParse(data)
-        if (!validation.success) {
-          if ("error" in validation) {
-            lastMessage = {
-              role: "assistant",
-              content: JSON.stringify(data)
+        if (params.response_model) {
+          const validation = params.response_model.safeParse(data)
+          if (!validation.success) {
+            if ("error" in validation) {
+              lastMessage = {
+                role: "assistant",
+                content: JSON.stringify(data)
+              }
+  
+              validationIssues = fromZodError(validation.error).message
+              throw validation.error
+            } else {
+              throw new Error("Validation failed.")
             }
-
-            validationIssues = fromZodError(validation.error).message
-            throw validation.error
-          } else {
-            throw new Error("Validation failed.")
           }
         }
         return data
