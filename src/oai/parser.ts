@@ -35,7 +35,6 @@ export function OAIResponseFnArgsParser(
     | OpenAI.Chat.Completions.ChatCompletion
 ) {
   const parsedData = typeof data === "string" ? JSON.parse(data) : data
-
   const text =
     parsedData.choices?.[0].delta?.function_call?.arguments ??
     parsedData.choices?.[0]?.message?.function_call?.arguments ??
