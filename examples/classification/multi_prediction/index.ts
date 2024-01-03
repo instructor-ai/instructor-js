@@ -26,7 +26,7 @@ const client = Instructor({
 })
 
 const createClassification = async (data: string): Promise<MultiClassification | undefined> => {
-  const classification: MultiClassification = await client.chat.completions.create({
+  const classification = await client.chat.completions.create({
     messages: [{ role: "user", content: `"Classify the following support ticket: ${data}` }],
     model: "gpt-3.5-turbo",
     response_model: MultiClassificationSchema,

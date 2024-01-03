@@ -39,7 +39,7 @@ function createHtmlDocument(data) {
     })
     .join(",\n")
 
-  const edgeDefs = []
+  const edgeDefs: string[] = []
   data.entities.forEach(entity => {
     entity.dependencies.forEach(depId => {
       // @ts-ignore

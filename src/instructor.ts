@@ -58,9 +58,10 @@ class Instructor {
   }
 
   /**
-   * Handles chat completion with retries.
-   * @param {PatchedChatCompletionCreateParams} params - The parameters for chat completion.
-   * @returns {Promise<any>} The response from the chat completion.
+   * Handles chat completion with retries and parses the response if a response model is provided.
+   *
+   * @param params - The parameters for chat completion.
+   * @returns The parsed response model if {@link PatchedChatCompletionCreateParams.response_model} is provided, otherwise the original chat completion.
    */
   chatCompletion = async ({
     max_retries = 3,
@@ -112,7 +113,6 @@ class Instructor {
     const makeCompletionCallWithRetries = async () => {
       try {
         const data = await makeCompletionCall()
-
         if (params.stream) {
           return this.partialStreamResponse({
             stream: data,
@@ -136,7 +136,6 @@ class Instructor {
             throw new Error("Validation failed.")
           }
         }
-        return validation.data
       } catch (error) {
         if (attempts < max_retries) {
           attempts++
