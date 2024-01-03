@@ -34,35 +34,21 @@ async function extractUser() {
     stream: true
   })
 
-  const reader = userStream.readable.getReader()
-  const decoder = new TextDecoder()
+  let user: User = {}
 
-  let result: User = {}
-  let done = false
-
-  while (!done) {
+  for await (const result of userStream) {
     try {
-      const { value, done: doneReading } = await reader.read()
-      done = doneReading
-
-      if (done) {
-        break
-      }
-
-      const chunkValue = decoder.decode(value)
-      result = JSON.parse(chunkValue)
-
+      user = result
       expect(result).toHaveProperty("_isValid")
       expect(result).toHaveProperty("name")
       expect(result).toHaveProperty("age")
     } catch (e) {
-      done = true
       console.log(e)
       break
     }
   }
 
-  return result
+  return user
 }
 
 describe("StreamFunctionCall", () => {

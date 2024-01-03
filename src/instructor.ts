@@ -8,7 +8,7 @@ import {
   OAIResponseJSONStringParser,
   OAIResponseToolArgsParser
 } from "@/oai/parser"
-import { OAIStream } from "@/oai/stream"
+import { OAIStream, readableStreamToAsyncGenerator } from "@/oai/stream"
 import OpenAI from "openai"
 import { ChatCompletionCreateParams } from "openai/resources/index.mjs"
 import { SchemaStream } from "schema-stream"
@@ -176,7 +176,7 @@ class Instructor {
     stream.pipeThrough(parser)
     parser.readable.pipeThrough(validationStream)
 
-    return validationStream
+    return readableStreamToAsyncGenerator(validationStream.readable)
   }
 
   /**

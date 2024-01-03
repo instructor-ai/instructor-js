@@ -49,3 +49,26 @@ export function OAIStream({ res, parser }: OaiStreamArgs): ReadableStream<Uint8A
     }
   })
 }
+
+/**
+ * `readableStreamToAsyncGenerator` converts a ReadableStream to an AsyncGenerator.
+ *
+ * @param {ReadableStream<Uint8Array>} stream - The ReadableStream to convert.
+ * @returns {AsyncGenerator<unknown>} - The converted AsyncGenerator.
+ */
+export async function* readableStreamToAsyncGenerator(
+  stream: ReadableStream<Uint8Array>
+): AsyncGenerator<unknown> {
+  const reader = stream.getReader()
+  const decoder = new TextDecoder()
+
+  while (true) {
+    const { done, value } = await reader.read()
+
+    if (done) {
+      break
+    }
+
+    yield JSON.parse(decoder.decode(value))
+  }
+}
