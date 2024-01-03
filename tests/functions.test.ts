@@ -6,8 +6,36 @@ import { z } from "zod"
 async function extractUser() {
   const UserSchema = z.object({
     age: z.number(),
-    name: z.string().refine(name => name.includes(" "), {
-      message: "Name must contain a space"
+    name: z.string()
+  })
+
+  type User = z.infer<typeof UserSchema>
+
+  const oai = new OpenAI({
+    apiKey: process.env.OPENAI_API_KEY ?? undefined,
+    organization: process.env.OPENAI_ORG_ID ?? undefined
+  })
+
+  const client = Instructor({
+    client: oai,
+    mode: "FUNCTIONS"
+  })
+
+  const user: User = await client.chat.completions.create({
+    messages: [{ role: "user", content: "Jason Liu is 30 years old" }],
+    model: "gpt-3.5-turbo",
+    response_model: UserSchema,
+  })
+
+  return user
+}
+
+async function extractUserValidated() {
+  const UserSchema = z.object({
+    age: z.number(),
+    // check if name is uppercase
+    name: z.string().refine(name => name === name.toUpperCase(), {
+      message: "Name must be uppercase, please try again"
     })
   })
 
@@ -38,6 +66,15 @@ describe("FunctionCall", () => {
     const user = await extractUser()
 
     expect(user.name).toEqual("Jason Liu")
+    expect(user.age).toEqual(30)
+  })
+})
+
+describe("FunctionCallValidated", () => {
+  test("Name should be uppercase based on validation check", async () => {
+    const user = await extractUserValidated()
+
+    expect(user.name).toEqual("JASON LIU")
     expect(user.age).toEqual(30)
   })
 })
