@@ -4,7 +4,9 @@ import { z } from "zod"
 
 const UserSchema = z.object({
   age: z.number(),
-  name: z.string()
+  name: z.string().refine(name => name.includes(" "), {
+    message: "Name must contain a space"
+  })
 })
 
 type User = Partial<z.infer<typeof UserSchema>>
