@@ -9,8 +9,8 @@ import {
   OAIResponseToolArgsParser
 } from "@/oai/parser"
 import OpenAI from "openai"
-import { ChatCompletion, ChatCompletionCreateParamsNonStreaming } from "openai/resources/index.mjs"
-import { ZodObject } from "zod"
+import { ChatCompletion, ChatCompletionCreateParamsNonStreaming, ChatCompletionMessage } from "openai/resources/index.mjs"
+import { ZodObject, z } from "zod"
 import zodToJsonSchema from "zod-to-json-schema"
 import { fromZodError } from "zod-validation-error"
 
@@ -32,9 +32,9 @@ const MODE_TO_PARAMS = {
   [MODE.JSON_SCHEMA]: OAIBuildMessageBasedParams
 }
 
-type PatchedChatCompletionCreateParams = ChatCompletionCreateParamsNonStreaming & {
+interface PatchedChatCompletionCreateParams<Model extends ZodObject<any>> extends ChatCompletionCreateParamsNonStreaming {
   //eslint-disable-next-line @typescript-eslint/no-explicit-any
-  response_model?: ZodObject<any>
+  response_model?: Model
   max_retries?: number
 }
 
@@ -57,10 +57,10 @@ class Instructor {
    * @param {PatchedChatCompletionCreateParams} params - The parameters for chat completion.
    * @returns {Promise<any>} The response from the chat completion.
    */
-  chatCompletion = async ({ max_retries = 3, ...params }: PatchedChatCompletionCreateParams) => {
+  async chatCompletion<Model extends ZodObject<any>>({ max_retries = 3, ...params }: PatchedChatCompletionCreateParams<Model>): Promise<z.infer<Model>> {
     let attempts = 0
     let validationIssues = ""
-    let lastMessage = null
+    let lastMessage: ChatCompletionMessage | null = null
 
     const completionParams = this.buildChatCompletionParams(params)
 
@@ -94,6 +94,10 @@ class Instructor {
     const makeCompletionCallWithRetries = async () => {
       try {
         const data = await makeCompletionCall()
+        if (params.response_model === undefined) {
+          // what do?
+          throw new Error(`TODO: define logic when response_model is undefined or require it`);
+        }
         const validation = params.response_model.safeParse(data)
         if (!validation.success) {
           if ("error" in validation) {
@@ -130,12 +134,12 @@ class Instructor {
   private buildChatCompletionParams = ({
     response_model,
     ...params
-  }: PatchedChatCompletionCreateParams): ChatCompletionCreateParamsNonStreaming => {
+  }: PatchedChatCompletionCreateParams<any>): ChatCompletionCreateParamsNonStreaming => {
     const jsonSchema = zodToJsonSchema(response_model, "response_model")
 
     const definition = {
       name: "response_model",
-      ...jsonSchema.definitions.response_model
+      ...jsonSchema.definitions?.response_model
     }
 
     const paramsForMode = MODE_TO_PARAMS[this.mode](definition, params, this.mode)

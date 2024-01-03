@@ -43,6 +43,6 @@ const classification = await createClassification(
 console.log({ classification })
 
 assert(
-  classification.class_label === CLASSIFICATION_LABELS.SPAM,
-  `Expected ${classification.class_label} to be ${CLASSIFICATION_LABELS.SPAM}`
+  classification?.class_label === CLASSIFICATION_LABELS.SPAM,
+  `Expected ${classification?.class_label} to be ${CLASSIFICATION_LABELS.SPAM}`
 )
