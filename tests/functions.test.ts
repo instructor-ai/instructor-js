@@ -24,7 +24,7 @@ async function extractUser() {
   const user: User = await client.chat.completions.create({
     messages: [{ role: "user", content: "Jason Liu is 30 years old" }],
     model: "gpt-3.5-turbo",
-    response_model: UserSchema,
+    response_model: UserSchema
   })
 
   return user
@@ -33,10 +33,12 @@ async function extractUser() {
 async function extractUserValidated() {
   const UserSchema = z.object({
     age: z.number(),
-    // check if name is uppercase
-    name: z.string().refine(name => name === name.toUpperCase(), {
-      message: "Name must be uppercase, please try again"
-    })
+    name: z
+      .string()
+      .refine(name => name === name.toUpperCase(), {
+        message: "Name must be uppercase, please try again"
+      })
+      .describe("The users name, all uppercase")
   })
 
   type User = z.infer<typeof UserSchema>
@@ -48,7 +50,7 @@ async function extractUserValidated() {
 
   const client = Instructor({
     client: oai,
-    mode: "FUNCTIONS"
+    mode: "TOOLS"
   })
 
   const user: User = await client.chat.completions.create({
@@ -61,16 +63,17 @@ async function extractUserValidated() {
   return user
 }
 
-
 async function extractUserMany() {
   const UserSchema = z.object({
     age: z.number(),
     name: z.string()
   })
 
-  const UsersSchema = z.object({
-    users: z.array(UserSchema)
-  }).describe("Correctly formatted list of users")
+  const UsersSchema = z
+    .object({
+      users: z.array(UserSchema)
+    })
+    .describe("Correctly formatted list of users")
 
   type Users = z.infer<typeof UsersSchema>
 
@@ -93,8 +96,6 @@ async function extractUserMany() {
 
   return user
 }
-
-
 
 describe("FunctionCall", () => {
   test("Should return extracted name and age based on schema", async () => {

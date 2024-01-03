@@ -131,7 +131,10 @@ class Instructor {
     response_model,
     ...params
   }: PatchedChatCompletionCreateParams): ChatCompletionCreateParamsNonStreaming => {
-    const jsonSchema = zodToJsonSchema(response_model, "response_model")
+    const jsonSchema = zodToJsonSchema(response_model, {
+      name: "response_model",
+      errorMessages: true
+    })
 
     const definition = {
       name: "response_model",
