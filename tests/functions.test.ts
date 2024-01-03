@@ -33,12 +33,9 @@ async function extractUser() {
 async function extractUserValidated() {
   const UserSchema = z.object({
     age: z.number(),
-    name: z
-      .string()
-      .refine(name => name === name.toUpperCase(), {
-        message: "Name must be uppercase, please try again"
-      })
-      .describe("The users name, all uppercase")
+    name: z.string().refine(name => name === name.toUpperCase(), {
+      message: "Name must be uppercase, please try again"
+    })
   })
 
   type User = z.infer<typeof UserSchema>
@@ -50,7 +47,8 @@ async function extractUserValidated() {
 
   const client = Instructor({
     client: oai,
-    mode: "TOOLS"
+    mode: "TOOLS",
+    debug: true
   })
 
   const user: User = await client.chat.completions.create({
