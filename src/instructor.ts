@@ -9,7 +9,11 @@ import {
   OAIResponseToolArgsParser
 } from "@/oai/parser"
 import OpenAI from "openai"
-import { ChatCompletion, ChatCompletionCreateParamsNonStreaming } from "openai/resources/index.mjs"
+import type {
+  ChatCompletion,
+  ChatCompletionCreateParamsNonStreaming,
+  ChatCompletionMessageParam
+} from "openai/resources/index.mjs"
 import { ZodObject } from "zod"
 import zodToJsonSchema from "zod-to-json-schema"
 import { fromZodError } from "zod-validation-error"
@@ -60,7 +64,7 @@ class Instructor {
   chatCompletion = async ({ max_retries = 3, ...params }: PatchedChatCompletionCreateParams) => {
     let attempts = 0
     let validationIssues = ""
-    let lastMessage = null
+    let lastMessage: ChatCompletionMessageParam | null = null
 
     const completionParams = this.buildChatCompletionParams(params)
 
@@ -94,6 +98,7 @@ class Instructor {
     const makeCompletionCallWithRetries = async () => {
       try {
         const data = await makeCompletionCall()
+        if (params.response_model === undefined) return data
         const validation = params.response_model.safeParse(data)
         if (!validation.success) {
           if ("error" in validation) {
@@ -108,7 +113,7 @@ class Instructor {
             throw new Error("Validation failed.")
           }
         }
-        return data
+        return validation.data
       } catch (error) {
         if (attempts < max_retries) {
           attempts++
@@ -131,11 +136,17 @@ class Instructor {
     response_model,
     ...params
   }: PatchedChatCompletionCreateParams): ChatCompletionCreateParamsNonStreaming => {
+    if (response_model === undefined) {
+      return {
+        stream: false,
+        ...params
+      }
+    }
     const jsonSchema = zodToJsonSchema(response_model, "response_model")
 
     const definition = {
       name: "response_model",
-      ...jsonSchema.definitions.response_model
+      ...jsonSchema.definitions?.response_model
     }
 
     const paramsForMode = MODE_TO_PARAMS[this.mode](definition, params, this.mode)
