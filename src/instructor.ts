@@ -113,7 +113,7 @@ class Instructor {
             throw new Error("Validation failed.")
           }
         }
-        return data
+        return validation.data
       } catch (error) {
         if (attempts < max_retries) {
           attempts++

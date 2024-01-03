@@ -15,10 +15,14 @@ export const maybe = <T extends z.ZodTypeAny>(schema: T): Maybe<T> =>
   z.object({
     result: schema
       .optional()
-      .describe("Correctly extracted result from the model, if any, otherwise undefined"),
+      .describe(
+        "Correctly extracted result, if any, from the provided context, otherwise undefined"
+      ),
     error: z.boolean().default(false),
     message: z
       .string()
       .optional()
-      .describe("Error message if no result was found, should be short and concise")
+      .describe(
+        "Error message if no result was found, should be short and concise, otherwise undefined"
+      )
   }) satisfies Maybe<T>
