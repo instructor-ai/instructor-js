@@ -61,6 +61,42 @@ async function extractUserValidated() {
   return user
 }
 
+
+async function extractUserMany() {
+  const UserSchema = z.object({
+    age: z.number(),
+    name: z.string()
+  })
+
+  const UsersSchema = z.object({
+    users: z.array(UserSchema)
+  }).describe("Correctly formatted list of users")
+
+  type User = z.infer<typeof UserSchema>
+  type UserMany = z.infer<typeof UsersSchema>
+
+  const oai = new OpenAI({
+    apiKey: process.env.OPENAI_API_KEY ?? undefined,
+    organization: process.env.OPENAI_ORG_ID ?? undefined
+  })
+
+  const client = Instructor({
+    client: oai,
+    mode: "FUNCTIONS"
+  })
+
+  const user: UserMany = await client.chat.completions.create({
+    messages: [{ role: "user", content: "Jason is 30 years old, Sarah is 12" }],
+    model: "gpt-3.5-turbo",
+    response_model: UsersSchema,
+    max_retries: 3
+  })
+
+  return user
+}
+
+
+
 describe("FunctionCall", () => {
   test("Should return extracted name and age based on schema", async () => {
     const user = await extractUser()
@@ -76,5 +112,13 @@ describe("FunctionCallValidated", () => {
 
     expect(user.name).toEqual("JASON LIU")
     expect(user.age).toEqual(30)
+  })
+})
+
+describe("FunctionCallMany", () => {
+  test("Should return extracted name and age based on schema", async () => {
+    const users = await extractUserMany()
+    expect(users.users).toContainEqual({ name: "Jason", age: 30 })
+    expect(users.users).toContainEqual({ name: "Sarah", age: 12 })
   })
 })
