@@ -41,12 +41,13 @@ while (!done) {
     done = doneReading
 
     if (done) {
+      console.log(`\n final: ${JSON.stringify(result)}`)
       break
     }
 
     const chunkValue = decoder.decode(value)
     result = JSON.parse(chunkValue)
-    console.log(result)
+    process.stdout.write(`\r streaming: ${JSON.stringify(result)}`)
   } catch (e) {
     done = true
     console.log(e)
