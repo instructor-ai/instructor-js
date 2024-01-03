@@ -7,11 +7,6 @@ This README provides a quick guide on how to implement and use the `LLMValidator
 The `LLMValidator` constructor takes parameters like `openaiClient`, `statement`, `allowOverride`, `model`, and `temperature`. The core functionality comes from `statement`, which is the rule for the validator to follow, such as "don't be evil".
 
 ```
-const QuestionAnswerSchema = z.object({
-  question: z.string(),
-  answer: z.string()
-})
-
 const oai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY ?? undefined,
   organization: process.env.OPENAI_ORG_ID ?? undefined
