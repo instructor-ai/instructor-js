@@ -10,9 +10,12 @@ import {
 } from "@/oai/parser"
 import { OAIStream, readableStreamToAsyncGenerator } from "@/oai/stream"
 import OpenAI from "openai"
-import { ChatCompletionCreateParams } from "openai/resources/index.mjs"
+import type {
+  ChatCompletionCreateParams,
+  ChatCompletionMessageParam
+} from "openai/resources/index.mjs"
 import { SchemaStream } from "schema-stream"
-import { ZodObject } from "zod"
+import { z } from "zod"
 import zodToJsonSchema from "zod-to-json-schema"
 import { fromZodError } from "zod-validation-error"
 
@@ -34,11 +37,11 @@ const MODE_TO_PARAMS = {
   [MODE.JSON_SCHEMA]: OAIBuildMessageBasedParams
 }
 
-type PatchedChatCompletionCreateParams = ChatCompletionCreateParams & {
-  //eslint-disable-next-line @typescript-eslint/no-explicit-any
-  response_model?: ZodObject<any>
-  max_retries?: number
-}
+type PatchedChatCompletionCreateParams<Model extends z.ZodType<z.ZodTypeAny> = z.ZodTypeAny> =
+  ChatCompletionCreateParams & {
+    response_model?: Model extends z.ZodType<infer T> ? T : never
+    max_retries?: number
+  }
 
 class Instructor {
   readonly client: OpenAI
@@ -59,12 +62,20 @@ class Instructor {
    * @param {PatchedChatCompletionCreateParams} params - The parameters for chat completion.
    * @returns {Promise<any>} The response from the chat completion.
    */
-  chatCompletion = async ({ max_retries = 3, ...params }: PatchedChatCompletionCreateParams) => {
+  chatCompletion = async ({
+    max_retries = 3,
+    response_model,
+    ...params
+  }: PatchedChatCompletionCreateParams) => {
     let attempts = 0
     let validationIssues = ""
-    let lastMessage = null
+    let lastMessage: ChatCompletionMessageParam | null = null
 
-    const completionParams = this.buildChatCompletionParams(params)
+    if (!response_model) {
+      return this.client.chat.completions.create(params)
+    }
+
+    const completionParams = this.buildChatCompletionParams({ ...params, response_model })
 
     const makeCompletionCall = async () => {
       let resolvedParams = completionParams
@@ -105,11 +116,12 @@ class Instructor {
         if (params.stream) {
           return this.partialStreamResponse({
             stream: data,
-            schema: params.response_model
+            schema: response_model
           })
         }
 
-        const validation = params.response_model.safeParse(data)
+        const validation = response_model.safeParse(data)
+
         if (!validation.success) {
           if ("error" in validation) {
             lastMessage = {
@@ -124,7 +136,7 @@ class Instructor {
             throw new Error("Validation failed.")
           }
         }
-        return data
+        return validation.data
       } catch (error) {
         if (attempts < max_retries) {
           attempts++
@@ -195,7 +207,7 @@ class Instructor {
 
     const definition = {
       name: "response_model",
-      ...jsonSchema.definitions.response_model
+      ...jsonSchema.definitions?.response_model
     }
 
     const paramsForMode = MODE_TO_PARAMS[this.mode](definition, params, this.mode)
