@@ -84,7 +84,7 @@ class Instructor {
               ...(lastMessage ? [lastMessage] : []),
               {
                 role: "user",
-                content: `Your last response had the following zod validation issues, please try again and fix any issues: ${validationIssues}`
+                content: `Please correct the function call; errors encountered:\n ${validationIssues}`
               }
             ]
           }
