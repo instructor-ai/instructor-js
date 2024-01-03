@@ -1,6 +1,5 @@
 {
   "singleQuote": true,
   "trailingComma": "all",
-  "endOfLine": "lf",
-  "@typescript-eslint/no-explicit-any": "off"
+  "endOfLine": "lf"
 }
