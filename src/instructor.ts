@@ -14,6 +14,7 @@ import { ChatCompletionCreateParams } from "openai/resources/index.mjs"
 import { SchemaStream } from "schema-stream"
 import { ZodObject } from "zod"
 import zodToJsonSchema from "zod-to-json-schema"
+import { fromZodError } from "zod-validation-error"
 
 import { MODE } from "@/constants/modes"
 
@@ -60,7 +61,7 @@ class Instructor {
    */
   chatCompletion = async ({ max_retries = 3, ...params }: PatchedChatCompletionCreateParams) => {
     let attempts = 0
-    let validationIssues = []
+    let validationIssues = ""
     let lastMessage = null
 
     const completionParams = this.buildChatCompletionParams(params)
@@ -69,17 +70,15 @@ class Instructor {
       let resolvedParams = completionParams
 
       try {
-        if (validationIssues.length > 0) {
+        if (validationIssues) {
           resolvedParams = {
             ...completionParams,
             messages: [
               ...completionParams.messages,
               ...(lastMessage ? [lastMessage] : []),
               {
-                role: "system",
-                content: `Your last response had the following validation issues, please try again: ${validationIssues.join(
-                  ", "
-                )}`
+                role: "user",
+                content: `Your last response had the following zod validation issues, please try again and fix any issues: ${validationIssues}`
               }
             ]
           }
@@ -111,7 +110,6 @@ class Instructor {
         }
 
         const validation = params.response_model.safeParse(data)
-
         if (!validation.success) {
           if ("error" in validation) {
             lastMessage = {
@@ -119,13 +117,13 @@ class Instructor {
               content: JSON.stringify(data)
             }
 
-            validationIssues = validation.error.issues.map(issue => issue.message)
+            validationIssues = fromZodError(validation.error)?.message
+
             throw validation.error
           } else {
             throw new Error("Validation failed.")
           }
         }
-
         return data
       } catch (error) {
         if (attempts < max_retries) {
@@ -190,7 +188,10 @@ class Instructor {
     response_model,
     ...params
   }: PatchedChatCompletionCreateParams): ChatCompletionCreateParams => {
-    const jsonSchema = zodToJsonSchema(response_model, "response_model")
+    const jsonSchema = zodToJsonSchema(response_model, {
+      name: "response_model",
+      errorMessages: true
+    })
 
     const definition = {
       name: "response_model",
