@@ -11,13 +11,24 @@ export function OAIBuildFunctionParams(definition, params) {
 }
 
 export function OAIBuildToolFunctionParams(definition, params) {
+  const { name, ...definitionParams } = definition
+
   return {
     ...params,
     tool_choice: {
       type: "function",
-      function: { name: definition.name }
+      function: { name }
     },
-    tools: [...(params?.tools ?? []), definition]
+    tools: [
+      {
+        type: "function",
+        function: {
+          name,
+          parameters: definitionParams
+        }
+      },
+      ...(params?.tools ?? [])
+    ]
   }
 }
 
@@ -27,7 +38,8 @@ export function OAIBuildMessageBasedParams(definition, params, mode) {
       response_format: { type: "json_object" }
     },
     [MODE.JSON_SCHEMA]: {
-      response_format: { type: "json_object", schema: definition }
+      //TODO: not sure what is different about this mode - the OAI sdk doesnt accept a schema here
+      response_format: { type: "json_object" }
     }
   }
 
@@ -39,7 +51,7 @@ export function OAIBuildMessageBasedParams(definition, params, mode) {
     messages: [
       ...(params?.messages ?? []),
       {
-        role: "SYSTEM",
+        role: "system",
         content: `
           Given a user prompt, you will return fully valid JSON based on the following description and schema.
           You will return no other prose. You will take into account the descriptions for each paramater within the schema
