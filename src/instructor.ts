@@ -149,8 +149,7 @@ class Instructor {
     })
 
     const parser = streamParser.parse({
-      stringStreaming: true,
-      handleUnescapedNewLines: true
+      stringStreaming: true
     })
 
     const textEncoder = new TextEncoder()

@@ -59,8 +59,8 @@ export function OAIResponseToolArgsParser(
   const parsedData = typeof data === "string" ? JSON.parse(data) : data
 
   const text =
-    parsedData.choices?.[0].delta?.tool_call?.function?.arguments ??
-    parsedData.choices?.[0]?.message?.tool_call?.function?.arguments ??
+    parsedData.choices?.[0].delta?.tool_calls?.[0]?.function?.arguments ??
+    parsedData.choices?.[0]?.message?.tool_calls?.[0]?.function?.arguments ??
     null
 
   return text

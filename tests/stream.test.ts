@@ -8,6 +8,9 @@ async function extractUser() {
     age: z.number(),
     name: z.string().refine(name => name.includes(" "), {
       message: "Name must contain a space"
+    }),
+    thingsThatAreAsOldAsTheUser: z.array(z.string(), {
+      description: "a list of random things that are the same age as the user"
     })
   })
 

@@ -6,7 +6,12 @@ const UserSchema = z.object({
   age: z.number(),
   name: z.string().refine(name => name.includes(" "), {
     message: "Name must contain a space"
-  })
+  }),
+  thingsThatAreTheSameAgeAsTheUser: z
+    .array(z.string(), {
+      description: "a list of random things that are the same age as the user"
+    })
+    .min(6)
 })
 
 type User = Partial<z.infer<typeof UserSchema>>
@@ -18,7 +23,7 @@ const oai = new OpenAI({
 
 const client = Instructor({
   client: oai,
-  mode: "FUNCTIONS"
+  mode: "TOOLS"
 })
 
 const userStream = await client.chat.completions.create({
@@ -41,7 +46,7 @@ while (!done) {
     done = doneReading
 
     if (done) {
-      console.log(`\n final: ${JSON.stringify(result)}`)
+      process.stdout.write(`\r final: ${JSON.stringify(result)}\n`)
       break
     }
 
