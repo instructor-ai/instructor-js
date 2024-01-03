@@ -12,6 +12,7 @@ import OpenAI from "openai"
 import { ChatCompletion, ChatCompletionCreateParamsNonStreaming } from "openai/resources/index.mjs"
 import { ZodObject } from "zod"
 import zodToJsonSchema from "zod-to-json-schema"
+import { fromZodError } from "zod-validation-error"
 
 import { MODE } from "@/constants/modes"
 
@@ -58,7 +59,7 @@ class Instructor {
    */
   chatCompletion = async ({ max_retries = 3, ...params }: PatchedChatCompletionCreateParams) => {
     let attempts = 0
-    let validationIssues = []
+    let validationIssues = ""
     let lastMessage = null
 
     const completionParams = this.buildChatCompletionParams(params)
@@ -67,7 +68,7 @@ class Instructor {
       let resolvedParams = completionParams
 
       try {
-        if (validationIssues.length > 0) {
+        if (validationIssues) {
           resolvedParams = {
             ...completionParams,
             messages: [
@@ -75,9 +76,7 @@ class Instructor {
               ...(lastMessage ? [lastMessage] : []),
               {
                 role: "system",
-                content: `Your last response had the following validation issues, please try again: ${validationIssues.join(
-                  ", "
-                )}`
+                content: `Your last response had the following zod validation issues, please try again: ${validationIssues}`
               }
             ]
           }
@@ -96,7 +95,6 @@ class Instructor {
       try {
         const data = await makeCompletionCall()
         const validation = params.response_model.safeParse(data)
-
         if (!validation.success) {
           if ("error" in validation) {
             lastMessage = {
@@ -104,13 +102,12 @@ class Instructor {
               content: JSON.stringify(data)
             }
 
-            validationIssues = validation.error.issues.map(issue => issue.message)
+            validationIssues = fromZodError(validation.error).message
             throw validation.error
           } else {
             throw new Error("Validation failed.")
           }
         }
-
         return data
       } catch (error) {
         if (attempts < max_retries) {

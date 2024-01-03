@@ -41,7 +41,8 @@
   },
   "homepage": "https://github.com/jxnl/instructor-js#readme",
   "dependencies": {
-    "zod-to-json-schema": "^3.22.3"
+    "zod-to-json-schema": "^3.22.3",
+    "zod-validation-error": "^2.1.0"
   },
   "peerDependencies": {
     "openai": ">=4.24.1",
