@@ -35,7 +35,6 @@ export function OAIResponseFnArgsParser(
     | OpenAI.Chat.Completions.ChatCompletion
 ) {
   const parsedData = typeof data === "string" ? JSON.parse(data) : data
-
   const text = parsedData.choices?.[0]?.message?.function_call?.arguments ?? "{}"
 
   return JSON.parse(text)
@@ -56,7 +55,7 @@ export function OAIResponseToolArgsParser(
 ) {
   const parsedData = typeof data === "string" ? JSON.parse(data) : data
 
-  const text = parsedData.choices?.[0]?.message?.tool_call?.function?.arguments ?? "{}"
+  const text = parsedData.choices?.[0]?.message?.tool_calls?.[0]?.function?.arguments ?? "{}"
 
   return JSON.parse(text)
 }
