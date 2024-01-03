@@ -102,7 +102,8 @@ class Instructor {
               content: JSON.stringify(data)
             }
 
-            validationIssues = fromZodError(validation.error).message
+            validationIssues = fromZodError(validation.error)?.message
+
             throw validation.error
           } else {
             throw new Error("Validation failed.")
