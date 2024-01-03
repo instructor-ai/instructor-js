@@ -8,9 +8,11 @@ import {
   OAIResponseJSONStringParser,
   OAIResponseToolArgsParser
 } from "@/oai/parser"
+import { OAIStream } from "@/oai/stream"
 import OpenAI from "openai"
-import { ChatCompletion, ChatCompletionCreateParamsNonStreaming } from "openai/resources/index.mjs"
-import { ZodObject } from "zod"
+import { ChatCompletion, ChatCompletionCreateParams } from "openai/resources/index.mjs"
+import { SchemaStream } from "schema-stream"
+import { z, ZodObject } from "zod"
 import zodToJsonSchema from "zod-to-json-schema"
 
 import { MODE } from "@/constants/modes"
@@ -31,7 +33,7 @@ const MODE_TO_PARAMS = {
   [MODE.JSON_SCHEMA]: OAIBuildMessageBasedParams
 }
 
-type PatchedChatCompletionCreateParams = ChatCompletionCreateParamsNonStreaming & {
+type PatchedChatCompletionCreateParams = ChatCompletionCreateParams & {
   //eslint-disable-next-line @typescript-eslint/no-explicit-any
   response_model?: ZodObject<any>
   max_retries?: number
@@ -84,9 +86,14 @@ class Instructor {
         }
 
         const completion = await this.client.chat.completions.create(resolvedParams)
-        const response = this.parseOAIResponse(completion)
+        const parser = MODE_TO_PARSER[this.mode]
 
-        return response
+        if ("choices" in completion) {
+          const parsedCompletion = parser(completion)
+          return JSON.parse(parsedCompletion)
+        } else {
+          return OAIStream({ res: completion, parser })
+        }
       } catch (error) {
         throw error
       }
@@ -95,6 +102,15 @@ class Instructor {
     const makeCompletionCallWithRetries = async () => {
       try {
         const data = await makeCompletionCall()
+
+        //short circuit if this is a stream for now
+        if (params.stream) {
+          return this.partialStreamResponse({
+            stream: data,
+            schema: params.response_model
+          })
+        }
+
         const validation = params.response_model.safeParse(data)
 
         if (!validation.success) {
@@ -125,15 +141,30 @@ class Instructor {
     return await makeCompletionCallWithRetries()
   }
 
+  private async partialStreamResponse({ stream, schema }) {
+    const streamParser = new SchemaStream(schema, {
+      onKeyComplete: console.log
+    })
+
+    const parser = streamParser.parse({
+      stringStreaming: true,
+      handleUnescapedNewLines: true
+    })
+
+    stream.pipeThrough(parser)
+
+    return parser
+  }
+
   /**
    * Builds the chat completion parameters.
    * @param {PatchedChatCompletionCreateParams} params - The parameters for chat completion.
-   * @returns {ChatCompletionCreateParamsNonStreaming} The chat completion parameters.
+   * @returns {ChatCompletionCreateParams} The chat completion parameters.
    */
   private buildChatCompletionParams = ({
     response_model,
     ...params
-  }: PatchedChatCompletionCreateParams): ChatCompletionCreateParamsNonStreaming => {
+  }: PatchedChatCompletionCreateParams): ChatCompletionCreateParams => {
     const jsonSchema = zodToJsonSchema(response_model, "response_model")
 
     const definition = {
@@ -147,17 +178,6 @@ class Instructor {
       stream: false,
       ...paramsForMode
     }
-  }
-
-  /**
-   * Parses the OAI response.
-   * @param {ChatCompletion} response - The response from the chat completion.
-   * @returns {any} The parsed response.
-   */
-  private parseOAIResponse = (response: ChatCompletion) => {
-    const parser = MODE_TO_PARSER[this.mode]
-
-    return parser(response)
   }
 
   /**
