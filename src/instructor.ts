@@ -14,7 +14,7 @@ import type {
   ChatCompletionCreateParamsNonStreaming,
   ChatCompletionMessageParam
 } from "openai/resources/index.mjs"
-import { ZodObject } from "zod"
+import type { ZodObject, z } from "zod"
 import zodToJsonSchema from "zod-to-json-schema"
 import { fromZodError } from "zod-validation-error"
 
@@ -36,9 +36,9 @@ const MODE_TO_PARAMS = {
   [MODE.JSON_SCHEMA]: OAIBuildMessageBasedParams
 }
 
-type PatchedChatCompletionCreateParams = ChatCompletionCreateParamsNonStreaming & {
+interface PatchedChatCompletionCreateParams<Model extends ZodObject<any> | undefined> extends ChatCompletionCreateParamsNonStreaming {
   //eslint-disable-next-line @typescript-eslint/no-explicit-any
-  response_model?: ZodObject<any>
+  response_model?: Model
   max_retries?: number
 }
 
@@ -65,11 +65,19 @@ class Instructor {
   }
 
   /**
-   * Handles chat completion with retries.
-   * @param {PatchedChatCompletionCreateParams} params - The parameters for chat completion.
-   * @returns {Promise<any>} The response from the chat completion.
+   * Handles chat completion with retries and parses the response if a response model is provided.
+   *
+   * @param params - The parameters for chat completion.
+   * @returns The parsed response model if {@link PatchedChatCompletionCreateParams.response_model} is provided, otherwise the original chat completion.
    */
-  chatCompletion = async ({ max_retries = 3, ...params }: PatchedChatCompletionCreateParams) => {
+  async chatCompletion<Model extends ZodObject<any> | undefined = undefined>({ 
+    max_retries = 3, 
+    ...params
+  }: PatchedChatCompletionCreateParams<Model>): 
+    Promise<Model extends ZodObject<any>
+      ? z.infer<Model> 
+      :  OpenAI.Chat.Completions.ChatCompletion > {
+
     let attempts = 0
     let validationIssues = ""
     let lastMessage: ChatCompletionMessageParam | null = null
@@ -97,7 +105,11 @@ class Instructor {
         this.log("making completion call with params: ", resolvedParams)
 
         const completion = await this.client.chat.completions.create(resolvedParams)
+        if (params.response_model === undefined) {
+          return completion;
+        }
         const response = this.parseOAIResponse(completion)
+
         this.log("Raw completion call response: ", response)
         this.log("Parsed completion call response: ", resolvedParams)
 
@@ -127,8 +139,8 @@ class Instructor {
           } else {
             throw new Error("Validation failed.")
           }
+          return validation.data
         }
-        return validation.data
       } catch (error) {
         if (attempts < max_retries) {
           this.log("Retrying, attempt: ", attempts)
@@ -165,6 +177,7 @@ class Instructor {
     })
 
     this.log("JSON Schema from zod: ", jsonSchema)
+
 
     const definition = {
       name: "response_model",
