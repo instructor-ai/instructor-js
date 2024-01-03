@@ -9,8 +9,9 @@ module.exports = {
     "linebreak-style": "off",
     "semi": "off",
     "indent": "off",
-    "@typescript-eslint/semi": "off",
     "no-unused-vars": "off",
+    "@typescript-eslint/semi": "off",
+    "@typescript-eslint/no-explicit-any": "off"
     "@typescript-eslint/no-unused-vars": [
       "warn",
       {
