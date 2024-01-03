@@ -1,6 +1,6 @@
 import Instructor, { OAIClientExtended } from "@/instructor"
 import OpenAI from "openai"
-import { z, ZodError } from "zod"
+import { z } from "zod"
 
 const ValidatorSchema = z.object({
   isValid: z.boolean(),
