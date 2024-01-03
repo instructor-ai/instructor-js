@@ -167,7 +167,8 @@ class Instructor {
   }
 }
 
-type OAIClientExtended = OpenAI & Instructor
+// TODO: Think about moving this to it's own type file
+export type OAIClientExtended = OpenAI & Instructor
 
 export default function (args: { client: OpenAI; mode: MODE }): OAIClientExtended {
   const instructor = new Instructor(args)
