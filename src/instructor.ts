@@ -9,8 +9,12 @@ import {
   OAIResponseToolArgsParser
 } from "@/oai/parser"
 import OpenAI from "openai"
-import { ChatCompletion, ChatCompletionCreateParamsNonStreaming, ChatCompletionMessage } from "openai/resources/index.mjs"
-import { ZodObject, z } from "zod"
+import type {
+  ChatCompletion,
+  ChatCompletionCreateParamsNonStreaming,
+  ChatCompletionMessageParam
+} from "openai/resources/index.mjs"
+import type { ZodObject, z } from "zod"
 import zodToJsonSchema from "zod-to-json-schema"
 import { fromZodError } from "zod-validation-error"
 
@@ -68,7 +72,7 @@ class Instructor {
 
     let attempts = 0
     let validationIssues = ""
-    let lastMessage: ChatCompletionMessage | null = null
+    let lastMessage: ChatCompletionMessageParam | null = null
 
     const completionParams = this.buildChatCompletionParams(params)
 
@@ -104,7 +108,9 @@ class Instructor {
     const makeCompletionCallWithRetries = async () => {
       try {
         const data = await makeCompletionCall()
-        if (params.response_model) {
+        if (params.response_model === undefined) {
+          return data;
+        } else {
           const validation = params.response_model.safeParse(data)
           if (!validation.success) {
             if ("error" in validation) {
@@ -119,8 +125,8 @@ class Instructor {
               throw new Error("Validation failed.")
             }
           }
+          return validation.data
         }
-        return data
       } catch (error) {
         if (attempts < max_retries) {
           attempts++
