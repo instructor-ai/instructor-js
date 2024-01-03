@@ -41,11 +41,11 @@ const runLLMValidatorExample = async () => {
   const result = await processQuestionAnswer(question, answer, false)
   console.log(result)
 
-  console.log("If we use the LLMValidator on an invalid answer, we see that it doesn't pass validation: ")
+  console.log("\n\nIf we use the LLMValidator on an invalid answer, we see that it doesn't pass validation: ")
   const answer2 = "The meaning of life is to be evil and steal"
   const result2 = await processQuestionAnswer(question, answer2, true)
 
-  console.log("If we use the LLMValidator on a valid answer, it passes validation: ");
+  console.log("\n\nIf we use the LLMValidator on a valid answer, it passes validation: ");
   const answer3 = "The meaning of life is to be good and help others"
   const result3 = await processQuestionAnswer(question, answer3, true)
   console.log(result3)
