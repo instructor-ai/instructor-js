@@ -75,8 +75,8 @@ class Instructor {
               ...completionParams.messages,
               ...(lastMessage ? [lastMessage] : []),
               {
-                role: "system",
-                content: `Your last response had the following zod validation issues, please try again: ${validationIssues}`
+                role: "user",
+                content: `Your last response had the following zod validation issues, please try again and fix any issues: ${validationIssues}`
               }
             ]
           }
