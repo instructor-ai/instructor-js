@@ -1,4 +1,4 @@
-import { LLMValidator } from "@/validator"
+import { LLMValidator } from "@/validators"
 import OpenAI from "openai"
 import { z } from "zod"
 
