@@ -3,7 +3,7 @@ import OpenAI from "openai"
 import * as z from "zod"
 
 const Validator = z.object({
-  isValid: z
+  valid: z
     .boolean()
     .default(true)
     .describe("Whether the attribute is valid based on the requirements"),
@@ -11,7 +11,7 @@ const Validator = z.object({
     .string()
     .optional()
     .describe("The error message if the attribute is not valid, otherwise None"),
-  fixedValue: z
+  suggestedValue: z
     .string()
     .optional()
     .describe("If the attribute is not valid, suggest a new value for the attribute")
@@ -32,28 +32,39 @@ export function llmValidator({
 }) {
   const client = openaiClient ?? Intructor({ client: new OpenAI(), mode: "FUNCTIONS" })
 
-  async function llm(v) {
+  //eslint-disable-next-line @typescript-eslint/no-explicit-any
+  async function llm(v: any, ctx: z.RefinementCtx) {
     const response = await client.chat.completions.create({
       response_model: Validator,
       messages: [
         {
           role: "system",
-          content:
-            "You are a world class validation model. Capable to determine if the following value is valid for the statement, if it is not, explain why and suggest a new value."
+          content: `# MISSION
+You are a world class validation model. Capable to determine if the value provided is valid based on the statement given. If it is not, give a reason why and suggest a new value.
+        `
         },
         {
           role: "user",
-          content: `Does ${v} follow the rules: ${statement}`
+          content: `Does value ${v} follow the statement: ${statement}`
         }
       ],
       model,
       temperature
     })
 
-    // If the response is not valid, return the reason, this could be used in
-    // the future to generate a better response, via reasking mechanism.
-    if (!response.isValid) return response.reason
-    if (allowOverride && !response.isValid && response.fixedValue) return response.fixedValue
+    if (allowOverride && !response.valid && response.suggestedValue) {
+      return response.fixedValue
+    }
+    // If the response is not valid, add the reason as an issue to zod so that
+    // in the future it can generate a better response, via reasking mechanism.
+    if (!response.valid) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: response.reason
+      })
+
+      return z.NEVER
+    }
 
     return v
   }
