@@ -72,8 +72,7 @@ async function extractUserMany() {
     users: z.array(UserSchema)
   }).describe("Correctly formatted list of users")
 
-  type User = z.infer<typeof UserSchema>
-  type UserMany = z.infer<typeof UsersSchema>
+  type Users = z.infer<typeof UsersSchema>
 
   const oai = new OpenAI({
     apiKey: process.env.OPENAI_API_KEY ?? undefined,
@@ -85,7 +84,7 @@ async function extractUserMany() {
     mode: "FUNCTIONS"
   })
 
-  const user: UserMany = await client.chat.completions.create({
+  const user: Users = await client.chat.completions.create({
     messages: [{ role: "user", content: "Jason is 30 years old, Sarah is 12" }],
     model: "gpt-3.5-turbo",
     response_model: UsersSchema,
