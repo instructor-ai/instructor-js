@@ -14,7 +14,7 @@ import type {
   ChatCompletionCreateParamsNonStreaming,
   ChatCompletionMessageParam
 } from "openai/resources/index.mjs"
-import type { ZodObject, z } from "zod"
+import type { z, ZodObject } from "zod"
 import zodToJsonSchema from "zod-to-json-schema"
 import { fromZodError } from "zod-validation-error"
 
@@ -36,7 +36,8 @@ const MODE_TO_PARAMS = {
   [MODE.JSON_SCHEMA]: OAIBuildMessageBasedParams
 }
 
-interface PatchedChatCompletionCreateParams<Model extends ZodObject<any> | undefined> extends ChatCompletionCreateParamsNonStreaming {
+interface PatchedChatCompletionCreateParams<Model extends ZodObject<any> | undefined>
+  extends ChatCompletionCreateParamsNonStreaming {
   //eslint-disable-next-line @typescript-eslint/no-explicit-any
   response_model?: Model
   max_retries?: number
@@ -62,14 +63,12 @@ class Instructor {
    * @param params - The parameters for chat completion.
    * @returns The parsed response model if {@link PatchedChatCompletionCreateParams.response_model} is provided, otherwise the original chat completion.
    */
-  async chatCompletion<Model extends ZodObject<any> | undefined = undefined>({ 
-    max_retries = 3, 
+  async chatCompletion<Model extends ZodObject<any> | undefined = undefined>({
+    max_retries = 3,
     ...params
-  }: PatchedChatCompletionCreateParams<Model>): 
-    Promise<Model extends ZodObject<any>
-      ? z.infer<Model> 
-      :  OpenAI.Chat.Completions.ChatCompletion > {
-
+  }: PatchedChatCompletionCreateParams<Model>): Promise<
+    Model extends ZodObject<any> ? z.infer<Model> : OpenAI.Chat.Completions.ChatCompletion
+  > {
     let attempts = 0
     let validationIssues = ""
     let lastMessage: ChatCompletionMessageParam | null = null
@@ -96,7 +95,7 @@ class Instructor {
 
         const completion = await this.client.chat.completions.create(resolvedParams)
         if (params.response_model === undefined) {
-          return completion;
+          return completion
         }
         const response = this.parseOAIResponse(completion)
         return response
@@ -109,7 +108,7 @@ class Instructor {
       try {
         const data = await makeCompletionCall()
         if (params.response_model === undefined) {
-          return data;
+          return data
         } else {
           const validation = params.response_model.safeParse(data)
           if (!validation.success) {
@@ -118,7 +117,7 @@ class Instructor {
                 role: "assistant",
                 content: JSON.stringify(data)
               }
-  
+
               validationIssues = fromZodError(validation.error).message
               throw validation.error
             } else {
