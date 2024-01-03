@@ -10,9 +10,9 @@ import {
 } from "@/oai/parser"
 import { OAIStream } from "@/oai/stream"
 import OpenAI from "openai"
-import { ChatCompletion, ChatCompletionCreateParams } from "openai/resources/index.mjs"
+import { ChatCompletionCreateParams } from "openai/resources/index.mjs"
 import { SchemaStream } from "schema-stream"
-import { z, ZodObject } from "zod"
+import { ZodObject } from "zod"
 import zodToJsonSchema from "zod-to-json-schema"
 
 import { MODE } from "@/constants/modes"
@@ -103,7 +103,6 @@ class Instructor {
       try {
         const data = await makeCompletionCall()
 
-        //short circuit if this is a stream for now
         if (params.stream) {
           return this.partialStreamResponse({
             stream: data,
@@ -142,8 +141,11 @@ class Instructor {
   }
 
   private async partialStreamResponse({ stream, schema }) {
+    let _activeKey = null
     const streamParser = new SchemaStream(schema, {
-      onKeyComplete: console.log
+      onKeyComplete: ({ activeKey }) => {
+        _activeKey = activeKey
+      }
     })
 
     const parser = streamParser.parse({
@@ -151,9 +153,33 @@ class Instructor {
       handleUnescapedNewLines: true
     })
 
-    stream.pipeThrough(parser)
+    const textEncoder = new TextEncoder()
+    const textDecoder = new TextDecoder()
 
-    return parser
+    const validationStream = new TransformStream({
+      transform: async (chunk, controller): Promise<void> => {
+        try {
+          const parsedChunk = JSON.parse(textDecoder.decode(chunk))
+          const validation = schema.safeParse(parsedChunk)
+
+          controller.enqueue(
+            textEncoder.encode(
+              JSON.stringify({ ...parsedChunk, _isValid: validation.success, _activeKey })
+            )
+          )
+        } catch (e) {
+          console.error(`Error in the partial stream validation stream`, e, chunk)
+        }
+      },
+      flush() {
+        this.activeKey = undefined
+      }
+    })
+
+    stream.pipeThrough(parser)
+    parser.readable.pipeThrough(validationStream)
+
+    return validationStream
   }
 
   /**

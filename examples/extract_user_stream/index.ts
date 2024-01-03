@@ -7,7 +7,7 @@ const UserSchema = z.object({
   name: z.string()
 })
 
-type User = z.infer<typeof UserSchema>
+type User = Partial<z.infer<typeof UserSchema>>
 
 const oai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY ?? undefined,
@@ -30,7 +30,7 @@ const userStream = await client.chat.completions.create({
 const reader = userStream.readable.getReader()
 const decoder = new TextDecoder()
 
-let result = {}
+let result: User = {}
 let done = false
 
 while (!done) {
