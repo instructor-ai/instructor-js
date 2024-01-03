@@ -7,6 +7,24 @@ const QuestionAnswerSchema = z.object({
   answer: z.string()
 })
 
+const QuestionAnswerSchemaNoEvil = z.object({
+  question: z.string(),
+  answer: z.string().refine(async answer => {
+    const validator = new LLMValidator({
+      statement: "don't say objectionable things",
+      allowOverride: false,
+      model: "gpt-3.5-turbo",
+      temperature: 0,
+      openaiClient: new OpenAI({
+        apiKey: process.env.OPENAI_API_KEY ?? undefined,
+        organization: process.env.OPENAI_ORG_ID ?? undefined
+      })
+    })
+    await validator.validate(answer)
+    return true
+  })
+})
+
 const oai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY ?? undefined,
   organization: process.env.OPENAI_ORG_ID ?? undefined
@@ -22,11 +40,12 @@ const validator = new LLMValidator({
 
 const processQuestionAnswer = async (question, answer, shouldValidate) => {
   try {
-    if (shouldValidate) {
-      answer = await validator.validate(answer)
-    }
     const qa = { question, answer }
-    QuestionAnswerSchema.parse(qa)
+    if (shouldValidate) {
+      await QuestionAnswerSchemaNoEvil.parseAsync(qa)
+    } else {
+      QuestionAnswerSchema.parse(qa)
+    }
     return qa
   } catch (error) {
     console.error(error)

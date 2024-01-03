@@ -21,6 +21,30 @@ const validator = new LLMValidator({
 })
 ```
 
+You can attach a validator directly to a schema like this:
+
+```
+const QuestionAnswerSchemaNoEvil = z.object({
+  question: z.string(),
+  answer: z.string().refine(async answer => {
+    const validator = new LLMValidator({
+      statement: "don't say objectionable things",
+      allowOverride: false,
+      model: "gpt-3.5-turbo",
+      temperature: 0,
+      openaiClient: new OpenAI({
+        apiKey: process.env.OPENAI_API_KEY ?? undefined,
+        organization: process.env.OPENAI_ORG_ID ?? undefined
+      })
+    })
+    await validator.validate(answer)
+    return true
+  })
+})
+
+await QuestionAnswerSchemaNoEvil.parseAsync(qa)
+```
+
 ### Example Usage
 You can test this by running `bun examples/validators/index.ts`.
 
