@@ -82,7 +82,7 @@ async function extractUserMany() {
 
   const client = Instructor({
     client: oai,
-    mode: "TOOLS"
+    mode: "FUNCTIONS"
   })
 
   const user: Users = await client.chat.completions.create({
