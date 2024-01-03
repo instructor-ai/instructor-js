@@ -118,7 +118,9 @@ describe("FunctionCallValidated", () => {
 describe("FunctionCallMany", () => {
   test("Should return extracted name and age based on schema", async () => {
     const users = await extractUserMany()
-    expect(users.users).toContainEqual({ name: "Jason", age: 30 })
-    expect(users.users).toContainEqual({ name: "Sarah", age: 12 })
+    expect(users.users[0].name).toEqual("Jason")
+    expect(users.users[0].age).toEqual(30)
+    expect(users.users[1].name).toEqual("Sarah")
+    expect(users.users[1].age).toEqual(12)
   })
 })
