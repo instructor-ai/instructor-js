@@ -7,21 +7,19 @@ const UserSchema = z.object({
   name: z.string()
 })
 
-type User = z.infer<typeof UserSchema>
-
 const oai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY ?? undefined,
-  organization: process.env.OPENAI_ORG_ID ?? undefined
+  baseURL: "https://api.endpoints.anyscale.com/v1",
+  apiKey: process.env.ANYSCALE_API_KEY ?? undefined,
 })
 
 const client = Instructor({
   client: oai,
-  mode: "TOOLS"
+  mode: "JSON_SCHEMA"
 })
 
 const user = await client.chat.completions.create({
   messages: [{ role: "user", content: "Jason Liu is 30 years old" }],
-  model: "gpt-4",
+  model: "mistralai/Mixtral-8x7B-Instruct-v0.1",
   response_model: UserSchema,
   max_retries: 3
 })
