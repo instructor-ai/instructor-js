@@ -14,6 +14,7 @@ import type {
   ChatCompletionCreateParams,
   ChatCompletionMessageParam
 } from "openai/resources/index.mjs"
+import { Stream } from "openai/streaming.mjs"
 import { SchemaStream } from "schema-stream"
 import { z } from "zod"
 import zodToJsonSchema from "zod-to-json-schema"
@@ -63,20 +64,17 @@ class Instructor {
    * @param params - The parameters for chat completion.
    * @returns The parsed response model if {@link PatchedChatCompletionCreateParams.response_model} is provided, otherwise the original chat completion.
    */
-  chatCompletion = async ({
+  chatCompletion = async <Model extends z.ZodType<z.ZodTypeAny>>({
     max_retries = 3,
-    response_model,
     ...params
-  }: PatchedChatCompletionCreateParams) => {
+  }: PatchedChatCompletionCreateParams<Model>): Promise<
+    Model extends z.ZodType<infer T> ? T : never
+  > => {
     let attempts = 0
     let validationIssues = ""
     let lastMessage: ChatCompletionMessageParam | null = null
 
-    if (!response_model) {
-      return this.client.chat.completions.create(params)
-    }
-
-    const completionParams = this.buildChatCompletionParams({ ...params, response_model })
+    const completionParams = this.buildChatCompletionParams({ ...params })
 
     const makeCompletionCall = async () => {
       let resolvedParams = completionParams
@@ -116,11 +114,11 @@ class Instructor {
         if (params.stream) {
           return this.partialStreamResponse({
             stream: data,
-            schema: response_model
+            schema: params.response_model
           })
         }
 
-        const validation = response_model.safeParse(data)
+        const validation = params.response_model!.safeParse(data)
 
         if (!validation.success) {
           if ("error" in validation) {
@@ -217,12 +215,23 @@ class Instructor {
     }
   }
 
-  /**
-   * Public chat interface.
-   */
+  chatCompletionWithoutModel = async (
+    params: Omit<PatchedChatCompletionCreateParams, "response_model">
+  ): Promise<
+    Stream<OpenAI.Chat.Completions.ChatCompletionChunk> | OpenAI.Chat.Completions.ChatCompletion
+  > => {
+    return this.client.chat.completions.create(params)
+  }
+
   public chat = {
     completions: {
-      create: this.chatCompletion
+      create: (params: PatchedChatCompletionCreateParams) => {
+        if ("response_model" in params) {
+          return this.chatCompletion(params)
+        } else {
+          return this.chatCompletionWithoutModel(params)
+        }
+      }
     }
   }
 }
