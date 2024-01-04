@@ -20,6 +20,8 @@
     "lint": "eslint src/",
     "type-check": "tsc --noEmit",
     "prepare": "husky install",
+    "format:write": "prettier --write \"**/*.{ts,tsx,mdx}\"",
+    "format:check": "prettier --check \"**/*.{ts,tsx,mdx}\"",
     "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist",
     "changeset": "changeset",
     "version-packages": "changeset version",

@@ -47,7 +47,7 @@ async function extractUserValidated() {
 
   const client = Instructor({
     client: oai,
-    mode: "FUNCTIONS",
+    mode: "FUNCTIONS"
   })
 
   const user: User = await client.chat.completions.create({
