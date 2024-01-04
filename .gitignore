@@ -89,3 +89,4 @@ dist
 
 tsconfig.tsbuildinfo
 
+.cache/
