@@ -130,6 +130,7 @@ nav:
   - Tips: 'concepts/prompting.md'
   - Cookbook:
     - Overview: 'examples/index.md'
+    - Classification: 'examples/classification.md'
   - Blog:
     - "blog/index.md"
   
