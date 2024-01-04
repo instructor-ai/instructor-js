@@ -86,19 +86,15 @@ This project is licensed under the terms of the MIT License.
 - [ ] Support Streaming
 - [ ] Optional/Maybe types
 - [ ] Add Tutorials, include in docs
-    - [ ] Text Classification
+    - [x] Text Classification
+    - [ ] Search Queries
+    - [ ] Query Decomposition
+    - [ ] Citations
+    - [ ] Knowledge Graph
     - [ ] Self Critique
     - [ ] Image Extracting Tables
     - [ ] Moderation
-    - [ ] Citations
-    - [ ] Knowledge Graph
     - [ ] Entity Resolution
-    - [ ] Search Queries
-    - [ ] Query Decomposition
-    - [ ] Recursive Schemas
-    - [ ] Table Extraction
     - [ ] Action Item and Dependency Mapping
-    - [ ] Multi-File Code Generation
-    - [ ] PII Data Sanitization
 
 These translations provide a structured approach to creating TypeScript schemas with Zod, mirroring the functionality and intent of the original Python examples.
