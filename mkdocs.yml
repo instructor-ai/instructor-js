@@ -128,12 +128,8 @@ nav:
     - Installation: 'installation.md'
     - Contributing: 'contributing.md'
   - Tips: 'concepts/prompting.md'
-  - Concepts:
-    - Philosophy: 'concepts/philosophy.md'
   - Cookbook:
     - Overview: 'examples/index.md'
-  - CLI Reference:
-  - API Reference:
   - Blog:
     - "blog/index.md"
   
