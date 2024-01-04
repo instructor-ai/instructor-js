@@ -127,7 +127,8 @@ nav:
     - Help with Instructor: 'help.md'
     - Installation: 'installation.md'
     - Contributing: 'contributing.md'
-  - Tips: 'concepts/prompting.md'
+  - Tips: concepts/prompting.md'
+  - Concepts: 
     - Modes: 'concepts/modes.md'
     - Schema: 'concepts/schema.md'
   - Cookbook:
