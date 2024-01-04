@@ -52,7 +52,7 @@ async function extractUserValidated() {
 
   const user: User = await client.chat.completions.create({
     messages: [{ role: "user", content: "Jason Liu is 30 years old" }],
-    model: "gpt-3.5-turbo",
+    model: "gpt-4",
     response_model: UserSchema,
     max_retries: 3
   })
