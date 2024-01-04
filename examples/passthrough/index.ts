@@ -12,9 +12,10 @@ const client = Instructor({
 })
 
 // ensures that when no `response_model` is provided, the response type is `ChatCompletion`
-const completion = await client.chat.completions.create({
+const completion = (await client.chat.completions.create({
   messages: [{ role: "user", content: "Jason Liu is 30 years old" }],
   model: "gpt-3.5-turbo",
   max_retries: 3
-}) satisfies OpenAI.Chat.ChatCompletion; 
+})) satisfies OpenAI.Chat.ChatCompletion
 
+console.log(completion)

@@ -8,7 +8,7 @@ _Structured extraction in Typescript, powered by llms, designed for simplicity, 
 [![Documentation](https://img.shields.io/badge/docs-available-brightgreen)](https://jxnl.github.io/instructor-js)
 [![GitHub issues](https://img.shields.io/github/issues/jxnl/instructor-js.svg)](https://github.com/jxnl/instructor-js/issues)
 
-Dive into the world of Python-based structured extraction, by OpenAI's function calling API and Pydantic, the most widely used data validation library for Python. Instructor stands out for its simplicity, transparency, and user-centric design. Whether you're a seasoned developer or just starting out, you'll find Instructor's approach intuitive and steerable.
+Dive into the world of Typescript-based structured extraction, by OpenAI's function calling API and Zod, typeScript-first schema validation with static type inference. Instructor stands out for its simplicity, transparency, and user-centric design. Whether you're a seasoned developer or just starting out, you'll find Instructor's approach intuitive and steerable.
 
 !!! tip "Support in other languages"
 

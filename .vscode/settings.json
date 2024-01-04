@@ -6,7 +6,7 @@
   "editor.formatOnPaste": false,
   "editor.trimAutoWhitespace": true,
   "editor.codeActionsOnSave": {
-    "source.fixAll.eslint": true,
+    "source.fixAll.eslint": true
   },
   "[html]": {
     "editor.defaultFormatter": "GitHub.copilot"
@@ -23,13 +23,9 @@
     "editor.tabSize": 2,
     "editor.formatOnSave": true,
     "editor.formatOnType": false,
-    "editor.formatOnPaste": true,
+    "editor.formatOnPaste": true
   },
-  "eslint.validate": [
-    "javascript",
-    "typescript",
-    "typescriptreact",
-  ],
+  "eslint.validate": ["javascript", "typescript", "typescriptreact"],
   "eslint.debug": true,
   "typescript.tsdk": "./node_modules/typescript/lib",
   "typescript.enablePromptUseWorkspaceTsdk": true,
@@ -46,6 +42,6 @@
     "editor.defaultFormatter": "vscode.json-language-features"
   },
   "[typescript]": {
-    "editor.defaultFormatter": "vscode.typescript-language-features",
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
   }
 }

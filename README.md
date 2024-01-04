@@ -7,6 +7,7 @@ _Structured extraction in Typescript, powered by llms, designed for simplicity, 
 [![Twitter Follow](https://img.shields.io/twitter/follow/jxnlco?style=social)](https://twitter.com/jxnlco)
 [![Documentation](https://img.shields.io/badge/docs-available-brightgreen)](https://jxnl.github.io/instructor-js)
 [![GitHub issues](https://img.shields.io/github/issues/jxnl/instructor-js.svg)](https://github.com/jxnl/instructor-js/issues)
+[![Discord](https://img.shields.io/discord/1192334452110659664?label=discord)](https://discord.gg/CV8sPM5k5Y)
 
 Dive into the world of Python-based structured extraction, by OpenAI's function calling API and Pydantic, the most widely used data validation library for Python. Instructor stands out for its simplicity, transparency, and user-centric design. Whether you're a seasoned developer or just starting out, you'll find Instructor's approach intuitive and steerable.
 
@@ -86,19 +87,15 @@ This project is licensed under the terms of the MIT License.
 - [ ] Support Streaming
 - [ ] Optional/Maybe types
 - [ ] Add Tutorials, include in docs
-    - [ ] Text Classification
+    - [x] Text Classification
+    - [ ] Search Queries
+    - [ ] Query Decomposition
+    - [ ] Citations
+    - [ ] Knowledge Graph
     - [ ] Self Critique
     - [ ] Image Extracting Tables
     - [ ] Moderation
-    - [ ] Citations
-    - [ ] Knowledge Graph
     - [ ] Entity Resolution
-    - [ ] Search Queries
-    - [ ] Query Decomposition
-    - [ ] Recursive Schemas
-    - [ ] Table Extraction
     - [ ] Action Item and Dependency Mapping
-    - [ ] Multi-File Code Generation
-    - [ ] PII Data Sanitization
 
 These translations provide a structured approach to creating TypeScript schemas with Zod, mirroring the functionality and intent of the original Python examples.
