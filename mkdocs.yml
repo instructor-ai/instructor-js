@@ -127,9 +127,15 @@ nav:
     - Help with Instructor: 'help.md'
     - Installation: 'installation.md'
     - Contributing: 'contributing.md'
-  - Tips: 'concepts/prompting.md'
+  - Concepts: 
+    - Overview: 'concepts/tips.md'
+    - Modes: 'concepts/modes.md'
+    - Schema: 'concepts/schema.md'
+    - Streaming: 'concepts/streaming.md'
   - Cookbook:
     - Overview: 'examples/index.md'
+    - Classification: 'examples/classification.md'
+    - Query Decomposition: 'examples/query_decomposition.md'
   - Blog:
     - "blog/index.md"
   
