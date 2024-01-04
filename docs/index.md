@@ -1,4 +1,4 @@
-# instructor-js
+# Instructor-js
 
 _Structured extraction in Typescript, powered by llms, designed for simplicity, transparency, and control._
 
@@ -21,7 +21,7 @@ Dive into the world of Python-based structured extraction, by OpenAI's function 
 
 ## Usage
 
-```js
+```ts
 import Instructor from "@/instructor"
 import OpenAI from "openai"
 import { z } from "zod"
@@ -78,27 +78,3 @@ If you want to help out, checkout some of the issues marked as `good-first-issue
 ## License
 
 This project is licensed under the terms of the MIT License.
-
-## TODO
-
-- [ ] Add `llm_validator`
-- [ ] Logging for Distillation / Finetuning
-- [ ] Support Streaming
-- [ ] Optional/Maybe types
-- [ ] Add Tutorials, include in docs
-    - [ ] Text Classification
-    - [ ] Self Critique
-    - [ ] Image Extracting Tables
-    - [ ] Moderation
-    - [ ] Citations
-    - [ ] Knowledge Graph
-    - [ ] Entity Resolution
-    - [ ] Search Queries
-    - [ ] Query Decomposition
-    - [ ] Recursive Schemas
-    - [ ] Table Extraction
-    - [ ] Action Item and Dependency Mapping
-    - [ ] Multi-File Code Generation
-    - [ ] PII Data Sanitization
-
-These translations provide a structured approach to creating TypeScript schemas with Zod, mirroring the functionality and intent of the original Python examples.
