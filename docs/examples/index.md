@@ -7,3 +7,4 @@
 ## Table of Contents
 
 - [How do I do classification?](./classification.md)
+- [How can I decompose queries?](./query_decomposition.md)
