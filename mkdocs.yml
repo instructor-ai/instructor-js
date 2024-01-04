@@ -128,6 +128,8 @@ nav:
     - Installation: 'installation.md'
     - Contributing: 'contributing.md'
   - Tips: 'concepts/prompting.md'
+    - Modes: 'concepts/modes.md'
+    - Schema: 'concepts/schema.md'
   - Cookbook:
     - Overview: 'examples/index.md'
     - Classification: 'examples/classification.md'
