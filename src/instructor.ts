@@ -114,9 +114,9 @@ class Instructor {
         const data = await makeCompletionCall()
         if (params.response_model === undefined) return data
         const validation = params.response_model.safeParse(data)
-        
+
         this.log("Completion validation: ", validation)
-        
+
         if (!validation.success) {
           if ("error" in validation) {
             lastMessage = {
@@ -169,7 +169,6 @@ class Instructor {
     })
 
     this.log("JSON Schema from zod: ", jsonSchema)
-
 
     const definition = {
       name: "response_model",
