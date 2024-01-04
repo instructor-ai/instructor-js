@@ -24,7 +24,7 @@ const oai = new OpenAI({
 
 const client = Instructor({
   client: oai,
-  mode: "JSON",
+  mode: "FUNCTIONS",
 })
 
 const createQueryPlan = async (question: string): Promise<QueryPlan | undefined> => {
