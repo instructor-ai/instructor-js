@@ -29,7 +29,7 @@ async function extractUser() {
   const userStream = await client.chat.completions.create({
     messages: [{ role: "user", content: "Jason Liu is 30 years old" }],
     model: "gpt-3.5-turbo",
-    response_model: { UserSchema },
+    response_model: UserSchema,
     max_retries: 3,
     stream: true
   })
