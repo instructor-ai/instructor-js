@@ -26,7 +26,7 @@ const client = Instructor({
   mode: "TOOLS"
 })
 
-const user = await client.chat.completions.create({
+const user: User = await client.chat.completions.create({
   messages: [{ role: "user", content: "Jason Liu is 30 years old" }],
   model: "gpt-4",
   response_model: UserSchema,

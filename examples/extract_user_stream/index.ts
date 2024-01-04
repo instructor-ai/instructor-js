@@ -34,28 +34,16 @@ const userStream = await client.chat.completions.create({
   stream: true
 })
 
-const reader = userStream.readable.getReader()
-const decoder = new TextDecoder()
+let user: User = {}
 
-let result: User = {}
-let done = false
-
-while (!done) {
+for await (const result of userStream) {
   try {
-    const { value, done: doneReading } = await reader.read()
-    done = doneReading
-
-    if (done) {
-      process.stdout.write(`\r final: ${JSON.stringify(result)}\n`)
-      break
-    }
-
-    const chunkValue = decoder.decode(value)
-    result = JSON.parse(chunkValue)
+    user = result
     process.stdout.write(`\r streaming: ${JSON.stringify(result)}`)
   } catch (e) {
-    done = true
     console.log(e)
     break
   }
 }
+
+console.log(`\n final result: ${JSON.stringify(user)}`)

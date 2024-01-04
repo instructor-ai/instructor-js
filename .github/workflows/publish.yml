@@ -48,7 +48,7 @@ jobs:
         id: changesets
         uses: changesets/action@v1
         with:
-          publish: bun publish-packages
+          publish: bun publish:latest
           createGithubReleases: true
 
         env:
