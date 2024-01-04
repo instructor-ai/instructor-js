@@ -43,13 +43,17 @@ export function OAIBuildToolFunctionParams(definition, params) {
 }
 
 export function OAIBuildMessageBasedParams(definition, params, mode) {
+  const { name, ...jsonSchema } = definition
+
   const MODE_SPECIFIC_CONFIGS = {
     [MODE.JSON]: {
       response_format: { type: "json_object" }
     },
     [MODE.JSON_SCHEMA]: {
-      //TODO: not sure what is different about this mode - the OAI sdk doesnt accept a schema here
-      response_format: { type: "json_object" }
+      response_format: {
+        type: "json_object",
+        schema: jsonSchema
+      }
     }
   }
 
