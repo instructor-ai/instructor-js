@@ -1,8 +1,8 @@
-We would love for you to contribute to `Instructor`.
+We would love for you to contribute to `Instructor-js`.
 
-## [Evals](https://github.com/jxnl/instructor/tree/main/tests/openai/evals)
+## [Evals](https://github.com/jxnl/instructor-js/tree/main/tests/openai/evals)
 
-We invite you to contribute evals in pytest as a way to monitor the quality of the openai models and the instructor library. To get started check out the [jxnl/instructor/tests/evals](https://github.com/jxnl/instructor/tree/main/tests/openai/evals) and contribute your own evals in the form of pytest tests. These evals will be run once a week and the results will be posted.
+We invite you to contribute evals in Jest as a way to monitor the quality of the openai models and the instructor library. To get started check out the [jxnl/instructor-js/tests/evals](https://github.com/jxnl/instructor-js/tree/main/tests/openai/evals) and contribute your own evals in the form of pytest tests. These evals will be run once a week and the results will be posted.
 
 ## Issues
 
