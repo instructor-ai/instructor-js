@@ -64,7 +64,7 @@ export function OAIBuildMessageBasedParams(definition, params, mode) {
         role: "system",
         content: `
           Given a user prompt, you will return fully valid JSON based on the following description and schema.
-          You will return no other prose. You will take into account the descriptions for each paramater within the schema
+          You will return no other prose. You will take into account any descriptions or required paramaters within the schema
           and return a valid JSON object that matches the schema and those instructions.
 
           description: ${definition?.description}
