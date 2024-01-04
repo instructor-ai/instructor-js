@@ -6,12 +6,7 @@ import { z } from "zod"
 async function extractUser() {
   const UserSchema = z.object({
     age: z.number(),
-    name: z.string().refine(name => name.includes(" "), {
-      message: "Name must contain a space"
-    }),
-    thingsThatAreAsOldAsTheUser: z.array(z.string(), {
-      description: "a list of random things that are the same age as the user"
-    })
+    name: z.string()
   })
 
   type User = Partial<z.infer<typeof UserSchema>>
@@ -27,7 +22,7 @@ async function extractUser() {
   })
 
   const userStream = await client.chat.completions.create({
-    messages: [{ role: "user", content: "Jason Liu is 30 years old" }],
+    messages: [{ role: "user", content: "Jason Liu is 30 years old, Sarah is 25 years old" }],
     model: "gpt-3.5-turbo",
     response_model: UserSchema,
     max_retries: 3,
