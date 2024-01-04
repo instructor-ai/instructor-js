@@ -128,7 +128,7 @@ class Instructor {
           })
         }
 
-        const validation = params.response_model!.safeParse(data)
+        const validation = await params.response_model!.safeParseAsync(data)
         this.log("Completion validation: ", validation)
 
         if (!validation.success) {
