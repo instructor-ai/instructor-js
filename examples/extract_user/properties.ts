@@ -13,36 +13,38 @@ const UserSchema = z.object({
   properties: z.array(property)
 })
 
+type User = z.infer<typeof UserSchema>
+
 const oai = new OpenAI({
-  baseURL: "https://api.endpoints.anyscale.com/v1",
-  apiKey: process.env.ANYSCALE_API_KEY ?? undefined,
+  apiKey: process.env.OPENAI_API_KEY ?? undefined,
+  organization: process.env.OPENAI_ORG_ID ?? undefined
 })
 
 const client = Instructor({
   client: oai,
-  mode: "JSON_SCHEMA"
+  mode: "TOOLS"
 })
 
 const user = await client.chat.completions.create({
-  messages: [{ role: "user", content: "Harry Potter" }],
-  model: "mistralai/Mixtral-8x7B-Instruct-v0.1",
+  messages: [{ role: "user", content: "Happy Potter" }],
+  model: "gpt-4",
   response_model: UserSchema,
   max_retries: 3
 })
 
 console.log(user)
-/**
+/** 
  * {
   age: 17,
-  name: "Harry Potter",
+  name: "Happy Potter",
   properties: [
     {
-      name: "House",
-      value: "Gryffindor",
+      name: "Occupation",
+      value: "Student",
     }, {
-      name: "Wand",
-      value: "Holly and Phoenix feather",
+      name: "School",
+      value: "Hogwarts School of Witchcraft and Wizardry",
     }
   ],
 }
- */
+*/

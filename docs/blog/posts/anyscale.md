@@ -37,9 +37,15 @@ import Instructor from "@/instructor"
 import OpenAI from "openai"
 import { z } from "zod"
 
+const property = z.object({
+  name: z.string(),
+  value: z.string()
+}).describe("A property defined by a name and value")
+
 const UserSchema = z.object({
   age: z.number(),
-  name: z.string()
+  name: z.string(),
+  properties: z.array(property)
 })
 
 const oai = new OpenAI({
@@ -53,17 +59,27 @@ const client = Instructor({
 })
 
 const user = await client.chat.completions.create({
+  messages: [{ role: "user", content: "Harry Potter" }],
   model: "mistralai/Mixtral-8x7B-Instruct-v0.1",
-  messages: [{ role: "user", content: "Jason Liu is 30 years old" }],
   response_model: UserSchema,
+  max_retries: 3
 })
 
 console.log(user)
-// {
-//  age: 30,
-//  name: "Jason Liu",
-// }
-
+/**
+ * {
+  age: 17,
+  name: "Harry Potter",
+  properties: [
+    {
+      name: "House",
+      value: "Gryffindor",
+    }, {
+      name: "Wand",
+      value: "Holly and Phoenix feather",
+    }
+  ],
+}
+ */
 ```
-
 You can find more information about Anyscale's output mode support [here](https://docs.endpoints.anyscale.com/).
