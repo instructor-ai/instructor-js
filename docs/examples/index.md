@@ -7,3 +7,4 @@
 ## Table of Contents
 
 - [How do I do classification?](./classification.md)
+- [How are complex queries decomposed into subqueries for a single request?](./query_decomposition.md)

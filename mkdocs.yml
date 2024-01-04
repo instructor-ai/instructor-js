@@ -135,6 +135,7 @@ nav:
   - Cookbook:
     - Overview: 'examples/index.md'
     - Classification: 'examples/classification.md'
+    - Query Decomposition: 'examples/query_decomposition.md'
   - Blog:
     - "blog/index.md"
   
