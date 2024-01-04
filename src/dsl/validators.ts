@@ -3,7 +3,7 @@ import OpenAI from "openai"
 import * as z from "zod"
 
 const Validator = z.object({
-  valid: z
+  isValid: z
     .boolean()
     .default(true)
     .describe("Whether the attribute is valid based on the requirements"),
@@ -11,7 +11,7 @@ const Validator = z.object({
     .string()
     .optional()
     .describe("The error message if the attribute is not valid, otherwise None"),
-  suggestedValue: z
+  fixedValue: z
     .string()
     .optional()
     .describe("If the attribute is not valid, suggest a new value for the attribute")
@@ -45,19 +45,19 @@ You are a world class validation model. Capable to determine if the value provid
         },
         {
           role: "user",
-          content: `Does value ${v} follow the statement: ${statement}`
+          content: `Does value "${v}" follow the statement: "${statement}"`
         }
       ],
       model,
       temperature
     })
 
-    if (allowOverride && !response.valid && response.suggestedValue) {
+    if (allowOverride && !response.isValid && response.fixedValue) {
       return response.fixedValue
     }
     // If the response is not valid, add the reason as an issue to zod so that
     // in the future it can generate a better response, via reasking mechanism.
-    if (!response.valid) {
+    if (!response.isValid) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         message: response.reason
