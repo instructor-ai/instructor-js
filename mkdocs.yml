@@ -1,9 +1,9 @@
-site_name: Instructor
+site_name: Instructor (JS)
 site_author: Jason Liu
 site_description: Enhancing OpenAI function calling with Zod 
 repo_name: instructor
 repo_url: https://github.com/jxnl/instructor-js
-site_url: https://jxnl.github.io/instructor/
+site_url: https://jxnl.github.io/instructor-js/
 edit_uri: edit/main/docs/
 copyright: Copyright &copy; 2024 Jason Liu 
 theme:
