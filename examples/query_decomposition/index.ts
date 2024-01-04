@@ -24,7 +24,7 @@ const oai = new OpenAI({
 
 const client = Instructor({
   client: oai,
-  mode: "FUNCTIONS"
+  mode: "JSON",
 })
 
 const createQueryPlan = async (question: string): Promise<QueryPlan | undefined> => {
@@ -32,16 +32,18 @@ const createQueryPlan = async (question: string): Promise<QueryPlan | undefined>
     messages: [
       {
         "role": "system",
-        "content": "You are a world class query planning algorithm capable ofbreaking apart questions into its dependency queries such that the answers can be used to inform the parent question. Do not answer the questions, simply provide a correct compute graph with good specific questions to ask and relevant dependencies. Before you call the function, think step-by-step to get a better understanding of the problem.",
+        "content": "You are a world class query planning algorithm capable of breaking apart questions into its dependency queries such that the answers can be used to inform the parent question. Do not answer the questions, simply provide a correct compute graph with good specific questions to ask and relevant dependencies. Before you call the function, think step-by-step to get a better understanding of the problem.",
       },
       {
         "role": "user",
         "content": `Consider: ${question}\nGenerate the correct query plan.`,
       },
     ],
-    model: "gpt-4-0613",
+    model: "gpt-4-1106-preview",
     response_model: QueryPlanSchema,
-    max_retries: 1
+    max_tokens: 1000,
+    temperature: 0.0,
+    max_retries: 2,
   })
 
   return queryPlan || undefined
@@ -51,4 +53,5 @@ const queryPlan = await createQueryPlan(
   "What is the difference in populations of Canada and the Jason's home country?"
 )
 
-console.log({ queryPlan })
+// "{\"query_graph\":[{\"id\":1,\"question\":\"What is the population of Canada?\",\"dependencies\":[],\"node_type\":\"SINGLE\"},{\"id\":2,\"question\":\"What is the name of Jason's home country?\",\"dependencies\":[],\"node_type\":\"SINGLE\"},{\"id\":3,\"question\":\"What is the population of {country}?\",\"dependencies\":[2],\"node_type\":\"SINGLE\"},{\"id\":4,\"question\":\"What is the difference in population between Canada and {country}?\",\"dependencies\":[1,3],\"node_type\":\"MERGE_MULTIPLE_RESPONSES\"}]}"
+console.log({ queryPlan: JSON.stringify(queryPlan) })
