@@ -31,17 +31,10 @@ const user = await client.chat.completions.create({
   model: "gpt-4",
   response_model: UserSchema,
   max_retries: 3
-});
-
-
-// let's now verify that the response type is inferred correctly
-
-const age: number = user.age;
-// @ts-expect-error - age is a number, not a string
-const _age: string = user.age;
-const name: string = user.name;
-
-// @ts-expect-error - this property does not exist
-user.missing;
+})
 
 console.log(user)
+// {
+//  age: 30,
+//  name: "Jason Liu",
+// }

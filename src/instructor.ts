@@ -59,10 +59,9 @@ class Instructor {
   }
 
   /**
-   * Handles chat completion with retries and parses the response if a response model is provided.
-   *
-   * @param params - The parameters for chat completion.
-   * @returns The parsed response model if {@link PatchedChatCompletionCreateParams.response_model} is provided, otherwise the original chat completion.
+   * Handles chat completion with retries.
+   * @param {PatchedChatCompletionCreateParams} params - The parameters for chat completion.
+   * @returns {Promise<any>} The response from the chat completion.
    */
   chatCompletion = async <Model extends z.ZodType<z.ZodTypeAny>>({
     max_retries = 3,
@@ -134,6 +133,7 @@ class Instructor {
             throw new Error("Validation failed.")
           }
         }
+        return validation.data
       } catch (error) {
         if (attempts < max_retries) {
           attempts++
