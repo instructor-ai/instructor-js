@@ -33,12 +33,9 @@ async function extractUser() {
 async function extractUserValidated() {
   const UserSchema = z.object({
     age: z.number(),
-    name: z
-      .string()
-      .refine(name => name === name.toUpperCase(), {
-        message: "Name must be uppercase, please try again"
-      })
-      .describe("The users name, all uppercase")
+    name: z.string().refine(name => name === name.toUpperCase(), {
+      message: "Name must be uppercase, please try again"
+    })
   })
 
   type User = z.infer<typeof UserSchema>
@@ -50,12 +47,12 @@ async function extractUserValidated() {
 
   const client = Instructor({
     client: oai,
-    mode: "TOOLS"
+    mode: "FUNCTIONS",
   })
 
   const user: User = await client.chat.completions.create({
     messages: [{ role: "user", content: "Jason Liu is 30 years old" }],
-    model: "gpt-3.5-turbo",
+    model: "gpt-4",
     response_model: UserSchema,
     max_retries: 3
   })
@@ -84,7 +81,7 @@ async function extractUserMany() {
 
   const client = Instructor({
     client: oai,
-    mode: "TOOLS"
+    mode: "FUNCTIONS"
   })
 
   const user: Users = await client.chat.completions.create({
