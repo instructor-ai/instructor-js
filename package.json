@@ -1,6 +1,6 @@
 {
   "name": "instructor-js",
-  "version": "0.0.1",
+  "version": "0.0.0",
   "description": "structured outputs for llms",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
@@ -24,6 +24,7 @@
     "format": "prettier \"src/**/*.{js,jsx,ts,tsx}\" --check",
     "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist",
     "changeset": "changeset",
+    
     "version-packages": "changeset version",
     "publish-packages": "tsup && changeset publish"
   },
