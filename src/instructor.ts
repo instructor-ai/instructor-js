@@ -60,6 +60,7 @@ class Instructor {
 
   private log = (...args) => {
     if (this.debug) {
+      // ! is there a better way to do this?
       console.log("INSTRUCTOR DEBUG: ", ...args)
     }
   }
