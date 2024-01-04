@@ -14,7 +14,7 @@ import type {
   ChatCompletionCreateParamsNonStreaming,
   ChatCompletionMessageParam
 } from "openai/resources/index.mjs"
-import type { ZodObject, z } from "zod"
+import { ZodObject } from "zod"
 import zodToJsonSchema from "zod-to-json-schema"
 import { fromZodError } from "zod-validation-error"
 
@@ -36,40 +36,41 @@ const MODE_TO_PARAMS = {
   [MODE.JSON_SCHEMA]: OAIBuildMessageBasedParams
 }
 
-interface PatchedChatCompletionCreateParams<Model extends ZodObject<any> | undefined> extends ChatCompletionCreateParamsNonStreaming {
+type PatchedChatCompletionCreateParams = ChatCompletionCreateParamsNonStreaming & {
   //eslint-disable-next-line @typescript-eslint/no-explicit-any
-  response_model?: Model
+  response_model?: ZodObject<any>
   max_retries?: number
 }
 
 class Instructor {
   readonly client: OpenAI
   readonly mode: MODE
+  readonly debug: boolean = false
 
   /**
    * Creates an instance of the `Instructor` class.
    * @param {OpenAI} client - The OpenAI client.
    * @param {string} mode - The mode of operation.
    */
-  constructor({ client, mode }: { client: OpenAI; mode: MODE }) {
+  constructor({ client, mode, debug = false }: { client: OpenAI; mode: MODE; debug?: boolean }) {
     this.client = client
     this.mode = mode
+    this.debug = debug
+  }
+
+  private log = (...args) => {
+    if (this.debug) {
+      // ! is there a better way to do this?
+      console.log("INSTRUCTOR DEBUG: ", ...args)
+    }
   }
 
   /**
-   * Handles chat completion with retries and parses the response if a response model is provided.
-   *
-   * @param params - The parameters for chat completion.
-   * @returns The parsed response model if {@link PatchedChatCompletionCreateParams.response_model} is provided, otherwise the original chat completion.
+   * Handles chat completion with retries.
+   * @param {PatchedChatCompletionCreateParams} params - The parameters for chat completion.
+   * @returns {Promise<any>} The response from the chat completion.
    */
-  async chatCompletion<Model extends ZodObject<any> | undefined = undefined>({ 
-    max_retries = 3, 
-    ...params
-  }: PatchedChatCompletionCreateParams<Model>): 
-    Promise<Model extends ZodObject<any>
-      ? z.infer<Model> 
-      :  OpenAI.Chat.Completions.ChatCompletion > {
-
+  chatCompletion = async ({ max_retries = 3, ...params }: PatchedChatCompletionCreateParams) => {
     let attempts = 0
     let validationIssues = ""
     let lastMessage: ChatCompletionMessageParam | null = null
@@ -87,18 +88,21 @@ class Instructor {
               ...completionParams.messages,
               ...(lastMessage ? [lastMessage] : []),
               {
-                role: "system",
-                content: `Your last response had the following zod validation issues, please try again: ${validationIssues}`
+                role: "user",
+                content: `Please correct the function call; errors encountered:\n ${validationIssues}`
               }
             ]
           }
         }
 
+        this.log("making completion call with params: ", resolvedParams)
+
         const completion = await this.client.chat.completions.create(resolvedParams)
-        if (params.response_model === undefined) {
-          return completion;
-        }
         const response = this.parseOAIResponse(completion)
+
+        this.log("Raw completion call response: ", response)
+        this.log("Parsed completion call response: ", resolvedParams)
+
         return response
       } catch (error) {
         throw error
@@ -108,30 +112,33 @@ class Instructor {
     const makeCompletionCallWithRetries = async () => {
       try {
         const data = await makeCompletionCall()
-        if (params.response_model === undefined) {
-          return data;
-        } else {
-          const validation = params.response_model.safeParse(data)
-          if (!validation.success) {
-            if ("error" in validation) {
-              lastMessage = {
-                role: "assistant",
-                content: JSON.stringify(data)
-              }
-  
-              validationIssues = fromZodError(validation.error).message
-              throw validation.error
-            } else {
-              throw new Error("Validation failed.")
+        if (params.response_model === undefined) return data
+        const validation = params.response_model.safeParse(data)
+        
+        this.log("Completion validation: ", validation)
+        
+        if (!validation.success) {
+          if ("error" in validation) {
+            lastMessage = {
+              role: "assistant",
+              content: JSON.stringify(data)
             }
+
+            validationIssues = fromZodError(validation.error)?.message
+
+            throw validation.error
+          } else {
+            throw new Error("Validation failed.")
           }
-          return validation.data
         }
+        return validation.data
       } catch (error) {
         if (attempts < max_retries) {
+          this.log("Retrying, attempt: ", attempts)
           attempts++
           return await makeCompletionCallWithRetries()
         } else {
+          this.log("Max attempts reached: ", attempts)
           throw error
         }
       }
@@ -148,8 +155,21 @@ class Instructor {
   private buildChatCompletionParams = ({
     response_model,
     ...params
-  }: PatchedChatCompletionCreateParams<any>): ChatCompletionCreateParamsNonStreaming => {
-    const jsonSchema = zodToJsonSchema(response_model, "response_model")
+  }: PatchedChatCompletionCreateParams): ChatCompletionCreateParamsNonStreaming => {
+    if (response_model === undefined) {
+      return {
+        stream: false,
+        ...params
+      }
+    }
+
+    const jsonSchema = zodToJsonSchema(response_model, {
+      name: "response_model",
+      errorMessages: true
+    })
+
+    this.log("JSON Schema from zod: ", jsonSchema)
+
 
     const definition = {
       name: "response_model",
@@ -187,7 +207,7 @@ class Instructor {
 
 type OAIClientExtended = OpenAI & Instructor
 
-export default function (args: { client: OpenAI; mode: MODE }): OAIClientExtended {
+export default function (args: { client: OpenAI; mode: MODE; debug?: boolean }): OAIClientExtended {
   const instructor = new Instructor(args)
 
   const instructorWithProxy = new Proxy(instructor, {

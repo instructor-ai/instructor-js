@@ -1,17 +1,26 @@
 import { MODE } from "@/constants/modes"
 
 export function OAIBuildFunctionParams(definition, params) {
+  const { name, description, ...definitionParams } = definition
+
   return {
     ...params,
     function_call: {
-      name: definition.name
+      name: name
     },
-    functions: [...(params?.functions ?? []), definition]
+    functions: [
+      ...(params?.functions ?? []),
+      {
+        name: name,
+        description: description ?? undefined,
+        paramaters: definitionParams
+      }
+    ]
   }
 }
 
 export function OAIBuildToolFunctionParams(definition, params) {
-  const { name, ...definitionParams } = definition
+  const { name, description, ...definitionParams } = definition
 
   return {
     ...params,
@@ -23,7 +32,8 @@ export function OAIBuildToolFunctionParams(definition, params) {
       {
         type: "function",
         function: {
-          name,
+          name: name,
+          description: description ?? undefined,
           parameters: definitionParams
         }
       },
