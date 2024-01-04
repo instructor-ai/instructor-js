@@ -19,6 +19,7 @@
     "build": "tsup",
     "lint": "eslint src/",
     "type-check": "tsc --noEmit",
+    "prepare": "husky install",
     "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist",
     "changeset": "changeset",
     "version-packages": "changeset version",
