@@ -16,6 +16,7 @@ const Validator = z.object({
     .optional()
     .describe("If the attribute is not valid, suggest a new value for the attribute")
 })
+  .describe("the validation schema to determine if the response is valid. If it is not, it will provide a reason and suggest a fixed value")
 
 export function llmValidator({
   statement,
