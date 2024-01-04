@@ -32,7 +32,7 @@ const oai = new OpenAI({
 
 const client = Instructor({
   client: oai,
-  mode: "JSON",
+  mode: "FUNCTIONS",
 })
 
 const extractActionItems = async (data: string): Promise<ActionItems | undefined> => {
