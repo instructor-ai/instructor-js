@@ -25,7 +25,7 @@ const client = Instructor({
 })
 
 const createClassification = async (data: string): Promise<SimpleClassification | undefined> => {
-  const classification: SimpleClassification = await client.chat.completions.create({
+  const classification = await client.chat.completions.create({
     messages: [{ role: "user", content: `"Classify the following text: ${data}` }],
     model: "gpt-3.5-turbo",
     response_model: SimpleClassificationSchema,
@@ -43,6 +43,6 @@ const classification = await createClassification(
 console.log({ classification })
 
 assert(
-  classification.class_label === CLASSIFICATION_LABELS.SPAM,
-  `Expected ${classification.class_label} to be ${CLASSIFICATION_LABELS.SPAM}`
+  classification?.class_label === CLASSIFICATION_LABELS.SPAM,
+  `Expected ${classification?.class_label} to be ${CLASSIFICATION_LABELS.SPAM}`
 )

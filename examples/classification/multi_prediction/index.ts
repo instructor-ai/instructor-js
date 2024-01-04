@@ -26,7 +26,7 @@ const client = Instructor({
 })
 
 const createClassification = async (data: string): Promise<MultiClassification | undefined> => {
-  const classification: MultiClassification = await client.chat.completions.create({
+  const classification = await client.chat.completions.create({
     messages: [{ role: "user", content: `"Classify the following support ticket: ${data}` }],
     model: "gpt-3.5-turbo",
     response_model: MultiClassificationSchema,
@@ -44,7 +44,7 @@ const classification = await createClassification(
 console.log({ classification })
 
 assert(
-  classification.predicted_labels.includes(MULTI_CLASSIFICATION_LABELS.BILLING) &&
+  classification?.predicted_labels.includes(MULTI_CLASSIFICATION_LABELS.BILLING) &&
     classification.predicted_labels.includes(MULTI_CLASSIFICATION_LABELS.HARDWARE),
-  `Expected ${classification.predicted_labels} to include ${MULTI_CLASSIFICATION_LABELS.BILLING} and ${MULTI_CLASSIFICATION_LABELS.HARDWARE}`
+  `Expected ${classification?.predicted_labels} to include ${MULTI_CLASSIFICATION_LABELS.BILLING} and ${MULTI_CLASSIFICATION_LABELS.HARDWARE}`
 )

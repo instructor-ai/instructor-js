@@ -1,15 +1,5 @@
 import Instructor from "@/instructor"
 import OpenAI from "openai"
-import { z } from "zod"
-
-const UserSchema = z.object({
-  age: z.number(),
-  name: z.string().refine(name => name.includes(" "), {
-    message: "Name must contain a space"
-  })
-})
-
-type User = z.infer<typeof UserSchema>
 
 const oai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY ?? undefined,
@@ -21,15 +11,10 @@ const client = Instructor({
   mode: "FUNCTIONS"
 })
 
-const user = await client.chat.completions.create({
+// ensures that when no `response_model` is provided, the response type is `ChatCompletion`
+const completion = await client.chat.completions.create({
   messages: [{ role: "user", content: "Jason Liu is 30 years old" }],
   model: "gpt-3.5-turbo",
-  response_model: UserSchema,
   max_retries: 3
-})
+}) satisfies OpenAI.Chat.ChatCompletion; 
 
-console.log(user)
-// {
-//  age: 30,
-//  name: "Jason Liu",
-// }
