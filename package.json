@@ -9,7 +9,7 @@
     ".": {
       "import": "./dist/index.mjs",
       "require": "./dist/index.js"
-      }
+    }
   },
   "publishConfig": {
     "access": "public"
@@ -19,6 +19,9 @@
     "build": "tsup",
     "lint": "eslint src/",
     "type-check": "tsc --noEmit",
+    "prepare": "husky install",
+    "format:write": "prettier --write \"**/*.{js,json,jsx,ts,tsx}\"",
+    "format": "prettier \"src/**/*.{js,jsx,ts,tsx}\" --check",
     "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist",
     "changeset": "changeset",
     "version-packages": "changeset version",
@@ -41,6 +44,7 @@
   },
   "homepage": "https://github.com/jxnl/instructor-js#readme",
   "dependencies": {
+    "schema-stream": "1.2.1",
     "zod-to-json-schema": "^3.22.3",
     "zod-validation-error": "^2.1.0"
   },

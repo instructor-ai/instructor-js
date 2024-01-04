@@ -16,9 +16,9 @@ export function OAIResponseTextParser(
 ) {
   const parsedData = typeof data === "string" ? JSON.parse(data) : data
 
-  const text = parsedData?.choices[0]?.message?.content ?? "{}"
+  const text = parsedData?.choices[0]?.message?.content ?? null
 
-  return JSON.parse(text)
+  return text
 }
 
 /**
@@ -35,9 +35,12 @@ export function OAIResponseFnArgsParser(
     | OpenAI.Chat.Completions.ChatCompletion
 ) {
   const parsedData = typeof data === "string" ? JSON.parse(data) : data
-  const text = parsedData.choices?.[0]?.message?.function_call?.arguments ?? "{}"
+  const text =
+    parsedData.choices?.[0].delta?.function_call?.arguments ??
+    parsedData.choices?.[0]?.message?.function_call?.arguments ??
+    null
 
-  return JSON.parse(text)
+  return text
 }
 
 /**
@@ -55,9 +58,12 @@ export function OAIResponseToolArgsParser(
 ) {
   const parsedData = typeof data === "string" ? JSON.parse(data) : data
 
-  const text = parsedData.choices?.[0]?.message?.tool_calls?.[0]?.function?.arguments ?? "{}"
+  const text =
+    parsedData.choices?.[0].delta?.tool_calls?.[0]?.function?.arguments ??
+    parsedData.choices?.[0]?.message?.tool_calls?.[0]?.function?.arguments ??
+    null
 
-  return JSON.parse(text)
+  return text
 }
 
 /**
@@ -74,7 +80,8 @@ export function OAIResponseJSONStringParser(
     | OpenAI.Chat.Completions.ChatCompletion
 ) {
   const parsedData = typeof data === "string" ? JSON.parse(data) : data
-  const text = parsedData?.choices[0]?.message?.content ?? "{}"
+  const text =
+    parsedData.choices?.[0].delta?.content ?? parsedData?.choices[0]?.message?.content ?? null
 
-  return JSON.parse(text)
+  return text
 }

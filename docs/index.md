@@ -1,4 +1,4 @@
-# instructor-js
+# Instructor-js
 
 _Structured extraction in Typescript, powered by llms, designed for simplicity, transparency, and control._
 
@@ -7,9 +7,8 @@ _Structured extraction in Typescript, powered by llms, designed for simplicity, 
 [![Twitter Follow](https://img.shields.io/twitter/follow/jxnlco?style=social)](https://twitter.com/jxnlco)
 [![Documentation](https://img.shields.io/badge/docs-available-brightgreen)](https://jxnl.github.io/instructor-js)
 [![GitHub issues](https://img.shields.io/github/issues/jxnl/instructor-js.svg)](https://github.com/jxnl/instructor-js/issues)
-[![Discord](https://img.shields.io/discord/1192334452110659664?label=discord)](https://discord.gg/CV8sPM5k5Y)
 
-Dive into the world of Python-based structured extraction, by OpenAI's function calling API and Pydantic, the most widely used data validation library for Python. Instructor stands out for its simplicity, transparency, and user-centric design. Whether you're a seasoned developer or just starting out, you'll find Instructor's approach intuitive and steerable.
+Dive into the world of Typescript-based structured extraction, by OpenAI's function calling API and Zod, typeScript-first schema validation with static type inference. Instructor stands out for its simplicity, transparency, and user-centric design. Whether you're a seasoned developer or just starting out, you'll find Instructor's approach intuitive and steerable.
 
 !!! tip "Support in other languages"
 
@@ -22,7 +21,7 @@ Dive into the world of Python-based structured extraction, by OpenAI's function 
 
 ## Usage
 
-```js
+```ts
 import Instructor from "@/instructor"
 import OpenAI from "openai"
 import { z } from "zod"
@@ -79,23 +78,3 @@ If you want to help out, checkout some of the issues marked as `good-first-issue
 ## License
 
 This project is licensed under the terms of the MIT License.
-
-## TODO
-
-- [ ] Add `llm_validator`
-- [ ] Logging for Distillation / Finetuning
-- [ ] Support Streaming
-- [ ] Optional/Maybe types
-- [ ] Add Tutorials, include in docs
-    - [x] Text Classification
-    - [ ] Search Queries
-    - [ ] Query Decomposition
-    - [ ] Citations
-    - [ ] Knowledge Graph
-    - [ ] Self Critique
-    - [ ] Image Extracting Tables
-    - [ ] Moderation
-    - [ ] Entity Resolution
-    - [ ] Action Item and Dependency Mapping
-
-These translations provide a structured approach to creating TypeScript schemas with Zod, mirroring the functionality and intent of the original Python examples.
