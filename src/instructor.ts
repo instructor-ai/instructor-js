@@ -58,6 +58,14 @@ class Instructor {
     this.client = client
     this.mode = mode
     this.debug = debug
+
+    //TODO: probably some more sophisticated validation we can do here re: modes and otherwise.
+    // but just throwing quick here for now.
+    if (mode === MODE.JSON_SCHEMA) {
+      if (!this.client.baseURL.includes("anyscale")) {
+        throw new Error("JSON_SCHEMA mode is only support on Anyscale.")
+      }
+    }
   }
 
   private log = (...args) => {
@@ -163,15 +171,21 @@ class Instructor {
 
   private async partialStreamResponse({ stream, schema }) {
     let _activeKey = null
+    let _completedKeys = []
+
     const streamParser = new SchemaStream(schema, {
-      onKeyComplete: ({ activeKey }) => {
+      typeDefaults: {
+        string: null,
+        number: null,
+        boolean: null
+      },
+      onKeyComplete: ({ activeKey, completedKeys }) => {
         _activeKey = activeKey
+        _completedKeys = completedKeys
       }
     })
 
-    const parser = streamParser.parse({
-      stringStreaming: true
-    })
+    const parser = streamParser.parse({})
 
     const textEncoder = new TextEncoder()
     const textDecoder = new TextDecoder()
@@ -184,7 +198,12 @@ class Instructor {
 
           controller.enqueue(
             textEncoder.encode(
-              JSON.stringify({ ...parsedChunk, _isValid: validation.success, _activeKey })
+              JSON.stringify({
+                ...parsedChunk,
+                _isValid: validation.success,
+                _activeKey,
+                _completedKeys
+              })
             )
           )
         } catch (e) {

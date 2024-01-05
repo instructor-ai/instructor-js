@@ -2,10 +2,12 @@ import Instructor from "@/instructor"
 import OpenAI from "openai"
 import { z } from "zod"
 
-const property = z.object({
-  name: z.string(),
-  value: z.string()
-}).describe("A property defined by a name and value")
+const property = z
+  .object({
+    name: z.string(),
+    value: z.string()
+  })
+  .describe("A property defined by a name and value")
 
 const UserSchema = z.object({
   age: z.number(),
@@ -15,7 +17,7 @@ const UserSchema = z.object({
 
 const oai = new OpenAI({
   baseURL: "https://api.endpoints.anyscale.com/v1",
-  apiKey: process.env.ANYSCALE_API_KEY ?? undefined,
+  apiKey: process.env.ANYSCALE_API_KEY ?? undefined
 })
 
 const client = Instructor({
