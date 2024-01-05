@@ -23,7 +23,6 @@ const SubtaskSchema = z.object({
 })
 
 const TicketSchema = z.object({
-  id: z.number(),
   name: z.string(),
   description: z.string(),
   priority: PrioritySchema,
@@ -33,7 +32,7 @@ const TicketSchema = z.object({
 })
 
 const ActionItemsSchema = z.object({
-  items: z.array(TicketSchema)
+  actionItems: z.array(TicketSchema)
 })
 
 type ActionItems = z.infer<typeof ActionItemsSchema>
@@ -51,7 +50,7 @@ const oai = new OpenAI({
 
 const client = Instructor({
   client: oai,
-  mode: "FUNCTIONS",
+  mode: "TOOLS",
 })
 
 const extractActionItems = async (data: string): Promise<ActionItems | undefined> => {
@@ -69,7 +68,7 @@ const extractActionItems = async (data: string): Promise<ActionItems | undefined
     model: "gpt-4-1106-preview",
     response_model: ActionItemsSchema,
     max_tokens: 1000,
-    temperature: 0.0,
+    temperature: 0.3,
     max_retries: 2,
   })
 
