@@ -9,7 +9,7 @@ const models_latest = ["gpt-3.5-turbo-1106", "gpt-4-1106-preview"]
 const models_old = ["gpt-3.5-turbo", "gpt-4"]
 
 const createTestCases = (): { model: string; mode: MODE }[] => {
-  const { FUNCTIONS, ...rest } = MODE
+  const { FUNCTIONS, JSON_SCHEMA, ...rest } = MODE
   const modes = Object.values(rest)
 
   return [
