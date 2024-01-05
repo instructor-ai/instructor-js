@@ -1,3 +1,5 @@
+import { omit } from "@/lib"
+
 import { MODE } from "@/constants/modes"
 
 export function OAIBuildFunctionParams(definition, params) {
@@ -43,8 +45,6 @@ export function OAIBuildToolFunctionParams(definition, params) {
 }
 
 export function OAIBuildMessageBasedParams(definition, params, mode) {
-  const { name, ...jsonSchema } = definition
-
   const MODE_SPECIFIC_CONFIGS = {
     [MODE.JSON]: {
       response_format: { type: "json_object" }
@@ -52,7 +52,7 @@ export function OAIBuildMessageBasedParams(definition, params, mode) {
     [MODE.JSON_SCHEMA]: {
       response_format: {
         type: "json_object",
-        schema: jsonSchema
+        schema: omit(["name"], definition)
       }
     }
   }

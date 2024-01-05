@@ -3,18 +3,36 @@ import { describe, expect, test } from "bun:test"
 import OpenAI from "openai"
 import { z } from "zod"
 
+const textBlock = `
+In our recent online meeting, participants from various backgrounds joined to discuss the upcoming tech conference. The names and contact details of the participants were as follows:
+
+- Name: John Doe, Email: johndoe@email.com, Twitter: @TechGuru44
+- Name: Jane Smith, Email: janesmith@email.com, Twitter: @DigitalDiva88
+- Name: Alex Johnson, Email: alexj@email.com, Twitter: @CodeMaster2023
+
+During the meeting, we agreed on several key points. The conference will be held on March 15th, 2024, at the Grand Tech Arena located at 4521 Innovation Drive. Dr. Emily Johnson, a renowned AI researcher, will be our keynote speaker.
+
+The budget for the event is set at $50,000, covering venue costs, speaker fees, and promotional activities. Each participant is expected to contribute an article to the conference blog by February 20th.
+
+A follow-up meeting is scheduled for January 25th at 3 PM GMT to finalize the agenda and confirm the list of speakers.
+`
+
 async function extractUser() {
-  const UserSchema = z.object({
-    age: z.number(),
-    name: z.string().refine(name => name.includes(" "), {
-      message: "Name must contain a space"
-    }),
-    thingsThatAreAsOldAsTheUser: z.array(z.string(), {
-      description: "a list of random things that are the same age as the user"
-    })
+  const ExtractionValuesSchema = z.object({
+    users: z
+      .array(
+        z.object({
+          name: z.string(),
+          handle: z.string(),
+          twitter: z.string()
+        })
+      )
+      .min(3),
+    location: z.string(),
+    budget: z.number()
   })
 
-  type User = Partial<z.infer<typeof UserSchema>>
+  type Extraction = Partial<z.infer<typeof ExtractionValuesSchema>>
 
   const oai = new OpenAI({
     apiKey: process.env.OPENAI_API_KEY ?? undefined,
@@ -23,39 +41,39 @@ async function extractUser() {
 
   const client = Instructor({
     client: oai,
-    mode: "FUNCTIONS"
+    mode: "TOOLS"
   })
 
-  const userStream = await client.chat.completions.create({
-    messages: [{ role: "user", content: "Jason Liu is 30 years old" }],
+  const extractionStream = await client.chat.completions.create({
+    messages: [{ role: "user", content: textBlock }],
     model: "gpt-3.5-turbo",
-    response_model: UserSchema,
+    response_model: ExtractionValuesSchema,
     max_retries: 3,
     stream: true
   })
 
-  let user: User = {}
+  let extraction: Extraction = {}
 
-  for await (const result of userStream) {
+  for await (const result of extractionStream) {
     try {
-      user = result
-      expect(result).toHaveProperty("_isValid")
-      expect(result).toHaveProperty("name")
-      expect(result).toHaveProperty("age")
+      extraction = result
     } catch (e) {
       console.log(e)
       break
     }
   }
 
-  return user
+  return extraction
 }
 
 describe("StreamFunctionCall", () => {
-  test("Should return extracted name and age based on schema and safe to parse json in stream", async () => {
-    const user = await extractUser()
+  test("Should return extracted users and budget", async () => {
+    const extraction = await extractUser()
 
-    expect(user.name).toEqual("Jason Liu")
-    expect(user.age).toEqual(30)
+    expect(extraction.users).toHaveLength(3)
+    expect(extraction.users![0]).toHaveProperty("name")
+    expect(extraction.users![0]).toHaveProperty("handle")
+    expect(extraction.users![0]).toHaveProperty("twitter")
+    expect(extraction.budget).toBe(50000)
   })
 })

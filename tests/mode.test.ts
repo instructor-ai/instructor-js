@@ -7,12 +7,14 @@ import { MODE } from "@/constants/modes"
 
 const models_latest = ["gpt-3.5-turbo-1106", "gpt-4-1106-preview"]
 const models_old = ["gpt-3.5-turbo", "gpt-4"]
+const models_anyscale = ["mistralai/Mixtral-8x7B-Instruct-v0.1"]
 
 const createTestCases = (): { model: string; mode: MODE }[] => {
   const { FUNCTIONS, JSON_SCHEMA, ...rest } = MODE
   const modes = Object.values(rest)
 
   return [
+    ...models_anyscale.flatMap(model => ({ model, mode: JSON_SCHEMA })),
     ...models_latest.flatMap(model => modes.map(mode => ({ model, mode }))),
     ...models_old.flatMap(model => ({ model, mode: FUNCTIONS }))
   ]
@@ -28,8 +30,10 @@ const UserSchema = z.object({
 type User = z.infer<typeof UserSchema>
 
 async function extractUser(model: string, mode: MODE) {
+  const anyscale = mode === MODE.JSON_SCHEMA
   const oai = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY ?? undefined,
+    baseURL: anyscale ? "https://api.endpoints.anyscale.com/v1" : undefined,
+    apiKey: anyscale ? process.env.ANYSCALE_API_KEY : process.env.OPENAI_API_KEY ?? undefined,
     organization: process.env.OPENAI_ORG_ID ?? undefined
   })
 
