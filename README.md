@@ -22,7 +22,7 @@ Dive into the world of Python-based structured extraction, by OpenAI's function 
 
 ## Usage
 
-```js
+```ts
 import Instructor from "@/instructor"
 import OpenAI from "openai"
 import { z } from "zod"
