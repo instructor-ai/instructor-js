@@ -42,7 +42,6 @@ function createHtmlDocument(data) {
   const edgeDefs: string[] = []
   data.entities.forEach(entity => {
     entity.dependencies.forEach(depId => {
-      // @ts-ignore
       edgeDefs.push(`{from: ${entity.id}, to: ${depId}}`)
     })
   })
