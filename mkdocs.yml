@@ -172,7 +172,7 @@ plugins:
 extra:
   analytics:
     provider: google
-    property: G-5CR8QXF5CN
+    property: G-3JFF533YVZ
     feedback:
       title: Was this page helpful?
       ratings:
