@@ -45,7 +45,7 @@ async function extractUser(model: string, mode: MODE) {
     model: model,
     response_model: { schema: UserSchema },
     max_retries: 3,
-    seed: 1
+    seed: !anyscale ? 1 : undefined
   })
 
   return user
