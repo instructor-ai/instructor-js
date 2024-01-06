@@ -1,8 +1,10 @@
 We would love for you to contribute to `Instructor-js`.
 
-## [Evals](https://github.com/jxnl/instructor-js/tree/main/tests/openai/evals)
+## Migrating Docs from Python
 
-We invite you to contribute evals in Bun as a way to monitor the quality of the openai models and the instructor library. To get started check out the [jxnl/instructor-js/tests/evals](https://github.com/jxnl/instructor-js/tree/main/tests/openai/evals) and contribute your own evals in the form of pytest tests. These evals will be run once a week and the results will be posted.
+Theres a bunch of examples in the python version, including documentation here [python docs](https://jxnl.github.io/instructor/examples/)
+
+If you want to contribute, please check out [issues](https://github.com/jxnl/instructor-js/issues/8)
 
 ## Issues
 
