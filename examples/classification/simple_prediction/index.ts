@@ -29,7 +29,8 @@ const createClassification = async (data: string): Promise<SimpleClassification 
     messages: [{ role: "user", content: `"Classify the following text: ${data}` }],
     model: "gpt-3.5-turbo",
     response_model: SimpleClassificationSchema,
-    max_retries: 3
+    max_retries: 3,
+    seed: 1
   })
 
   return classification || undefined

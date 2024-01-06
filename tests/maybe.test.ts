@@ -28,7 +28,8 @@ async function maybeExtractUser(content: string) {
     messages: [{ role: "user", content: "Extract " + content }],
     model: "gpt-4",
     response_model: MaybeUserSchema,
-    max_retries: 3
+    max_retries: 3,
+    seed: 1
   })
 
   return user

@@ -2,7 +2,7 @@ import Instructor from "@/instructor"
 import OpenAI from "openai"
 import { z } from "zod"
 
-const QueryTypeSchema = z.enum(["SINGLE", "MERGE_MULTIPLE_RESPONSES"]);
+const QueryTypeSchema = z.enum(["SINGLE", "MERGE_MULTIPLE_RESPONSES"])
 
 const QuerySchema = z.object({
   id: z.number(),
@@ -24,26 +24,28 @@ const oai = new OpenAI({
 
 const client = Instructor({
   client: oai,
-  mode: "FUNCTIONS",
+  mode: "FUNCTIONS"
 })
 
 const createQueryPlan = async (question: string): Promise<QueryPlan | undefined> => {
   const queryPlan: QueryPlan = await client.chat.completions.create({
     messages: [
       {
-        "role": "system",
-        "content": "You are a world class query planning algorithm capable of breaking apart questions into its dependency queries such that the answers can be used to inform the parent question. Do not answer the questions, simply provide a correct compute graph with good specific questions to ask and relevant dependencies. Before you call the function, think step-by-step to get a better understanding of the problem.",
+        role: "system",
+        content:
+          "You are a world class query planning algorithm capable of breaking apart questions into its dependency queries such that the answers can be used to inform the parent question. Do not answer the questions, simply provide a correct compute graph with good specific questions to ask and relevant dependencies. Before you call the function, think step-by-step to get a better understanding of the problem."
       },
       {
-        "role": "user",
-        "content": `Consider: ${question}\nGenerate the correct query plan.`,
-      },
+        role: "user",
+        content: `Consider: ${question}\nGenerate the correct query plan.`
+      }
     ],
     model: "gpt-4-1106-preview",
     response_model: QueryPlanSchema,
     max_tokens: 1000,
-    temperature: 0.0,
+    temperature: 0.3,
     max_retries: 2,
+    seed: 1
   })
 
   return queryPlan || undefined
