@@ -44,11 +44,6 @@ type ResponseModel<T> = {
   description?: string
 }
 
-export type ParseParams = {
-  name: string
-  description?: string
-} & JsonSchema7Type
-
 type InstructorChatCompletionParams<T> = {
   response_model: ResponseModel<T>
   max_retries?: number
