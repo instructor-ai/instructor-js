@@ -22,7 +22,7 @@ const oai = new OpenAI({
 
 const client = Instructor({
   client: oai,
-  mode: "FUNCTIONS"
+  mode: "TOOLS"
 })
 
 const createClassification = async (data: string): Promise<MultiClassification | undefined> => {
@@ -30,7 +30,8 @@ const createClassification = async (data: string): Promise<MultiClassification |
     messages: [{ role: "user", content: `"Classify the following support ticket: ${data}` }],
     model: "gpt-3.5-turbo",
     response_model: MultiClassificationSchema,
-    max_retries: 3
+    max_retries: 3,
+    seed: 1
   })
 
   return classification || undefined
