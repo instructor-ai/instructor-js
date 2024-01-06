@@ -54,7 +54,9 @@ const client = Instructor({
 const extractionStream = await client.chat.completions.create({
   messages: [{ role: "user", content: textBlock }],
   model: "gpt-4-1106-preview",
-  response_model: ExtractionValuesSchema,
+  response_model: {
+    schema: ExtractionValuesSchema
+  },
   max_retries: 3,
   stream: true
 })

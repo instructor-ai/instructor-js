@@ -2,11 +2,11 @@ import Instructor from "@/instructor"
 import OpenAI from "openai"
 import { z } from "zod"
 
-const PrioritySchema = z.enum(["HIGH", "MEDIUM", "LOW"]);
+const PrioritySchema = z.enum(["HIGH", "MEDIUM", "LOW"])
 
 const SubtaskSchema = z.object({
   id: z.number(),
-  name: z.string(),
+  name: z.string()
 })
 
 const TicketSchema = z.object({
@@ -23,8 +23,6 @@ const ActionItemsSchema = z.object({
   items: z.array(TicketSchema)
 })
 
-type ActionItems = z.infer<typeof ActionItemsSchema>
-
 const oai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY ?? undefined,
   organization: process.env.OPENAI_ORG_ID ?? undefined
@@ -32,33 +30,33 @@ const oai = new OpenAI({
 
 const client = Instructor({
   client: oai,
-  mode: "FUNCTIONS",
+  mode: "FUNCTIONS"
 })
 
-const extractActionItems = async (data: string): Promise<ActionItems | undefined> => {
-  const actionItems: ActionItems = await client.chat.completions.create({
+const extractActionItems = async (data: string) => {
+  const actionItems = await client.chat.completions.create({
     messages: [
       {
-        "role": "system",
-        "content": "The following is a transcript of a meeting...",
+        role: "system",
+        content: "The following is a transcript of a meeting..."
       },
       {
-        "role": "user",
-        "content": `Create the action items for the following transcript: ${data}`,
-      },
+        role: "user",
+        content: `Create the action items for the following transcript: ${data}`
+      }
     ],
     model: "gpt-4-1106-preview",
-    response_model: ActionItemsSchema,
+    response_model: { schema: ActionItemsSchema },
     max_tokens: 1000,
     temperature: 0.0,
-    max_retries: 2,
+    max_retries: 2
   })
 
-  return actionItems || undefined
+  return actionItems
 }
 
 const actionItems = await extractActionItems(
-`Alice: Hey team, we have several critical tasks we need to tackle for the upcoming release. First, we need to work on improving the authentication system. It's a top priority.
+  `Alice: Hey team, we have several critical tasks we need to tackle for the upcoming release. First, we need to work on improving the authentication system. It's a top priority.
 
 Bob: Got it, Alice. I can take the lead on the authentication improvements. Are there any specific areas you want me to focus on?
 

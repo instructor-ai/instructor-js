@@ -27,8 +27,6 @@ const UserSchema = z.object({
   })
 })
 
-type User = z.infer<typeof UserSchema>
-
 async function extractUser(model: string, mode: MODE) {
   const anyscale = mode === MODE.JSON_SCHEMA
   const oai = new OpenAI({
@@ -42,10 +40,10 @@ async function extractUser(model: string, mode: MODE) {
     mode: mode
   })
 
-  const user: User = await client.chat.completions.create({
+  const user = await client.chat.completions.create({
     messages: [{ role: "user", content: "Jason Liu is 30 years old" }],
     model: model,
-    response_model: UserSchema,
+    response_model: { schema: UserSchema },
     max_retries: 3
   })
 

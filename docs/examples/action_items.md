@@ -67,7 +67,7 @@ const extractActionItems = async (data: string): Promise<ActionItems | undefined
       },
     ],
     model: "gpt-4-1106-preview",
-    response_model: ActionItemsSchema,
+    response_model: { schema: ActionItemsSchema },
     max_tokens: 1000,
     temperature: 0.0,
     max_retries: 2,
