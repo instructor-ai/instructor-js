@@ -23,7 +23,8 @@ const user = await client.chat.completions.create({
   response_model: {
     schema: UserSchema
   },
-  max_retries: 3
+  max_retries: 3,
+  seed: 1
 })
 
 console.log(user)

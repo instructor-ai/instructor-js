@@ -44,7 +44,8 @@ async function extractUser(model: string, mode: MODE) {
     messages: [{ role: "user", content: "Jason Liu is 30 years old" }],
     model: model,
     response_model: { schema: UserSchema },
-    max_retries: 3
+    max_retries: 3,
+    seed: 1
   })
 
   return user

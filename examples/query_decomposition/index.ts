@@ -42,7 +42,8 @@ const createQueryPlan = async (question: string) => {
     response_model: { schema: QueryPlanSchema },
     max_tokens: 1000,
     temperature: 0.0,
-    max_retries: 2
+    max_retries: 2,
+    seed: 1
   })
 
   return queryPlan || undefined

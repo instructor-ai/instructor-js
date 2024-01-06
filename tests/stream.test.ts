@@ -49,7 +49,8 @@ async function extractUser() {
     model: "gpt-3.5-turbo",
     response_model: { schema: ExtractionValuesSchema },
     max_retries: 3,
-    stream: true
+    stream: true,
+    seed: 1
   })
 
   let extraction: Extraction = {}

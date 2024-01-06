@@ -27,7 +27,8 @@ const createClassification = async (data: string) => {
     messages: [{ role: "user", content: `"Classify the following text: ${data}` }],
     model: "gpt-3.5-turbo",
     response_model: { schema: SimpleClassificationSchema },
-    max_retries: 3
+    max_retries: 3,
+    seed: 1
   })
 
   return classification

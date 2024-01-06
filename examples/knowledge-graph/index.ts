@@ -40,7 +40,8 @@ const createGraph = async (input: string) => {
     ],
     model: "gpt-3.5-turbo-1106",
     response_model: { schema: KnowledgeGraphSchema },
-    max_retries: 5
+    max_retries: 5,
+    seed: 1
   })
 
   return graph

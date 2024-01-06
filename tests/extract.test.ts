@@ -22,7 +22,8 @@ async function extractUser() {
   const user = await client.chat.completions.create({
     messages: [{ role: "user", content: "Jason Liu is 30 years old" }],
     model: "gpt-3.5-turbo",
-    response_model: { schema: UserSchema }
+    response_model: { schema: UserSchema },
+    seed: 1
   })
 
   return user
@@ -50,7 +51,8 @@ async function extractUserValidated() {
     messages: [{ role: "user", content: "Jason Liu is 30 years old" }],
     model: "gpt-4",
     response_model: { schema: UserSchema },
-    max_retries: 3
+    max_retries: 3,
+    seed: 1
   })
 
   return user
@@ -82,7 +84,8 @@ async function extractUserMany() {
     messages: [{ role: "user", content: "Jason is 30 years old, Sarah is 12" }],
     model: "gpt-3.5-turbo",
     response_model: { schema: UsersSchema },
-    max_retries: 3
+    max_retries: 3,
+    seed: 1
   })
 
   return user

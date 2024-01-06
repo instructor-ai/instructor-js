@@ -61,7 +61,8 @@ const askAi = async (input: string) => {
     ],
     model: "gpt-4",
     response_model: { schema: DocumentExtractionSchema },
-    max_retries: 3
+    max_retries: 3,
+    seed: 1
   })
 
   return answer

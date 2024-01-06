@@ -1,0 +1,72 @@
+
+  <!DOCTYPE html>
+  <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Entity graph</title>
+        <script type="text/javascript" src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+        <link href="https://unpkg.com/vis-network/styles/vis-network.min.css" rel="stylesheet" type="text/css" />
+        <style>
+          body, html {
+          height: 100%;
+          margin: 0;
+          overflow: hidden;
+          }
+          #mynetwork {
+          width: 100%;
+          height: 100%;
+          border: 1px solid lightgray;
+          }
+        </style>
+    </head>
+    <body>
+        <div id="mynetwork"></div>
+        <script>
+          const nodes = new vis.DataSet([{id: 1, image: 'data:image/svg+xml;charset=utf-8,%0A%20%20%20%20%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22300%22%20height%3D%22100%22%3E%0A%20%20%20%20%20%20%3Crect%20x%3D%220%22%20y%3D%220%22%20width%3D%22100%25%22%20height%3D%22100%25%22%20fill%3D%22white%22%2F%3E%0A%20%20%20%20%20%20%3CforeignObject%20x%3D%220%22%20y%3D%220%22%20width%3D%22300px%22%20height%3D%22100px%22%3E%0A%20%20%20%20%20%20%3Cdiv%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F1999%2Fxhtml%22%20style%3D%22font-size%3A12px%3B%20width%3A%20300px%3B%20height%3A%20100px%3B%20display%3A%20flex%3B%20align-items%3A%20center%3B%20justify-content%3A%20center%3B%22%3E%0A%20%20%20%20%20%20%20%20%3Ctable%20style%3D%22border%3A%201px%20solid%20black%3B%20border-collapse%3A%20collapse%3B%20width%3A%20100%25%3B%22%3E%20%20%3Ctr%3E%3Ctd%20colspan%3D%222%22%20style%3D%22border%3A%201px%20solid%20black%3B%20text-align%3A%20center%3B%22%3E%3Cb%3EAgreement%20Contract%3C%2Fb%3E%3C%2Ftd%3E%3C%2Ftr%3E%20%20%3Ctr%3E%3Ctd%3EDate%3C%2Ftd%3E%3Ctd%3E2020-01-01%3C%2Ftd%3E%3C%2Ftr%3E%3Ctr%3E%3Ctd%3EClient%3C%2Ftd%3E%3Ctd%3ECompany%20A%3C%2Ftd%3E%3C%2Ftr%3E%3Ctr%3E%3Ctd%3EService%20Provider%3C%2Ftd%3E%3Ctd%3ECompany%20B%3C%2Ftd%3E%3C%2Ftr%3E%3C%2Ftable%3E%0A%20%20%20%20%20%20%3C%2Fdiv%3E%0A%20%20%20%20%3C%2FforeignObject%3E%0A%20%20%20%20%3C%2Fsvg%3E', shape: 'image'},
+{id: 2, image: 'data:image/svg+xml;charset=utf-8,%0A%20%20%20%20%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22300%22%20height%3D%22100%22%3E%0A%20%20%20%20%20%20%3Crect%20x%3D%220%22%20y%3D%220%22%20width%3D%22100%25%22%20height%3D%22100%25%22%20fill%3D%22white%22%2F%3E%0A%20%20%20%20%20%20%3CforeignObject%20x%3D%220%22%20y%3D%220%22%20width%3D%22300px%22%20height%3D%22100px%22%3E%0A%20%20%20%20%20%20%3Cdiv%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F1999%2Fxhtml%22%20style%3D%22font-size%3A12px%3B%20width%3A%20300px%3B%20height%3A%20100px%3B%20display%3A%20flex%3B%20align-items%3A%20center%3B%20justify-content%3A%20center%3B%22%3E%0A%20%20%20%20%20%20%20%20%3Ctable%20style%3D%22border%3A%201px%20solid%20black%3B%20border-collapse%3A%20collapse%3B%20width%3A%20100%25%3B%22%3E%20%20%3Ctr%3E%3Ctd%20colspan%3D%222%22%20style%3D%22border%3A%201px%20solid%20black%3B%20text-align%3A%20center%3B%22%3E%3Cb%3EScope%20of%20Work%3C%2Fb%3E%3C%2Ftd%3E%3C%2Ftr%3E%20%20%3Ctr%3E%3Ctd%3EProduct%20Delivery%3C%2Ftd%3E%3Ctd%3E2020-01-31%3C%2Ftd%3E%3C%2Ftr%3E%3C%2Ftable%3E%0A%20%20%20%20%20%20%3C%2Fdiv%3E%0A%20%20%20%20%3C%2FforeignObject%3E%0A%20%20%20%20%3C%2Fsvg%3E', shape: 'image'},
+{id: 3, image: 'data:image/svg+xml;charset=utf-8,%0A%20%20%20%20%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22300%22%20height%3D%22100%22%3E%0A%20%20%20%20%20%20%3Crect%20x%3D%220%22%20y%3D%220%22%20width%3D%22100%25%22%20height%3D%22100%25%22%20fill%3D%22white%22%2F%3E%0A%20%20%20%20%20%20%3CforeignObject%20x%3D%220%22%20y%3D%220%22%20width%3D%22300px%22%20height%3D%22100px%22%3E%0A%20%20%20%20%20%20%3Cdiv%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F1999%2Fxhtml%22%20style%3D%22font-size%3A12px%3B%20width%3A%20300px%3B%20height%3A%20100px%3B%20display%3A%20flex%3B%20align-items%3A%20center%3B%20justify-content%3A%20center%3B%22%3E%0A%20%20%20%20%20%20%20%20%3Ctable%20style%3D%22border%3A%201px%20solid%20black%3B%20border-collapse%3A%20collapse%3B%20width%3A%20100%25%3B%22%3E%20%20%3Ctr%3E%3Ctd%20colspan%3D%222%22%20style%3D%22border%3A%201px%20solid%20black%3B%20text-align%3A%20center%3B%22%3E%3Cb%3EPayment%20Terms%3C%2Fb%3E%3C%2Ftd%3E%3C%2Ftr%3E%20%20%3Ctr%3E%3Ctd%3ETotal%20Payment%3C%2Ftd%3E%3Ctd%3E%2450%2C000%3C%2Ftd%3E%3C%2Ftr%3E%3Ctr%3E%3Ctd%3EInitial%20Payment%3C%2Ftd%3E%3Ctd%3E%2410%2C000%3C%2Ftd%3E%3C%2Ftr%3E%3Ctr%3E%3Ctd%3EFinal%20Payment%3C%2Ftd%3E%3Ctd%3E2020-02-15%3C%2Ftd%3E%3C%2Ftr%3E%3C%2Ftable%3E%0A%20%20%20%20%20%20%3C%2Fdiv%3E%0A%20%20%20%20%3C%2FforeignObject%3E%0A%20%20%20%20%3C%2Fsvg%3E', shape: 'image'},
+{id: 4, image: 'data:image/svg+xml;charset=utf-8,%0A%20%20%20%20%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22300%22%20height%3D%22100%22%3E%0A%20%20%20%20%20%20%3Crect%20x%3D%220%22%20y%3D%220%22%20width%3D%22100%25%22%20height%3D%22100%25%22%20fill%3D%22white%22%2F%3E%0A%20%20%20%20%20%20%3CforeignObject%20x%3D%220%22%20y%3D%220%22%20width%3D%22300px%22%20height%3D%22100px%22%3E%0A%20%20%20%20%20%20%3Cdiv%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F1999%2Fxhtml%22%20style%3D%22font-size%3A12px%3B%20width%3A%20300px%3B%20height%3A%20100px%3B%20display%3A%20flex%3B%20align-items%3A%20center%3B%20justify-content%3A%20center%3B%22%3E%0A%20%20%20%20%20%20%20%20%3Ctable%20style%3D%22border%3A%201px%20solid%20black%3B%20border-collapse%3A%20collapse%3B%20width%3A%20100%25%3B%22%3E%20%20%3Ctr%3E%3Ctd%20colspan%3D%222%22%20style%3D%22border%3A%201px%20solid%20black%3B%20text-align%3A%20center%3B%22%3E%3Cb%3EConfidentiality%3C%2Fb%3E%3C%2Ftd%3E%3C%2Ftr%3E%20%20%3Ctr%3E%3Ctd%3EConfidentiality%20Duration%3C%2Ftd%3E%3Ctd%3E2020-05-15%3C%2Ftd%3E%3C%2Ftr%3E%3C%2Ftable%3E%0A%20%20%20%20%20%20%3C%2Fdiv%3E%0A%20%20%20%20%3C%2FforeignObject%3E%0A%20%20%20%20%3C%2Fsvg%3E', shape: 'image'},
+{id: 5, image: 'data:image/svg+xml;charset=utf-8,%0A%20%20%20%20%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22300%22%20height%3D%22100%22%3E%0A%20%20%20%20%20%20%3Crect%20x%3D%220%22%20y%3D%220%22%20width%3D%22100%25%22%20height%3D%22100%25%22%20fill%3D%22white%22%2F%3E%0A%20%20%20%20%20%20%3CforeignObject%20x%3D%220%22%20y%3D%220%22%20width%3D%22300px%22%20height%3D%22100px%22%3E%0A%20%20%20%20%20%20%3Cdiv%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F1999%2Fxhtml%22%20style%3D%22font-size%3A12px%3B%20width%3A%20300px%3B%20height%3A%20100px%3B%20display%3A%20flex%3B%20align-items%3A%20center%3B%20justify-content%3A%20center%3B%22%3E%0A%20%20%20%20%20%20%20%20%3Ctable%20style%3D%22border%3A%201px%20solid%20black%3B%20border-collapse%3A%20collapse%3B%20width%3A%20100%25%3B%22%3E%20%20%3Ctr%3E%3Ctd%20colspan%3D%222%22%20style%3D%22border%3A%201px%20solid%20black%3B%20text-align%3A%20center%3B%22%3E%3Cb%3ETermination%3C%2Fb%3E%3C%2Ftd%3E%3C%2Ftr%3E%20%20%3Ctr%3E%3Ctd%3ETermination%20Notice%3C%2Ftd%3E%3Ctd%3E30%20days%3C%2Ftd%3E%3C%2Ftr%3E%3Ctr%3E%3Ctd%3EOutstanding%20Obligations%3C%2Ftd%3E%3Ctd%3E2020-02-01%3C%2Ftd%3E%3C%2Ftr%3E%3C%2Ftable%3E%0A%20%20%20%20%20%20%3C%2Fdiv%3E%0A%20%20%20%20%3C%2FforeignObject%3E%0A%20%20%20%20%3C%2Fsvg%3E', shape: 'image'}]);
+          const edges = new vis.DataSet([{from: 2, to: 1},
+{from: 3, to: 1},
+{from: 4, to: 3},
+{from: 5, to: 2}]);
+          
+          const options = {
+            scale: 2.0,
+            edges: {
+              smooth: true,
+            arrows: {
+              to: { enabled: true, scaleFactor: 0.3, type: 'arrow' }
+            },
+            color: "black"
+          },
+          layout: {
+            hierarchical: {
+              enabled: true,
+              levelSeparation: 75,
+              nodeSpacing: 600,
+              treeSpacing: 200,
+              direction: 'DU',
+              shakeTowards: 'roots'
+            }
+          },
+            physics: {
+              enabled: false
+            }
+          };
+          
+          const container = document.getElementById('mynetwork');
+          const graphData = {
+              nodes: nodes,
+              edges: edges
+          };
+          const network = new vis.Network(container, graphData, options);
+          network.moveTo({
+            scale: 2
+          });
+        </script>
+    </body>
+  </html>
+  
