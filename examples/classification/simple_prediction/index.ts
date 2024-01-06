@@ -12,8 +12,6 @@ const SimpleClassificationSchema = z.object({
   class_label: z.nativeEnum(CLASSIFICATION_LABELS)
 })
 
-type SimpleClassification = z.infer<typeof SimpleClassificationSchema>
-
 const oai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY ?? undefined,
   organization: process.env.OPENAI_ORG_ID ?? undefined
@@ -24,16 +22,16 @@ const client = Instructor({
   mode: "FUNCTIONS"
 })
 
-const createClassification = async (data: string): Promise<SimpleClassification | undefined> => {
+const createClassification = async (data: string) => {
   const classification = await client.chat.completions.create({
     messages: [{ role: "user", content: `"Classify the following text: ${data}` }],
     model: "gpt-3.5-turbo",
-    response_model: SimpleClassificationSchema,
+    response_model: { schema: SimpleClassificationSchema },
     max_retries: 3,
     seed: 1
   })
 
-  return classification || undefined
+  return classification
 }
 
 const classification = await createClassification(

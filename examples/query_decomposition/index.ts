@@ -15,8 +15,6 @@ const QueryPlanSchema = z.object({
   query_graph: z.array(QuerySchema)
 })
 
-type QueryPlan = z.infer<typeof QueryPlanSchema>
-
 const oai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY ?? undefined,
   organization: process.env.OPENAI_ORG_ID ?? undefined
@@ -27,8 +25,8 @@ const client = Instructor({
   mode: "FUNCTIONS"
 })
 
-const createQueryPlan = async (question: string): Promise<QueryPlan | undefined> => {
-  const queryPlan: QueryPlan = await client.chat.completions.create({
+const createQueryPlan = async (question: string) => {
+  const queryPlan = await client.chat.completions.create({
     messages: [
       {
         role: "system",
@@ -41,9 +39,9 @@ const createQueryPlan = async (question: string): Promise<QueryPlan | undefined>
       }
     ],
     model: "gpt-4-1106-preview",
-    response_model: QueryPlanSchema,
+    response_model: { schema: QueryPlanSchema },
     max_tokens: 1000,
-    temperature: 0.3,
+    temperature: 0.0,
     max_retries: 2,
     seed: 1
   })

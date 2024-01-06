@@ -36,8 +36,6 @@ const DocumentExtractionSchema = z.object({
     )
 })
 
-type DocumentExtraction = z.infer<typeof DocumentExtractionSchema>
-
 const oai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY ?? undefined,
   organization: process.env.OPENAI_ORG_ID ?? undefined
@@ -48,8 +46,8 @@ const client = Instructor({
   mode: "TOOLS"
 })
 
-const askAi = async (input: string): Promise<DocumentExtraction | undefined> => {
-  const answer: DocumentExtraction = await client.chat.completions.create({
+const askAi = async (input: string) => {
+  const answer = await client.chat.completions.create({
     messages: [
       {
         role: "system",
@@ -62,7 +60,7 @@ const askAi = async (input: string): Promise<DocumentExtraction | undefined> => 
       }
     ],
     model: "gpt-4",
-    response_model: DocumentExtractionSchema,
+    response_model: { schema: DocumentExtractionSchema },
     max_retries: 3,
     seed: 1
   })

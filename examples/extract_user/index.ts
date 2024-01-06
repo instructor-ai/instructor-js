@@ -7,8 +7,6 @@ const UserSchema = z.object({
   name: z.string()
 })
 
-type User = z.infer<typeof UserSchema>
-
 const oai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY ?? undefined,
   organization: process.env.OPENAI_ORG_ID ?? undefined
@@ -22,7 +20,9 @@ const client = Instructor({
 const user = await client.chat.completions.create({
   messages: [{ role: "user", content: "Jason Liu is 30 years old" }],
   model: "gpt-4",
-  response_model: UserSchema,
+  response_model: {
+    schema: UserSchema
+  },
   max_retries: 3,
   seed: 1
 })

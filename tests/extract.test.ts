@@ -9,8 +9,6 @@ async function extractUser() {
     name: z.string()
   })
 
-  type User = z.infer<typeof UserSchema>
-
   const oai = new OpenAI({
     apiKey: process.env.OPENAI_API_KEY ?? undefined,
     organization: process.env.OPENAI_ORG_ID ?? undefined
@@ -21,10 +19,10 @@ async function extractUser() {
     mode: "FUNCTIONS"
   })
 
-  const user: User = await client.chat.completions.create({
+  const user = await client.chat.completions.create({
     messages: [{ role: "user", content: "Jason Liu is 30 years old" }],
     model: "gpt-3.5-turbo",
-    response_model: UserSchema,
+    response_model: { schema: UserSchema },
     seed: 1
   })
 
@@ -39,8 +37,6 @@ async function extractUserValidated() {
     })
   })
 
-  type User = z.infer<typeof UserSchema>
-
   const oai = new OpenAI({
     apiKey: process.env.OPENAI_API_KEY ?? undefined,
     organization: process.env.OPENAI_ORG_ID ?? undefined
@@ -51,10 +47,10 @@ async function extractUserValidated() {
     mode: "FUNCTIONS"
   })
 
-  const user: User = await client.chat.completions.create({
+  const user = await client.chat.completions.create({
     messages: [{ role: "user", content: "Jason Liu is 30 years old" }],
     model: "gpt-4",
-    response_model: UserSchema,
+    response_model: { schema: UserSchema },
     max_retries: 3,
     seed: 1
   })
@@ -74,8 +70,6 @@ async function extractUserMany() {
     })
     .describe("Correctly formatted list of users")
 
-  type Users = z.infer<typeof UsersSchema>
-
   const oai = new OpenAI({
     apiKey: process.env.OPENAI_API_KEY ?? undefined,
     organization: process.env.OPENAI_ORG_ID ?? undefined
@@ -86,10 +80,10 @@ async function extractUserMany() {
     mode: "FUNCTIONS"
   })
 
-  const user: Users = await client.chat.completions.create({
+  const user = await client.chat.completions.create({
     messages: [{ role: "user", content: "Jason is 30 years old, Sarah is 12" }],
     model: "gpt-3.5-turbo",
-    response_model: UsersSchema,
+    response_model: { schema: UsersSchema },
     max_retries: 3,
     seed: 1
   })

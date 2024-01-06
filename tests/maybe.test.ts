@@ -12,8 +12,6 @@ async function maybeExtractUser(content: string) {
 
   const MaybeUserSchema = maybe(UserSchema)
 
-  type MaybeUser = z.infer<typeof MaybeUserSchema>
-
   const oai = new OpenAI({
     apiKey: process.env.OPENAI_API_KEY ?? undefined,
     organization: process.env.OPENAI_ORG_ID ?? undefined
@@ -24,10 +22,10 @@ async function maybeExtractUser(content: string) {
     mode: "TOOLS"
   })
 
-  const user: MaybeUser = await client.chat.completions.create({
+  const user = await client.chat.completions.create({
     messages: [{ role: "user", content: "Extract " + content }],
     model: "gpt-4",
-    response_model: MaybeUserSchema,
+    response_model: { schema: MaybeUserSchema },
     max_retries: 3,
     seed: 1
   })

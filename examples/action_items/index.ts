@@ -23,8 +23,6 @@ const ActionItemsSchema = z.object({
   items: z.array(TicketSchema)
 })
 
-type ActionItems = z.infer<typeof ActionItemsSchema>
-
 const oai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY ?? undefined,
   organization: process.env.OPENAI_ORG_ID ?? undefined
@@ -35,8 +33,8 @@ const client = Instructor({
   mode: "TOOLS"
 })
 
-const extractActionItems = async (data: string): Promise<ActionItems | undefined> => {
-  const actionItems: ActionItems = await client.chat.completions.create({
+const extractActionItems = async (data: string) => {
+  const actionItems = await client.chat.completions.create({
     messages: [
       {
         role: "system",
@@ -48,14 +46,14 @@ const extractActionItems = async (data: string): Promise<ActionItems | undefined
       }
     ],
     model: "gpt-4-1106-preview",
-    response_model: ActionItemsSchema,
-    temperature: 0.3,
+    response_model: { schema: ActionItemsSchema },
     max_tokens: 1000,
+    temperature: 0.0,
     max_retries: 2,
     seed: 1
   })
 
-  return actionItems || undefined
+  return actionItems
 }
 
 const actionItems = await extractActionItems(
