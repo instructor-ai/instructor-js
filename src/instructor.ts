@@ -17,7 +17,7 @@ import type {
 import { Stream } from "openai/streaming.mjs"
 import { SchemaStream } from "schema-stream"
 import { z } from "zod"
-import zodToJsonSchema from "zod-to-json-schema"
+import zodToJsonSchema, { JsonSchema7Type } from "zod-to-json-schema"
 import { fromZodError } from "zod-validation-error"
 
 import { MODE } from "@/constants/modes"
@@ -44,13 +44,18 @@ type ResponseModel<T> = {
   description?: string
 }
 
+export type ParseParams = {
+  name: string
+  description?: string
+} & JsonSchema7Type
+
 type InstructorChatCompletionParams<T> = {
   response_model: ResponseModel<T>
   max_retries?: number
 }
 
-type ChatCompletionCreateParamsWithModel<T extends z.ZodTypeAny> = ChatCompletionCreateParams &
-  InstructorChatCompletionParams<T>
+export type ChatCompletionCreateParamsWithModel<T extends z.ZodTypeAny> =
+  ChatCompletionCreateParams & InstructorChatCompletionParams<T>
 
 type ReturnTypeBasedOnParams<P> = P extends ChatCompletionCreateParamsWithModel<infer T>
   ? P extends { stream: true }
@@ -246,16 +251,20 @@ class Instructor {
     response_model,
     ...params
   }: ChatCompletionCreateParamsWithModel<T>): ChatCompletionCreateParams => {
-    const jsonSchema = zodToJsonSchema(response_model.schema, {
-      name: "response_model",
-      errorMessages: true
-    })
+    // TODO: update default response_model name
+    const model_name = response_model.name ?? "response_model"
 
-    this.log("JSON Schema from zod: ", jsonSchema)
+    const modelJsonSchema = zodToJsonSchema(response_model.schema, {
+      name: model_name,
+      errorMessages: true
+    }).definitions
+
+    this.log("JSON Schema from zod: ", modelJsonSchema)
 
     const definition = {
-      name: "response_model",
-      ...jsonSchema.definitions?.response_model
+      name: model_name,
+      description: response_model.description,
+      ...modelJsonSchema?.[model_name]
     }
 
     const paramsForMode = MODE_TO_PARAMS[this.mode](definition, params, this.mode)

@@ -1,4 +1,7 @@
+import { ChatCompletionCreateParamsWithModel, ParseParams } from "@/instructor"
 import { omit } from "@/lib"
+import { ChatCompletionCreateParams } from "openai/resources/index.mjs"
+import { z } from "zod"
 
 import { MODE } from "@/constants/modes"
 
@@ -21,7 +24,10 @@ export function OAIBuildFunctionParams(definition, params) {
   }
 }
 
-export function OAIBuildToolFunctionParams(definition, params) {
+export function OAIBuildToolFunctionParams<T extends z.ZodTypeAny>(
+  definition: ParseParams,
+  params: Omit<ChatCompletionCreateParamsWithModel<T>, "response_model">
+): ChatCompletionCreateParams {
   const { name, description, ...definitionParams } = definition
 
   return {
@@ -35,7 +41,7 @@ export function OAIBuildToolFunctionParams(definition, params) {
         type: "function",
         function: {
           name: name,
-          description: description ?? undefined,
+          description: description,
           parameters: definitionParams
         }
       },
