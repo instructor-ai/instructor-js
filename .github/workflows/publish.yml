@@ -1,4 +1,4 @@
-name: Publish changesets
+name: Publish
 
 on:
   pull_request:
@@ -9,13 +9,17 @@ concurrency: ${{ github.workflow }}-${{ github.ref }}
 permissions: {} #reset
 jobs:
   publish:
-    if: github.repository == 'jxnl/instructor-js' && github.event.pull_request.merged == true && (startsWith(github.head_ref, 'changeset-release/main') || startsWith(github.head_ref, '_publish-trigger'))
+    if: github.repository == 'instructor-ai/instructor-js' && github.event.pull_request.merged == true && (startsWith(github.head_ref, 'changeset-release/main') || startsWith(github.head_ref, '_publish-trigger'))
     permissions:
       contents: write
       pull-requests: write
 
     name: Publish packages
     runs-on: ubuntu-latest
+    environment: Publish
+    env:
+      NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+    
 
     steps:
       - name: Checkout Repo

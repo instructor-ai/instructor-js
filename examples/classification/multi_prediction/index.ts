@@ -13,8 +13,6 @@ const MultiClassificationSchema = z.object({
   predicted_labels: z.array(z.nativeEnum(MULTI_CLASSIFICATION_LABELS))
 })
 
-type MultiClassification = z.infer<typeof MultiClassificationSchema>
-
 const oai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY ?? undefined,
   organization: process.env.OPENAI_ORG_ID ?? undefined
@@ -22,18 +20,19 @@ const oai = new OpenAI({
 
 const client = Instructor({
   client: oai,
-  mode: "FUNCTIONS"
+  mode: "TOOLS"
 })
 
-const createClassification = async (data: string): Promise<MultiClassification | undefined> => {
+const createClassification = async (data: string) => {
   const classification = await client.chat.completions.create({
     messages: [{ role: "user", content: `"Classify the following support ticket: ${data}` }],
     model: "gpt-3.5-turbo",
-    response_model: MultiClassificationSchema,
-    max_retries: 3
+    response_model: { schema: MultiClassificationSchema },
+    max_retries: 3,
+    seed: 1
   })
 
-  return classification || undefined
+  return classification
 }
 
 const classification = await createClassification(

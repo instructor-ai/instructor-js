@@ -1,27 +1,31 @@
 {
-  "name": "instructor-js",
+  "name": "@instructor-ai/instructor",
   "version": "0.0.1",
   "description": "structured outputs for llms",
-  "main": "./dist/index.js",
-  "module": "./dist/index.mjs",
-  "types": "./dist/index.d.ts",
-  "exports": {
-    ".": {
-      "import": "./dist/index.mjs",
-      "require": "./dist/index.js"
-    }
-  },
   "publishConfig": {
     "access": "public"
   },
+  "main": "./dist/instructor.js",
+  "module": "./dist/instructor.mjs",
+  "types": "./dist/instructor.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/instructor.mjs",
+      "require": "./dist/instructor.js"
+    },
+    "./*": "./dist/*.mjs"
+  },
+  "files": [
+    "dist/**"
+  ],
+  "sideEffects": false,
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsup",
-    "lint": "eslint src/",
+    "lint": "eslint \"**/*.{js,json,jsx,ts,tsx}\"",
+    "lint:fix": "eslint --fix \"**/*.{js,json,jsx,ts,tsx}\"",
     "type-check": "tsc --noEmit",
     "prepare": "husky install",
-    "format:write": "prettier --write \"**/*.{js,json,jsx,ts,tsx}\"",
-    "format": "prettier \"src/**/*.{js,jsx,ts,tsx}\" --check",
     "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist",
     "changeset": "changeset",
     "version-packages": "changeset version",
@@ -29,7 +33,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/jxnl/instructor-js.git"
+    "url": "git+https://github.com/instructor-ai/instructor-js.git"
   },
   "keywords": [
     "llm",
@@ -40,11 +44,11 @@
   "author": "Jason Liu",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/jxnl/instructor-js/issues"
+    "url": "https://github.com/instructor-ai/instructor-js/issues"
   },
-  "homepage": "https://github.com/jxnl/instructor-js#readme",
+  "homepage": "https://github.com/instructor-ai/instructor-js#readme",
   "dependencies": {
-    "schema-stream": "1.2.1",
+    "schema-stream": "1.6.0",
     "zod-to-json-schema": "^3.22.3",
     "zod-validation-error": "^2.1.0"
   },

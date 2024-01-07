@@ -49,7 +49,7 @@ async function classify(data: string): Promise<SimpleClassification> {
   const classification = await client.chat.completions.create({
     messages: [{ role: "user", content: `"Classify the following text: ${data}` }],
     model: "gpt-3.5-turbo",
-    response_model: SimpleClassificationSchema,
+    response_model: { schema: SimpleClassificationSchema },
     max_retries: 3
   })
 
@@ -93,7 +93,7 @@ async function multi_classify(data: string): Promise<MultiClassification> {
   const classification = await client.chat.completions.create({
     messages: [{ role: "user", content: `"Classify the following support ticket: ${data}` }],
     model: "gpt-3.5-turbo",
-    response_model: MultiClassificationSchema,
+    response_model: { schema: MultiClassificationSchema },
     max_retries: 3
   })
   return classification 

@@ -1,3 +1,5 @@
+import { omit } from "@/lib"
+
 import { MODE } from "@/constants/modes"
 
 export function OAIBuildFunctionParams(definition, params) {
@@ -13,7 +15,7 @@ export function OAIBuildFunctionParams(definition, params) {
       {
         name: name,
         description: description ?? undefined,
-        paramaters: definitionParams
+        parameters: definitionParams
       }
     ]
   }
@@ -43,8 +45,6 @@ export function OAIBuildToolFunctionParams(definition, params) {
 }
 
 export function OAIBuildMessageBasedParams(definition, params, mode) {
-  const { name, ...jsonSchema } = definition
-
   const MODE_SPECIFIC_CONFIGS = {
     [MODE.JSON]: {
       response_format: { type: "json_object" }
@@ -52,7 +52,7 @@ export function OAIBuildMessageBasedParams(definition, params, mode) {
     [MODE.JSON_SCHEMA]: {
       response_format: {
         type: "json_object",
-        schema: jsonSchema
+        schema: omit(["name", "description"], definition)
       }
     }
   }
@@ -68,8 +68,8 @@ export function OAIBuildMessageBasedParams(definition, params, mode) {
         role: "system",
         content: `
           Given a user prompt, you will return fully valid JSON based on the following description and schema.
-          You will return no other prose. You will take into account any descriptions or required paramaters within the schema
-          and return a valid JSON object that matches the schema and those instructions.
+          You will return no other prose. You will take into account any descriptions or required parameters within the schema
+          and return a valid and fully escaped JSON object that matches the schema and those instructions.
 
           description: ${definition?.description}
           json schema: ${JSON.stringify(definition)}

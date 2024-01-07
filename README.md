@@ -6,7 +6,7 @@ _Structured extraction in Typescript, powered by llms, designed for simplicity, 
 
 [![Twitter Follow](https://img.shields.io/twitter/follow/jxnlco?style=social)](https://twitter.com/jxnlco)
 [![Documentation](https://img.shields.io/badge/docs-available-brightgreen)](https://jxnl.github.io/instructor-js)
-[![GitHub issues](https://img.shields.io/github/issues/jxnl/instructor-js.svg)](https://github.com/jxnl/instructor-js/issues)
+[![GitHub issues](https://img.shields.io/github/issues/instructor-ai/instructor-js.svg)](https://github.com/instructor-ai/instructor-js/issues)
 [![Discord](https://img.shields.io/discord/1192334452110659664?label=discord)](https://discord.gg/CV8sPM5k5Y)
 
 Dive into the world of Python-based structured extraction, by OpenAI's function calling API and Pydantic, the most widely used data validation library for Python. Instructor stands out for its simplicity, transparency, and user-centric design. Whether you're a seasoned developer or just starting out, you'll find Instructor's approach intuitive and steerable.
@@ -22,8 +22,8 @@ Dive into the world of Python-based structured extraction, by OpenAI's function 
 
 ## Usage
 
-```js
-import Instructor from "@/instructor"
+```ts
+import Instructor from "@instructor-ai/instructor";
 import OpenAI from "openai"
 import { z } from "zod"
 
@@ -47,7 +47,7 @@ const client = Instructor({
 const user: User = await client.chat.completions.create({
   messages: [{ role: "user", content: "Jason Liu is 30 years old" }],
   model: "gpt-3.5-turbo",
-  response_model: UserSchema
+  response_model: { schema: UserSchema }
 })
 
 console.log(user)
@@ -74,7 +74,7 @@ If you'd like to see more check out our [cookbook](examples/index.md).
 
 ## Contributing
 
-If you want to help out, checkout some of the issues marked as `good-first-issue` or `help-wanted`. Found [here](https://github.com/jxnl/instructor-js/labels/good%20first%20issue). They could be anything from code improvements, a guest blog post, or a new cook book.
+If you want to help out, checkout some of the issues marked as `good-first-issue` or `help-wanted`. Found [here](https://github.com/instructor-ai/instructor-js/labels/good%20first%20issue). They could be anything from code improvements, a guest blog post, or a new cook book.
 
 ## License
 
@@ -84,14 +84,14 @@ This project is licensed under the terms of the MIT License.
 
 - [ ] Add `llm_validator`
 - [ ] Logging for Distillation / Finetuning
-- [ ] Support Streaming
+- [x] Support Streaming
 - [ ] Optional/Maybe types
 - [ ] Add Tutorials, include in docs
     - [x] Text Classification
     - [ ] Search Queries
-    - [ ] Query Decomposition
+    - [x] Query Decomposition
     - [ ] Citations
-    - [ ] Knowledge Graph
+    - [x] Knowledge Graph
     - [ ] Self Critique
     - [ ] Image Extracting Tables
     - [ ] Moderation

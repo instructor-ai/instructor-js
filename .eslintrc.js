@@ -19,5 +19,6 @@ module.exports = {
         caughtErrorsIgnorePattern: "^_"
       }
     ]
-  }
+  },
+  ignorePatterns: ["node_modules/", "dist/", "coverage/", "docs/"]
 }
