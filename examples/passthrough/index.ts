@@ -16,6 +16,6 @@ const completion = (await client.chat.completions.create({
   messages: [{ role: "user", content: "Jason Liu is 30 years old" }],
   model: "gpt-3.5-turbo",
   seed: 1
-})) satisfies OpenAI.ChatCompletion
+})) satisfies OpenAI.Chat.ChatCompletion
 
 console.log(completion)
