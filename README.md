@@ -84,14 +84,14 @@ This project is licensed under the terms of the MIT License.
 
 - [ ] Add `llm_validator`
 - [ ] Logging for Distillation / Finetuning
-- [ ] Support Streaming
+- [x] Support Streaming
 - [ ] Optional/Maybe types
 - [ ] Add Tutorials, include in docs
     - [x] Text Classification
     - [ ] Search Queries
-    - [ ] Query Decomposition
+    - [x] Query Decomposition
     - [ ] Citations
-    - [ ] Knowledge Graph
+    - [x] Knowledge Graph
     - [ ] Self Critique
     - [ ] Image Extracting Tables
     - [ ] Moderation
