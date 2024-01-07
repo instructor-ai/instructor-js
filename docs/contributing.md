@@ -1,12 +1,14 @@
 We would love for you to contribute to `Instructor-js`.
 
-## [Evals](https://github.com/jxnl/instructor-js/tree/main/tests/openai/evals)
+## Migrating Docs from Python
 
-We invite you to contribute evals in Bun as a way to monitor the quality of the openai models and the instructor library. To get started check out the [jxnl/instructor-js/tests/evals](https://github.com/jxnl/instructor-js/tree/main/tests/openai/evals) and contribute your own evals in the form of pytest tests. These evals will be run once a week and the results will be posted.
+Theres a bunch of examples in the python version, including documentation here [python docs](https://jxnl.github.io/instructor/examples/)
+
+If you want to contribute, please check out [issues](https://github.com/instructor-ai/instructor-js/issues/8)
 
 ## Issues
 
-If you find a bug, please file an issue on [our issue tracker on GitHub](https://github.com/jxnl/instructor-js/issues).
+If you find a bug, please file an issue on [our issue tracker on GitHub](https://github.com/instructor-ai/instructor-js/issues).
 
 To help us reproduce the bug, please provide a minimal reproducible example, including a code snippet and the full error message.
 
@@ -18,9 +20,9 @@ To help us reproduce the bug, please provide a minimal reproducible example, inc
 
 We welcome pull requests! There is plenty to do, and we are happy to discuss any contributions you would like to make.
 
-If it is not a small change, please start by [filing an issue](https://github.com/jxnl/instructor-js/issues) first.
+If it is not a small change, please start by [filing an issue](https://github.com/instructor-ai/instructor-js/issues) first.
 
-If you need ideas, you can check out the [help wanted](https://github.com/jxnl/instructor-js/labels/help%20wanted) or [good first issue](https://github.com/jxnl/instructor-js/labels/good%20first%20issue) labels.
+If you need ideas, you can check out the [help wanted](https://github.com/instructor-ai/instructor-js/labels/help%20wanted) or [good first issue](https://github.com/instructor-ai/instructor-js/labels/good%20first%20issue) labels.
 
 # Contributors
 
@@ -34,7 +36,7 @@ If you need ideas, you can check out the [help wanted](https://github.com/jxnl/i
 <!-- ALL-CONTRIBUTORS-LIST:END -->
 
 <a href="https://github.com/jxnl/instructor/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=jxnl/instructor-js" />
+  <img src="https://contrib.rocks/image?repo=instructor-ai/instructor-js" />
 </a>
 
 

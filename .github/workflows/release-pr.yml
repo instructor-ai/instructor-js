@@ -1,4 +1,4 @@
-name: Create changeset release PR
+name: RC PR
 
 on:
   push:
@@ -12,13 +12,17 @@ env:
 
 jobs:
   release:
-    if: github.repository == 'jxnl/instructor-js'
+    if: github.repository == 'instructor-ai/instructor-js'
     permissions:
       contents: write
       pull-requests: write
 
     name: Changeset Release
     runs-on: ubuntu-latest
+    environment: Publish
+    env:
+      NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+      GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
     steps:
       - name: Checkout code
@@ -49,5 +53,5 @@ jobs:
         with:
           version: bun run version-packages
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
           NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}

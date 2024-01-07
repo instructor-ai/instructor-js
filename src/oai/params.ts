@@ -71,7 +71,7 @@ export function OAIBuildMessageBasedParams<T extends z.ZodTypeAny>(
     [MODE.JSON_SCHEMA]: {
       response_format: {
         type: "json_object",
-        schema: omit(["name"], definition)
+        schema: omit(["name", "description"], definition)
       }
     }
   }
@@ -87,8 +87,8 @@ export function OAIBuildMessageBasedParams<T extends z.ZodTypeAny>(
         role: "system",
         content: `
           Given a user prompt, you will return fully valid JSON based on the following description and schema.
-          You will return no other prose. You will take into account any descriptions or required paramaters within the schema
-          and return a valid JSON object that matches the schema and those instructions.
+          You will return no other prose. You will take into account any descriptions or required parameters within the schema
+          and return a valid and fully escaped JSON object that matches the schema and those instructions.
 
           description: ${definition.description}
           json schema: ${JSON.stringify(definition)}

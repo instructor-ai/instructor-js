@@ -1,4 +1,4 @@
-name: test-wf
+name: Test
 on:
   push:
     branches: 
@@ -36,4 +36,4 @@ jobs:
 
       - run: bun run type-check
       - run: bun run lint
-      - run: bun test
+      - run: bun test --timeout=15000

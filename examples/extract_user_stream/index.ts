@@ -56,7 +56,7 @@ const extractionStream = await client.chat.completions.create({
   model: "gpt-4-1106-preview",
   response_model: {
     schema: ExtractionValuesSchema,
-    name: "Extraction"
+    name: "value extraction"
   },
   max_retries: 3,
   stream: true,
