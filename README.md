@@ -23,7 +23,7 @@ Dive into the world of Python-based structured extraction, by OpenAI's function 
 ## Usage
 
 ```ts
-import Instructor from "@/instructor"
+import Instructor from "@instructor-ai/instructor";
 import OpenAI from "openai"
 import { z } from "zod"
 
