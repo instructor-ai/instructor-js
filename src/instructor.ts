@@ -106,7 +106,7 @@ class Instructor {
     let validationIssues = ""
     let lastMessage: ChatCompletionMessageParam | null = null
 
-    const completionParams = this.buildChatCompletionParams({ ...params })
+    const completionParams = this.buildChatCompletionParams(params)
 
     const makeCompletionCall = async () => {
       let resolvedParams = completionParams
@@ -133,7 +133,7 @@ class Instructor {
 
         if ("choices" in completion) {
           const parsedCompletion = parser(completion)
-          return JSON.parse(parsedCompletion)
+          return JSON.parse(parsedCompletion) as z.infer<T>
         } else {
           return OAIStream({ res: completion, parser })
         }
