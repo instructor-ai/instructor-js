@@ -46,7 +46,7 @@ const client = Instructor({
 const user: User = await client.chat.completions.create({
   messages: [{ role: "user", content: "Jason Liu is 30 years old" }],
   model: "gpt-3.5-turbo",
-  response_model: UserSchema
+  response_model: { schema: UserSchema }
 })
 
 console.log(user)

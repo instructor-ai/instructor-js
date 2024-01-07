@@ -20,8 +20,6 @@ const KnowledgeGraphSchema = z.object({
   edges: z.array(EdgeSchema)
 })
 
-type KnowledgeGraph = z.infer<typeof KnowledgeGraphSchema>
-
 const oai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY ?? undefined,
   organization: process.env.OPENAI_ORG_ID ?? undefined
@@ -32,8 +30,8 @@ const client = Instructor({
   mode: "JSON"
 })
 
-const createGraph = async (input: string): Promise<KnowledgeGraph | undefined> => {
-  const graph: KnowledgeGraph = await client.chat.completions.create({
+const createGraph = async (input: string) => {
+  const graph = await client.chat.completions.create({
     messages: [
       {
         role: "user",
@@ -41,8 +39,9 @@ const createGraph = async (input: string): Promise<KnowledgeGraph | undefined> =
       }
     ],
     model: "gpt-3.5-turbo-1106",
-    response_model: KnowledgeGraphSchema,
-    max_retries: 5
+    response_model: { schema: KnowledgeGraphSchema },
+    max_retries: 5,
+    seed: 1
   })
 
   return graph

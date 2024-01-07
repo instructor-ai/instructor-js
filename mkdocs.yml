@@ -127,13 +127,16 @@ nav:
     - Help with Instructor: 'help.md'
     - Installation: 'installation.md'
     - Contributing: 'contributing.md'
-  - Tips: concepts/prompting.md'
   - Concepts: 
+    - Overview: 'concepts/tips.md'
     - Modes: 'concepts/modes.md'
     - Schema: 'concepts/schema.md'
+    - Streaming: 'concepts/streaming.md'
   - Cookbook:
     - Overview: 'examples/index.md'
     - Classification: 'examples/classification.md'
+    - Query Decomposition: 'examples/query_decomposition.md'
+    - Action Item and Dependency Mapping: 'examples/action_items.md'
   - Blog:
     - "blog/index.md"
   
@@ -169,7 +172,7 @@ plugins:
 extra:
   analytics:
     provider: google
-    property: G-5CR8QXF5CN
+    property: G-3JFF533YVZ
     feedback:
       title: Was this page helpful?
       ratings:

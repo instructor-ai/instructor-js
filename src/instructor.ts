@@ -38,11 +38,27 @@ const MODE_TO_PARAMS = {
   [MODE.JSON_SCHEMA]: OAIBuildMessageBasedParams
 }
 
-type PatchedChatCompletionCreateParams<Model extends z.ZodType<z.ZodTypeAny> = z.ZodTypeAny> =
-  ChatCompletionCreateParams & {
-    response_model?: Model extends z.ZodType<infer T> ? T : never
-    max_retries?: number
-  }
+type ResponseModel<T> = {
+  schema: T
+  name?: string
+  description?: string
+}
+
+type InstructorChatCompletionParams<T> = {
+  response_model: ResponseModel<T>
+  max_retries?: number
+}
+
+type ChatCompletionCreateParamsWithModel<T extends z.ZodTypeAny> = ChatCompletionCreateParams &
+  InstructorChatCompletionParams<T>
+
+type ReturnTypeBasedOnParams<P> = P extends ChatCompletionCreateParamsWithModel<infer T>
+  ? P extends { stream: true }
+    ? Promise<AsyncGenerator<z.infer<T>, void, unknown>>
+    : Promise<z.infer<T>>
+  : P extends { stream: true }
+    ? Promise<Stream<OpenAI.Chat.Completions.ChatCompletionChunk>>
+    : Promise<OpenAI.Chat.Completions.ChatCompletion>
 
 class Instructor {
   readonly client: OpenAI
@@ -58,6 +74,14 @@ class Instructor {
     this.client = client
     this.mode = mode
     this.debug = debug
+
+    //TODO: probably some more sophisticated validation we can do here re: modes and otherwise.
+    // but just throwing quick here for now.
+    if (mode === MODE.JSON_SCHEMA) {
+      if (!this.client.baseURL.includes("anyscale")) {
+        throw new Error("JSON_SCHEMA mode is only support on Anyscale.")
+      }
+    }
   }
 
   private log = (...args) => {
@@ -69,14 +93,14 @@ class Instructor {
 
   /**
    * Handles chat completion with retries.
-   * @param {PatchedChatCompletionCreateParams} params - The parameters for chat completion.
+   * @param {ChatCompletionCreateParamsWithModel} params - The parameters for chat completion.
    * @returns {Promise<any>} The response from the chat completion.
    */
-  chatCompletion = async <Model extends z.ZodType<z.ZodTypeAny>>({
+  chatCompletion = async <T extends z.ZodTypeAny>({
     max_retries = 3,
     ...params
-  }: PatchedChatCompletionCreateParams<Model>): Promise<
-    Model extends z.ZodType<infer T> ? T : never
+  }: ChatCompletionCreateParamsWithModel<T>): Promise<
+    Promise<z.infer<T>> | AsyncGenerator<z.infer<T>, void, unknown>
   > => {
     let attempts = 0
     let validationIssues = ""
@@ -124,10 +148,9 @@ class Instructor {
         if (params.stream) {
           return this.partialStreamResponse({
             stream: data,
-            schema: params.response_model
+            schema: params.response_model.schema
           })
         }
-
         const validation = await params.response_model!.safeParseAsync(data)
         this.log("Completion validation: ", validation)
 
@@ -163,15 +186,21 @@ class Instructor {
 
   private async partialStreamResponse({ stream, schema }) {
     let _activeKey = null
+    let _completedKeys = []
+
     const streamParser = new SchemaStream(schema, {
-      onKeyComplete: ({ activeKey }) => {
+      typeDefaults: {
+        string: null,
+        number: null,
+        boolean: null
+      },
+      onKeyComplete: ({ activeKey, completedKeys }) => {
         _activeKey = activeKey
+        _completedKeys = completedKeys
       }
     })
 
-    const parser = streamParser.parse({
-      stringStreaming: true
-    })
+    const parser = streamParser.parse({})
 
     const textEncoder = new TextEncoder()
     const textDecoder = new TextDecoder()
@@ -184,7 +213,12 @@ class Instructor {
 
           controller.enqueue(
             textEncoder.encode(
-              JSON.stringify({ ...parsedChunk, _isValid: validation.success, _activeKey })
+              JSON.stringify({
+                ...parsedChunk,
+                _isValid: validation.success,
+                _activeKey,
+                _completedKeys
+              })
             )
           )
         } catch (e) {
@@ -204,14 +238,14 @@ class Instructor {
 
   /**
    * Builds the chat completion parameters.
-   * @param {PatchedChatCompletionCreateParams} params - The parameters for chat completion.
+   * @param {ChatCompletionCreateParamsWithModel} params - The parameters for chat completion.
    * @returns {ChatCompletionCreateParams} The chat completion parameters.
    */
-  private buildChatCompletionParams = ({
+  private buildChatCompletionParams = <T extends z.ZodTypeAny>({
     response_model,
     ...params
-  }: PatchedChatCompletionCreateParams): ChatCompletionCreateParams => {
-    const jsonSchema = zodToJsonSchema(response_model, {
+  }: ChatCompletionCreateParamsWithModel<T>): ChatCompletionCreateParams => {
+    const jsonSchema = zodToJsonSchema(response_model.schema, {
       name: "response_model",
       errorMessages: true
     })
@@ -232,7 +266,7 @@ class Instructor {
   }
 
   chatCompletionWithoutModel = async (
-    params: Omit<PatchedChatCompletionCreateParams, "response_model">
+    params: ChatCompletionCreateParams
   ): Promise<
     Stream<OpenAI.Chat.Completions.ChatCompletionChunk> | OpenAI.Chat.Completions.ChatCompletion
   > => {
@@ -241,19 +275,26 @@ class Instructor {
 
   public chat = {
     completions: {
-      create: (params: PatchedChatCompletionCreateParams) => {
-        if ("response_model" in params) {
-          return this.chatCompletion(params)
+      create: <
+        P extends ChatCompletionCreateParamsWithModel<z.ZodTypeAny> | ChatCompletionCreateParams
+      >(
+        params: P
+      ): ReturnTypeBasedOnParams<P> => {
+        if ("response_model" in params && params.response_model?.schema !== undefined) {
+          return this.chatCompletion(
+            params as ChatCompletionCreateParamsWithModel<z.ZodTypeAny>
+          ) as ReturnTypeBasedOnParams<P>
         } else {
-          return this.chatCompletionWithoutModel(params)
+          return this.chatCompletionWithoutModel(
+            params as ChatCompletionCreateParams
+          ) as ReturnTypeBasedOnParams<P>
         }
       }
     }
   }
 }
 
-// TODO: Think about moving this to it's own type file
-export type OAIClientExtended = OpenAI & Instructor
+type OAIClientExtended = OpenAI & Instructor
 
 export default function (args: { client: OpenAI; mode: MODE; debug?: boolean }): OAIClientExtended {
   const instructor = new Instructor(args)

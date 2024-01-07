@@ -1,3 +1,5 @@
+import { omit } from "@/lib"
+
 import { MODE } from "@/constants/modes"
 
 export function OAIBuildFunctionParams(definition, params) {
@@ -48,8 +50,10 @@ export function OAIBuildMessageBasedParams(definition, params, mode) {
       response_format: { type: "json_object" }
     },
     [MODE.JSON_SCHEMA]: {
-      //TODO: not sure what is different about this mode - the OAI sdk doesnt accept a schema here
-      response_format: { type: "json_object" }
+      response_format: {
+        type: "json_object",
+        schema: omit(["name"], definition)
+      }
     }
   }
 
@@ -65,7 +69,7 @@ export function OAIBuildMessageBasedParams(definition, params, mode) {
         content: `
           Given a user prompt, you will return fully valid JSON based on the following description and schema.
           You will return no other prose. You will take into account any descriptions or required paramaters within the schema
-          and return a valid JSON object that matches the schema and those instructions.
+          and return a valid and fully escaped JSON object that matches the schema and those instructions.
 
           description: ${definition?.description}
           json schema: ${JSON.stringify(definition)}

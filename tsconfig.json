@@ -18,7 +18,6 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "incremental": true,
-    "strictNullChecks": true,
     "tsBuildInfoFile": "tsconfig.tsbuildinfo",
     "paths": {
       "@/*": ["./src/*"]

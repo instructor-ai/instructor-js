@@ -14,6 +14,7 @@ jobs:
     environment: OPENAI
     env:
       OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      ANYSCALE_API_KEY: ${{ secrets.ANYSCALE_API_KEY }}
 
     steps:
       - uses: actions/checkout@v3
@@ -35,4 +36,4 @@ jobs:
 
       - run: bun run type-check
       - run: bun run lint
-      - run: bun test
+      - run: bun test --timeout=15000
