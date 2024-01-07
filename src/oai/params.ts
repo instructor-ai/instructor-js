@@ -52,7 +52,7 @@ export function OAIBuildMessageBasedParams(definition, params, mode) {
     [MODE.JSON_SCHEMA]: {
       response_format: {
         type: "json_object",
-        schema: omit(["name"], definition)
+        schema: omit(["name", "description"], definition)
       }
     }
   }

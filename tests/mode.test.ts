@@ -7,7 +7,7 @@ import { MODE } from "@/constants/modes"
 
 const models_latest = ["gpt-3.5-turbo-1106", "gpt-4-1106-preview"]
 const models_old = ["gpt-3.5-turbo", "gpt-4"]
-const models_anyscale = ["mistralai/Mixtral-8x7B-Instruct-v0.1"]
+const models_anyscale = ["Open-Orca/Mistral-7B-OpenOrca"]
 
 const createTestCases = (): { model: string; mode: MODE }[] => {
   const { FUNCTIONS, JSON_SCHEMA, ...rest } = MODE
