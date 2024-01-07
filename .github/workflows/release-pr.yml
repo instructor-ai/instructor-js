@@ -1,4 +1,4 @@
-name: Create changeset release PR
+name: RC PR
 
 on:
   push:
@@ -12,7 +12,7 @@ env:
 
 jobs:
   release:
-    if: github.repository == 'jxnl/instructor-js'
+    if: github.repository == 'instructor-ai/instructor-js'
     permissions:
       contents: write
       pull-requests: write

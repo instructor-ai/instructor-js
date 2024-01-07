@@ -1,4 +1,4 @@
-name: test-wf
+name: Test
 on:
   push:
     branches: 

@@ -21,11 +21,11 @@ The [cookbooks](examples/index.md) are a great place to start. They contain a va
 
 ## :material-github: GitHub Discussions
 
-[GitHub discussions](https://github.com/jxnl/instructor-js/discussions) are useful for asking questions, your question and the answer will help everyone.
+[GitHub discussions](https://github.com/instructor-ai/instructor-js/discussions) are useful for asking questions, your question and the answer will help everyone.
 
 ## :material-github: GitHub Issues
 
-[GitHub issues](https://github.com/jxnl/instructor-js/issues) are useful for reporting bugs or requesting new features.
+[GitHub issues](https://github.com/instructor-ai/instructor-js/issues) are useful for reporting bugs or requesting new features.
 
 ## :material-twitter: Twitter
 

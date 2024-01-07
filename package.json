@@ -33,7 +33,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/jxnl/instructor-js.git"
+    "url": "git+https://github.com/instructor-ai/instructor-js.git"
   },
   "keywords": [
     "llm",
@@ -44,9 +44,9 @@
   "author": "Jason Liu",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/jxnl/instructor-js/issues"
+    "url": "https://github.com/instructor-ai/instructor-js/issues"
   },
-  "homepage": "https://github.com/jxnl/instructor-js#readme",
+  "homepage": "https://github.com/instructor-ai/instructor-js#readme",
   "dependencies": {
     "schema-stream": "1.6.0",
     "zod-to-json-schema": "^3.22.3",
