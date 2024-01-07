@@ -1,14 +1,14 @@
 {
   "$schema": "https://unpkg.com/@changesets/config@2.3.0/schema.json",
-  "changelog": ["@changesets/changelog-github", { "repo": "jxnl/instructor-js" }],
+  "changelog": ["@changesets/changelog-github", { "repo": "instructor-ai/instructor-js" }],
   "commit": false,
   "fixed": [],
   "linked": [],
-  "access": "restricted",
+  "access": "public",
   "baseBranch": "main",
   "ignore": [],
   "privatePackages": {
-    "version": true,
+    "version": false,
     "tag": false
   }
 }

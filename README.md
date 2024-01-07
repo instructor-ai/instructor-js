@@ -6,7 +6,7 @@ _Structured extraction in Typescript, powered by llms, designed for simplicity, 
 
 [![Twitter Follow](https://img.shields.io/twitter/follow/jxnlco?style=social)](https://twitter.com/jxnlco)
 [![Documentation](https://img.shields.io/badge/docs-available-brightgreen)](https://jxnl.github.io/instructor-js)
-[![GitHub issues](https://img.shields.io/github/issues/jxnl/instructor-js.svg)](https://github.com/jxnl/instructor-js/issues)
+[![GitHub issues](https://img.shields.io/github/issues/instructor-ai/instructor-js.svg)](https://github.com/instructor-ai/instructor-js/issues)
 [![Discord](https://img.shields.io/discord/1192334452110659664?label=discord)](https://discord.gg/CV8sPM5k5Y)
 
 Dive into the world of Python-based structured extraction, by OpenAI's function calling API and Pydantic, the most widely used data validation library for Python. Instructor stands out for its simplicity, transparency, and user-centric design. Whether you're a seasoned developer or just starting out, you'll find Instructor's approach intuitive and steerable.
@@ -74,7 +74,7 @@ If you'd like to see more check out our [cookbook](examples/index.md).
 
 ## Contributing
 
-If you want to help out, checkout some of the issues marked as `good-first-issue` or `help-wanted`. Found [here](https://github.com/jxnl/instructor-js/labels/good%20first%20issue). They could be anything from code improvements, a guest blog post, or a new cook book.
+If you want to help out, checkout some of the issues marked as `good-first-issue` or `help-wanted`. Found [here](https://github.com/instructor-ai/instructor-js/labels/good%20first%20issue). They could be anything from code improvements, a guest blog post, or a new cook book.
 
 ## License
 
