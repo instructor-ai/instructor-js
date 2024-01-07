@@ -247,13 +247,14 @@ class Instructor {
     ...params
   }: ChatCompletionCreateParamsWithModel<T>): ChatCompletionCreateParams => {
     const { schema, name = "response_model", description } = response_model
+    const safeName = name.replace(/[^a-zA-Z0-9]/g, "_").replace(/\s/g, "_")
 
     const { definitions } = zodToJsonSchema(schema, {
-      name,
+      name: safeName,
       errorMessages: true
     })
 
-    if (!definitions || !definitions?.[name]) {
+    if (!definitions || !definitions?.[safeName]) {
       console.warn("Could not extract json schema definitions from your schema", schema)
       throw new Error("Could not extract json schema definitions from your schema")
     }
@@ -261,9 +262,9 @@ class Instructor {
     this.log("JSON Schema from zod: ", definitions)
 
     const definition = {
-      name,
+      name: safeName,
       description,
-      ...definitions[name]
+      ...definitions[safeName]
     }
 
     const paramsForMode = MODE_TO_PARAMS[this.mode](definition, params, this.mode)

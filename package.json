@@ -1,19 +1,24 @@
 {
   "name": "instructor-js",
-  "version": "0.0.1",
+  "version": "0.0.1--alpha.0",
   "description": "structured outputs for llms",
-  "main": "./dist/index.js",
-  "module": "./dist/index.mjs",
-  "types": "./dist/index.d.ts",
-  "exports": {
-    ".": {
-      "import": "./dist/index.mjs",
-      "require": "./dist/index.js"
-    }
-  },
   "publishConfig": {
     "access": "public"
   },
+  "main": "./dist/instructor.js",
+  "module": "./dist/instructor.mjs",
+  "types": "./dist/instructor.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/instructor.mjs",
+      "require": "./dist/instructor.js"
+    },
+    "./*": "./dist/*.mjs"
+  },
+  "files": [
+    "dist/**"
+  ],
+  "sideEffects": false,
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsup",
