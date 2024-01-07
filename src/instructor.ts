@@ -17,7 +17,7 @@ import type {
 import { Stream } from "openai/streaming.mjs"
 import { SchemaStream } from "schema-stream"
 import { z } from "zod"
-import zodToJsonSchema, { JsonSchema7Type } from "zod-to-json-schema"
+import zodToJsonSchema from "zod-to-json-schema"
 import { fromZodError } from "zod-validation-error"
 
 import { MODE } from "@/constants/modes"
@@ -38,19 +38,19 @@ const MODE_TO_PARAMS = {
   [MODE.JSON_SCHEMA]: OAIBuildMessageBasedParams
 }
 
-type ResponseModel<T> = {
+type ResponseModel<T extends z.ZodTypeAny> = {
   schema: T
-  name?: string
+  name: string
   description?: string
 }
 
-type InstructorChatCompletionParams<T> = {
+type InstructorChatCompletionParams<T extends z.ZodTypeAny> = {
   response_model: ResponseModel<T>
   max_retries?: number
 }
 
 export type ChatCompletionCreateParamsWithModel<T extends z.ZodTypeAny> =
-  ChatCompletionCreateParams & InstructorChatCompletionParams<T>
+  InstructorChatCompletionParams<T> & ChatCompletionCreateParams
 
 type ReturnTypeBasedOnParams<P> = P extends ChatCompletionCreateParamsWithModel<infer T>
   ? P extends { stream: true }
@@ -96,11 +96,11 @@ class Instructor {
    * @param {ChatCompletionCreateParamsWithModel} params - The parameters for chat completion.
    * @returns {Promise<any>} The response from the chat completion.
    */
-  chatCompletion = async <T extends z.ZodTypeAny>({
+  chatCompletion = <T extends z.ZodTypeAny>({
     max_retries = 3,
     ...params
-  }: ChatCompletionCreateParamsWithModel<T>): Promise<
-    Promise<z.infer<T>> | AsyncGenerator<z.infer<T>, void, unknown>
+  }: ChatCompletionCreateParamsWithModel<T>): ReturnTypeBasedOnParams<
+    ChatCompletionCreateParamsWithModel<T>
   > => {
     let attempts = 0
     let validationIssues = ""
@@ -182,7 +182,7 @@ class Instructor {
       }
     }
 
-    return await makeCompletionCallWithRetries()
+    return makeCompletionCallWithRetries()
   }
 
   private async partialStreamResponse({ stream, schema }) {
@@ -243,23 +243,20 @@ class Instructor {
    * @returns {ChatCompletionCreateParams} The chat completion parameters.
    */
   private buildChatCompletionParams = <T extends z.ZodTypeAny>({
-    response_model,
+    response_model: { name, schema, description },
     ...params
   }: ChatCompletionCreateParamsWithModel<T>): ChatCompletionCreateParams => {
-    // TODO: update default response_model name
-    const model_name = response_model.name ?? "response_model"
-
-    const modelJsonSchema = zodToJsonSchema(response_model.schema, {
-      name: model_name,
+    const { definitions } = zodToJsonSchema(schema, {
+      name,
       errorMessages: true
-    }).definitions
+    })
 
-    this.log("JSON Schema from zod: ", modelJsonSchema)
+    this.log("JSON Schema from zod: ", definitions)
 
     const definition = {
-      name: model_name,
-      description: response_model.description,
-      ...modelJsonSchema?.[model_name]
+      name,
+      description,
+      ...definitions?.[name]
     }
 
     const paramsForMode = MODE_TO_PARAMS[this.mode](definition, params, this.mode)
@@ -270,7 +267,7 @@ class Instructor {
     }
   }
 
-  chatCompletionWithoutModel = async (
+  chatCompletionWithoutModel = (
     params: ChatCompletionCreateParams
   ): Promise<
     Stream<OpenAI.Chat.Completions.ChatCompletionChunk> | OpenAI.Chat.Completions.ChatCompletion
@@ -281,18 +278,18 @@ class Instructor {
   public chat = {
     completions: {
       create: <
-        P extends ChatCompletionCreateParamsWithModel<z.ZodTypeAny> | ChatCompletionCreateParams
+        T extends z.ZodTypeAny | undefined,
+        P extends T extends z.ZodTypeAny
+          ? ChatCompletionCreateParamsWithModel<T>
+          : ChatCompletionCreateParams & { response_model: never }
       >(
         params: P
       ): ReturnTypeBasedOnParams<P> => {
-        if ("response_model" in params && params.response_model?.schema !== undefined) {
-          return this.chatCompletion(
-            params as ChatCompletionCreateParamsWithModel<z.ZodTypeAny>
-          ) as ReturnTypeBasedOnParams<P>
+        if ("response_model" in params) {
+          console.log(params.response_model.name)
+          return this.chatCompletion(params) as ReturnTypeBasedOnParams<P>
         } else {
-          return this.chatCompletionWithoutModel(
-            params as ChatCompletionCreateParams
-          ) as ReturnTypeBasedOnParams<P>
+          return this.chatCompletionWithoutModel(params) as ReturnTypeBasedOnParams<P>
         }
       }
     }

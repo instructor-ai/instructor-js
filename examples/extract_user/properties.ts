@@ -28,7 +28,7 @@ const client = Instructor({
 const user = await client.chat.completions.create({
   messages: [{ role: "user", content: "Happy Potter" }],
   model: "gpt-4",
-  response_model: { schema: UserSchema },
+  response_model: { schema: UserSchema, name: "User" },
   max_retries: 3,
   seed: 1
 })

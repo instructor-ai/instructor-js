@@ -26,7 +26,7 @@ const createClassification = async (data: string) => {
   const classification = await client.chat.completions.create({
     messages: [{ role: "user", content: `"Classify the following text: ${data}` }],
     model: "gpt-3.5-turbo",
-    response_model: { schema: SimpleClassificationSchema },
+    response_model: { schema: SimpleClassificationSchema, name: "SimpleClassification" },
     max_retries: 3,
     seed: 1
   })

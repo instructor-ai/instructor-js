@@ -21,7 +21,8 @@ const user = await client.chat.completions.create({
   messages: [{ role: "user", content: "Jason Liu is 30 years old" }],
   model: "gpt-4",
   response_model: {
-    schema: UserSchema
+    schema: UserSchema,
+    name: "User"
   },
   max_retries: 3,
   seed: 1

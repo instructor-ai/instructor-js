@@ -47,7 +47,7 @@ async function extractUser() {
   const extractionStream = await client.chat.completions.create({
     messages: [{ role: "user", content: textBlock }],
     model: "gpt-3.5-turbo",
-    response_model: { schema: ExtractionValuesSchema },
+    response_model: { schema: ExtractionValuesSchema, name: "Extr" },
     max_retries: 3,
     stream: true,
     seed: 1
