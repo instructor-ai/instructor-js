@@ -41,7 +41,7 @@ export const createQueryPlan = async (question: string) => {
       }
     ],
     model: "gpt-4-1106-preview",
-    response_model: { schema: QueryPlanSchema, name: "query_plan" },
+    response_model: { schema: QueryPlanSchema, name: "Query Plan Decomposition" },
     max_tokens: 1000,
     temperature: 0.0,
     max_retries: 2,

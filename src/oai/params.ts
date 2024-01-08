@@ -1,8 +1,20 @@
+import { ChatCompletionCreateParamsWithModel } from "@/instructor"
 import { omit } from "@/lib"
+import { ChatCompletionCreateParams } from "openai/resources/index.mjs"
+import { z } from "zod"
+import { JsonSchema7Type } from "zod-to-json-schema"
 
 import { MODE } from "@/constants/modes"
 
-export function OAIBuildFunctionParams(definition, params) {
+type ParseParams = {
+  name: string
+  description?: string
+} & JsonSchema7Type
+
+export function OAIBuildFunctionParams<T extends z.ZodTypeAny>(
+  definition: ParseParams,
+  params: Omit<ChatCompletionCreateParamsWithModel<T>, "response_model">
+): ChatCompletionCreateParams {
   const { name, description, ...definitionParams } = definition
 
   return {
@@ -21,7 +33,10 @@ export function OAIBuildFunctionParams(definition, params) {
   }
 }
 
-export function OAIBuildToolFunctionParams(definition, params) {
+export function OAIBuildToolFunctionParams<T extends z.ZodTypeAny>(
+  definition: ParseParams,
+  params: Omit<ChatCompletionCreateParamsWithModel<T>, "response_model">
+): ChatCompletionCreateParams {
   const { name, description, ...definitionParams } = definition
 
   return {
@@ -35,7 +50,7 @@ export function OAIBuildToolFunctionParams(definition, params) {
         type: "function",
         function: {
           name: name,
-          description: description ?? undefined,
+          description: description,
           parameters: definitionParams
         }
       },
@@ -44,7 +59,11 @@ export function OAIBuildToolFunctionParams(definition, params) {
   }
 }
 
-export function OAIBuildMessageBasedParams(definition, params, mode) {
+export function OAIBuildMessageBasedParams<T extends z.ZodTypeAny>(
+  definition: ParseParams,
+  params: Omit<ChatCompletionCreateParamsWithModel<T>, "response_model">,
+  mode: MODE // This type should be typeof MODE.JSON | typeof MODE.JSON_SCHEMA | typeof MODE.MD_JSON
+): ChatCompletionCreateParams {
   const MODE_SPECIFIC_CONFIGS = {
     [MODE.JSON]: {
       response_format: { type: "json_object" }
@@ -57,13 +76,13 @@ export function OAIBuildMessageBasedParams(definition, params, mode) {
     }
   }
 
-  const modeConfig = MODE_SPECIFIC_CONFIGS[mode] ?? {}
+  const modeConfig = MODE_SPECIFIC_CONFIGS[mode]
 
-  return {
+  const t = {
     ...params,
     ...modeConfig,
     messages: [
-      ...(params?.messages ?? []),
+      ...params.messages,
       {
         role: "system",
         content: `
@@ -71,10 +90,11 @@ export function OAIBuildMessageBasedParams(definition, params, mode) {
           You will return no other prose. You will take into account any descriptions or required parameters within the schema
           and return a valid and fully escaped JSON object that matches the schema and those instructions.
 
-          description: ${definition?.description}
+          description: ${definition.description}
           json schema: ${JSON.stringify(definition)}
         `
       }
     ]
   }
+  return t
 }
