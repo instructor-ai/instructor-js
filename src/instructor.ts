@@ -293,7 +293,6 @@ class Instructor {
         params: P
       ): ReturnTypeBasedOnParams<P> => {
         if ("response_model" in params) {
-          console.log(params.response_model.name)
           return this.chatCompletion(params) as ReturnTypeBasedOnParams<P>
         } else {
           return this.chatCompletionWithoutModel(params) as ReturnTypeBasedOnParams<P>
