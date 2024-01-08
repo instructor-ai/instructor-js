@@ -25,7 +25,7 @@ async function maybeExtractUser(content: string) {
   const user = await client.chat.completions.create({
     messages: [{ role: "user", content: "Extract " + content }],
     model: "gpt-4",
-    response_model: { schema: MaybeUserSchema },
+    response_model: { schema: MaybeUserSchema, name: "User" },
     max_retries: 3,
     seed: 1
   })

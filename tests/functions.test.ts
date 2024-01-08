@@ -9,8 +9,6 @@ async function extractUser() {
     name: z.string()
   })
 
-  type User = z.infer<typeof UserSchema>
-
   const oai = new OpenAI({
     apiKey: process.env.OPENAI_API_KEY ?? undefined,
     organization: process.env.OPENAI_ORG_ID ?? undefined
@@ -21,10 +19,10 @@ async function extractUser() {
     mode: "FUNCTIONS"
   })
 
-  const user: User = await client.chat.completions.create({
+  const user = await client.chat.completions.create({
     messages: [{ role: "user", content: "Jason Liu is 30 years old" }],
     model: "gpt-3.5-turbo",
-    response_model: { schema: UserSchema },
+    response_model: { schema: UserSchema, name: "User" },
     seed: 1
   })
 
@@ -42,8 +40,6 @@ async function extractUserValidated() {
       .describe("The users name, all uppercase")
   })
 
-  type User = z.infer<typeof UserSchema>
-
   const oai = new OpenAI({
     apiKey: process.env.OPENAI_API_KEY ?? undefined,
     organization: process.env.OPENAI_ORG_ID ?? undefined
@@ -54,10 +50,10 @@ async function extractUserValidated() {
     mode: "TOOLS"
   })
 
-  const user: User = await client.chat.completions.create({
+  const user = await client.chat.completions.create({
     messages: [{ role: "user", content: "Jason Liu is 30 years old" }],
     model: "gpt-3.5-turbo",
-    response_model: { schema: UserSchema },
+    response_model: { schema: UserSchema, name: "User" },
     max_retries: 3,
     seed: 1
   })
@@ -77,8 +73,6 @@ async function extractUserMany() {
     })
     .describe("Correctly formatted list of users")
 
-  type Users = z.infer<typeof UsersSchema>
-
   const oai = new OpenAI({
     apiKey: process.env.OPENAI_API_KEY ?? undefined,
     organization: process.env.OPENAI_ORG_ID ?? undefined
@@ -89,10 +83,10 @@ async function extractUserMany() {
     mode: "TOOLS"
   })
 
-  const user: Users = await client.chat.completions.create({
+  const user = await client.chat.completions.create({
     messages: [{ role: "user", content: "Jason is 30 years old, Sarah is 12" }],
     model: "gpt-3.5-turbo",
-    response_model: { schema: UsersSchema },
+    response_model: { schema: UsersSchema, name: "Users" },
     max_retries: 3,
     seed: 1
   })

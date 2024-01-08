@@ -5,13 +5,14 @@ _Structured extraction in Typescript, powered by llms, designed for simplicity, 
 ---
 
 [![Twitter Follow](https://img.shields.io/twitter/follow/jxnlco?style=social)](https://twitter.com/jxnlco)
+[![Twitter Follow](https://img.shields.io/twitter/follow/dimitrikennedy?style=social)](https://twitter.com/dimitrikennedy)
 [![Documentation](https://img.shields.io/badge/docs-available-brightgreen)](https://jxnl.github.io/instructor-js)
 [![GitHub issues](https://img.shields.io/github/issues/instructor-ai/instructor-js.svg)](https://github.com/instructor-ai/instructor-js/issues)
 [![Discord](https://img.shields.io/discord/1192334452110659664?label=discord)](https://discord.gg/CV8sPM5k5Y)
 
-Dive into the world of Python-based structured extraction, by OpenAI's function calling API and Pydantic, the most widely used data validation library for Python. Instructor stands out for its simplicity, transparency, and user-centric design. Whether you're a seasoned developer or just starting out, you'll find Instructor's approach intuitive and steerable.
+Dive into the world of Typescript-based structured extraction, by OpenAI's function calling API and Zod, typeScript-first schema validation with static type inference. Instructor stands out for its simplicity, transparency, and user-centric design. Whether you're a seasoned developer or just starting out, you'll find Instructor's approach intuitive and steerable.
 
-!!! tip "Support in other languages"
+> ℹ️ **Tip:**  Support in other languages
 
     Check out ports to other languages below:
 
@@ -56,7 +57,7 @@ console.log(user)
 
 ## Why use Instructor?
 
-The question of using Instructor is fundamentally a question of why to use Pydantic.
+The question of using Instructor is fundamentally a question of why to use zod.
 
 1. **Powered by OpenAI** — Instructor is powered by OpenAI's function calling API. This means you can use the same API for both prompting and extraction.
 
@@ -76,16 +77,17 @@ If you'd like to see more check out our [cookbook](examples/index.md).
 
 If you want to help out, checkout some of the issues marked as `good-first-issue` or `help-wanted`. Found [here](https://github.com/instructor-ai/instructor-js/labels/good%20first%20issue). They could be anything from code improvements, a guest blog post, or a new cook book.
 
+Checkout the [contribution guide]() for details on how to set things up, testing, changesets and guidelines.
+
 ## License
 
 This project is licensed under the terms of the MIT License.
 
 ## TODO
-
 - [ ] Add `llm_validator`
 - [ ] Logging for Distillation / Finetuning
 - [x] Support Streaming
-- [ ] Optional/Maybe types
+- [x] Optional/Maybe types
 - [ ] Add Tutorials, include in docs
     - [x] Text Classification
     - [ ] Search Queries

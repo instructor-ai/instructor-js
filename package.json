@@ -1,6 +1,6 @@
 {
   "name": "@instructor-ai/instructor",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "structured outputs for llms",
   "publishConfig": {
     "access": "public"
@@ -49,6 +49,7 @@
   "homepage": "https://github.com/instructor-ai/instructor-js#readme",
   "dependencies": {
     "schema-stream": "1.6.0",
+    "ts-inference-check": "^0.3.0",
     "zod-to-json-schema": "^3.22.3",
     "zod-validation-error": "^2.1.0"
   },

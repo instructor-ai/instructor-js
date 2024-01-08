@@ -39,7 +39,7 @@ const createGraph = async (input: string) => {
       }
     ],
     model: "gpt-3.5-turbo-1106",
-    response_model: { schema: KnowledgeGraphSchema },
+    response_model: { schema: KnowledgeGraphSchema, name: "Knowledge Graph" },
     max_retries: 5,
     seed: 1
   })
