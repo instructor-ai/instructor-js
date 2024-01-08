@@ -1,4 +1,3 @@
-import assert from "assert"
 import Instructor from "@/instructor"
 import OpenAI from "openai"
 import { z } from "zod"
