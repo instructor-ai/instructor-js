@@ -43,8 +43,8 @@ async function extractUser(model: string, mode: MODE) {
   const user = await client.chat.completions.create({
     messages: [{ role: "user", content: "Jason Liu is 30 years old" }],
     model: model,
-    response_model: { schema: UserSchema },
-    max_retries: 3,
+    response_model: { schema: UserSchema, name: "User" },
+    max_retries: 4,
     seed: !anyscale ? 1 : undefined
   })
 

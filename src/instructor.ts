@@ -38,19 +38,19 @@ const MODE_TO_PARAMS = {
   [MODE.JSON_SCHEMA]: OAIBuildMessageBasedParams
 }
 
-type ResponseModel<T> = {
+type ResponseModel<T extends z.ZodTypeAny> = {
   schema: T
-  name?: string
+  name: string
   description?: string
 }
 
-type InstructorChatCompletionParams<T> = {
+type InstructorChatCompletionParams<T extends z.ZodTypeAny> = {
   response_model: ResponseModel<T>
   max_retries?: number
 }
 
-type ChatCompletionCreateParamsWithModel<T extends z.ZodTypeAny> = ChatCompletionCreateParams &
-  InstructorChatCompletionParams<T>
+export type ChatCompletionCreateParamsWithModel<T extends z.ZodTypeAny> =
+  InstructorChatCompletionParams<T> & ChatCompletionCreateParams
 
 type ReturnTypeBasedOnParams<P> = P extends ChatCompletionCreateParamsWithModel<infer T>
   ? P extends { stream: true }
@@ -96,17 +96,17 @@ class Instructor {
    * @param {ChatCompletionCreateParamsWithModel} params - The parameters for chat completion.
    * @returns {Promise<any>} The response from the chat completion.
    */
-  chatCompletion = async <T extends z.ZodTypeAny>({
+  chatCompletion = <T extends z.ZodTypeAny>({
     max_retries = 3,
     ...params
-  }: ChatCompletionCreateParamsWithModel<T>): Promise<
-    Promise<z.infer<T>> | AsyncGenerator<z.infer<T>, void, unknown>
+  }: ChatCompletionCreateParamsWithModel<T>): ReturnTypeBasedOnParams<
+    ChatCompletionCreateParamsWithModel<T>
   > => {
     let attempts = 0
     let validationIssues = ""
     let lastMessage: ChatCompletionMessageParam | null = null
 
-    const completionParams = this.buildChatCompletionParams({ ...params })
+    const completionParams = this.buildChatCompletionParams(params)
 
     const makeCompletionCall = async () => {
       let resolvedParams = completionParams
@@ -133,7 +133,7 @@ class Instructor {
 
         if ("choices" in completion) {
           const parsedCompletion = parser(completion)
-          return JSON.parse(parsedCompletion)
+          return JSON.parse(parsedCompletion) as z.infer<T>
         } else {
           return OAIStream({ res: completion, parser })
         }
@@ -182,7 +182,7 @@ class Instructor {
       }
     }
 
-    return await makeCompletionCallWithRetries()
+    return makeCompletionCallWithRetries()
   }
 
   private async partialStreamResponse({ stream, schema }) {
@@ -243,10 +243,9 @@ class Instructor {
    * @returns {ChatCompletionCreateParams} The chat completion parameters.
    */
   private buildChatCompletionParams = <T extends z.ZodTypeAny>({
-    response_model,
+    response_model: { name, schema, description },
     ...params
   }: ChatCompletionCreateParamsWithModel<T>): ChatCompletionCreateParams => {
-    const { schema, name = "response_model", description } = response_model
     const safeName = name.replace(/[^a-zA-Z0-9]/g, "_").replace(/\s/g, "_")
 
     const { definitions } = zodToJsonSchema(schema, {
@@ -275,7 +274,7 @@ class Instructor {
     }
   }
 
-  chatCompletionWithoutModel = async (
+  chatCompletionWithoutModel = (
     params: ChatCompletionCreateParams
   ): Promise<
     Stream<OpenAI.Chat.Completions.ChatCompletionChunk> | OpenAI.Chat.Completions.ChatCompletion
@@ -286,18 +285,18 @@ class Instructor {
   public chat = {
     completions: {
       create: <
-        P extends ChatCompletionCreateParamsWithModel<z.ZodTypeAny> | ChatCompletionCreateParams
+        T extends z.ZodTypeAny | undefined,
+        P extends T extends z.ZodTypeAny
+          ? ChatCompletionCreateParamsWithModel<T>
+          : ChatCompletionCreateParams & { response_model: never }
       >(
         params: P
       ): ReturnTypeBasedOnParams<P> => {
-        if ("response_model" in params && params.response_model?.schema !== undefined) {
-          return this.chatCompletion(
-            params as ChatCompletionCreateParamsWithModel<z.ZodTypeAny>
-          ) as ReturnTypeBasedOnParams<P>
+        if ("response_model" in params) {
+          console.log(params.response_model.name)
+          return this.chatCompletion(params) as ReturnTypeBasedOnParams<P>
         } else {
-          return this.chatCompletionWithoutModel(
-            params as ChatCompletionCreateParams
-          ) as ReturnTypeBasedOnParams<P>
+          return this.chatCompletionWithoutModel(params) as ReturnTypeBasedOnParams<P>
         }
       }
     }
