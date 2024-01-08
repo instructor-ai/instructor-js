@@ -1,2 +1,5 @@
 [install]
 peer = true
+
+[test]
+coverage = true

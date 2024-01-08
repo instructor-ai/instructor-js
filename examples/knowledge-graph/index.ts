@@ -33,7 +33,7 @@ const client = Instructor({
 })
 
 const createGraph = async (input: string) => {
-  const graph = await client.chat.completions.create({
+  return await client.chat.completions.create({
     messages: [
       {
         role: "user",
@@ -45,8 +45,6 @@ const createGraph = async (input: string) => {
     max_retries: 5,
     seed: 1
   })
-
-  return graph
 }
 
 export const graph = await createGraph("Teach me about quantum mechanics")

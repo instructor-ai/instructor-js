@@ -25,17 +25,17 @@ import { Entity, model } from "./resolving-complex-entitities"
 describe("examples", () => {
   // these tests maintain the type inference of examples
 
-  test("Resolving Complex Entities", async () => {
+  test("Resolving Complex Entities", () => {
     expect(type(model.entities).strictly.is<Entity[]>(true)).toBeTrue()
-  }, 100000)
+  })
 
   test("Query Decomposition", () => {
     expect(type(queryPlan).strictly.is<QueryPlan>(true)).toBeTrue()
   })
 
-  test("Knowledge Graph", async () => {
+  test("Knowledge Graph", () => {
     expect(type(graph).strictly.is<KnowledgeGraph>(true)).toBeTrue()
-  }, 100000)
+  })
 
   test("Extract User Stream", async () => {
     expect(

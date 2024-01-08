@@ -63,19 +63,19 @@ export const extractionStream = await client.chat.completions.create({
   seed: 1
 })
 
-let extraction: Partial<Extraction> = {}
+// let extraction: Partial<Extraction> = {}
 
-for await (const result of extractionStream) {
-  try {
-    extraction = result
-    console.clear()
-    console.table(extraction)
-  } catch (e) {
-    console.log(e)
-    break
-  }
-}
+// for await (const result of extractionStream) {
+//   try {
+//     extraction = result
+//     console.clear()
+//     console.table(extraction)
+//   } catch (e) {
+//     console.log(e)
+//     break
+//   }
+// }
 
-console.clear()
-console.log("completed extraction:")
-console.table(extraction)
+// console.clear()
+// console.log("completed extraction:")
+// console.table(extraction)
