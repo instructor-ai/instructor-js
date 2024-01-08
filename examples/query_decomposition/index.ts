@@ -15,6 +15,8 @@ const QueryPlanSchema = z.object({
   query_graph: z.array(QuerySchema)
 })
 
+export type QueryPlan = z.infer<typeof QueryPlanSchema>
+
 const oai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY ?? undefined,
   organization: process.env.OPENAI_ORG_ID ?? undefined
@@ -25,7 +27,7 @@ const client = Instructor({
   mode: "FUNCTIONS"
 })
 
-const createQueryPlan = async (question: string) => {
+export const createQueryPlan = async (question: string) => {
   const queryPlan = await client.chat.completions.create({
     messages: [
       {
@@ -39,14 +41,14 @@ const createQueryPlan = async (question: string) => {
       }
     ],
     model: "gpt-4-1106-preview",
-    response_model: { schema: QueryPlanSchema },
+    response_model: { schema: QueryPlanSchema, name: "query_plan" },
     max_tokens: 1000,
     temperature: 0.0,
     max_retries: 2,
     seed: 1
   })
 
-  return queryPlan || undefined
+  return queryPlan
 }
 
 const queryPlan = await createQueryPlan(
