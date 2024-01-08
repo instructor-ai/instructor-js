@@ -3,7 +3,7 @@ import Instructor from "@/instructor"
 import OpenAI from "openai"
 import { z } from "zod"
 
-enum MULTI_CLASSIFICATION_LABELS {
+export enum MULTI_CLASSIFICATION_LABELS {
   "BILLING" = "billing",
   "GENERAL_QUERY" = "general_query",
   "HARDWARE" = "hardware"
@@ -12,6 +12,8 @@ enum MULTI_CLASSIFICATION_LABELS {
 const MultiClassificationSchema = z.object({
   predicted_labels: z.array(z.nativeEnum(MULTI_CLASSIFICATION_LABELS))
 })
+
+export type MultiClassification = z.infer<typeof MultiClassificationSchema>
 
 const oai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY ?? undefined,
@@ -35,15 +37,9 @@ const createClassification = async (data: string) => {
   return classification
 }
 
-const classification = await createClassification(
+export const multiClassification = await createClassification(
   "My account is locked and I can't access my billing info. Phone is also broken"
 )
 // OUTPUT: { predicted_labels: [ 'billing', 'hardware' ] }
 
-console.log({ classification })
-
-assert(
-  classification?.predicted_labels.includes(MULTI_CLASSIFICATION_LABELS.BILLING) &&
-    classification.predicted_labels.includes(MULTI_CLASSIFICATION_LABELS.HARDWARE),
-  `Expected ${classification?.predicted_labels} to include ${MULTI_CLASSIFICATION_LABELS.BILLING} and ${MULTI_CLASSIFICATION_LABELS.HARDWARE}`
-)
+// console.log({ multiClassification })

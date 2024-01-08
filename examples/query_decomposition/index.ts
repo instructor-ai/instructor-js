@@ -51,9 +51,9 @@ export const createQueryPlan = async (question: string) => {
   return queryPlan
 }
 
-const queryPlan = await createQueryPlan(
+export const queryPlan = await createQueryPlan(
   "What is the difference in populations of Canada and the Jason's home country?"
 )
 
 // "{\"query_graph\":[{\"id\":1,\"question\":\"What is the population of Canada?\",\"dependencies\":[],\"node_type\":\"SINGLE\"},{\"id\":2,\"question\":\"What is the name of Jason's home country?\",\"dependencies\":[],\"node_type\":\"SINGLE\"},{\"id\":3,\"question\":\"What is the population of {country}?\",\"dependencies\":[2],\"node_type\":\"SINGLE\"},{\"id\":4,\"question\":\"What is the difference in population between Canada and {country}?\",\"dependencies\":[1,3],\"node_type\":\"MERGE_MULTIPLE_RESPONSES\"}]}"
-console.log({ queryPlan: JSON.stringify(queryPlan) })
+// console.log({ queryPlan: JSON.stringify(queryPlan) })

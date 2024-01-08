@@ -28,6 +28,8 @@ const EntitySchema = z.object({
     .describe("List of entity ids that this entity depends or relies on to resolve it")
 })
 
+export type Entity = z.infer<typeof EntitySchema>
+
 const DocumentExtractionSchema = z.object({
   entities: z
     .array(EntitySchema)
@@ -93,7 +95,8 @@ Article 4: Termination
 The contract can be terminated with a 30-day notice, unless there are outstanding obligations that must be fulfilled after the [DeliveryDate].
 `
 
-const model = await askAi(content)
+export const model = await askAi(content)
+
 /*
 OUTPUT:
 {
@@ -212,7 +215,7 @@ OUTPUT:
 }
 */
 
-console.log({ model: JSON.stringify(model) })
+// console.log({ model: JSON.stringify(model) })
 
 // Create HTMl document from the model
 saveHtmlDocument(model, "entityGraph")

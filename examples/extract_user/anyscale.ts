@@ -15,6 +15,8 @@ const UserSchema = z.object({
   properties: z.array(property)
 })
 
+export type User = z.infer<typeof UserSchema>
+
 const oai = new OpenAI({
   baseURL: "https://api.endpoints.anyscale.com/v1",
   apiKey: process.env.ANYSCALE_API_KEY ?? undefined
@@ -25,14 +27,14 @@ const client = Instructor({
   mode: "JSON_SCHEMA"
 })
 
-const user = await client.chat.completions.create({
+export const user = await client.chat.completions.create({
   messages: [{ role: "user", content: "Harry Potter" }],
   model: "mistralai/Mixtral-8x7B-Instruct-v0.1",
   response_model: { schema: UserSchema, name: "User" },
   max_retries: 3
 })
 
-console.log(user)
+// console.log(user)
 /**
  * {
   age: 17,

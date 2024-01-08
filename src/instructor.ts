@@ -153,7 +153,6 @@ class Instructor {
         }
 
         const validation = params.response_model.schema.safeParse(data)
-        this.log("Completion validation: ", validation)
 
         if (!validation.success) {
           if ("error" in validation) {
@@ -169,6 +168,7 @@ class Instructor {
             throw new Error("Validation failed.")
           }
         }
+
         return validation.data
       } catch (error) {
         if (attempts < max_retries) {
@@ -293,7 +293,6 @@ class Instructor {
         params: P
       ): ReturnTypeBasedOnParams<P> => {
         if ("response_model" in params) {
-          console.log(params.response_model.name)
           return this.chatCompletion(params) as ReturnTypeBasedOnParams<P>
         } else {
           return this.chatCompletionWithoutModel(params) as ReturnTypeBasedOnParams<P>

@@ -3,14 +3,16 @@ import Instructor from "@/instructor"
 import OpenAI from "openai"
 import { z } from "zod"
 
-enum CLASSIFICATION_LABELS {
+export enum SIMPLE_CLASSIFICATION_LABELS {
   "SPAM" = "SPAM",
   "NOT_SPAM" = "NOT_SPAM"
 }
 
 const SimpleClassificationSchema = z.object({
-  class_label: z.nativeEnum(CLASSIFICATION_LABELS)
+  class_label: z.nativeEnum(SIMPLE_CLASSIFICATION_LABELS)
 })
+
+export type SimpleClassification = z.infer<typeof SimpleClassificationSchema>
 
 const oai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY ?? undefined,
@@ -34,14 +36,9 @@ const createClassification = async (data: string) => {
   return classification
 }
 
-const classification = await createClassification(
+export const simpleClassification = await createClassification(
   "Hello there I'm a nigerian prince and I want to give you money"
 )
 // OUTPUT: { class_label: 'SPAM' }
 
-console.log({ classification })
-
-assert(
-  classification?.class_label === CLASSIFICATION_LABELS.SPAM,
-  `Expected ${classification?.class_label} to be ${CLASSIFICATION_LABELS.SPAM}`
-)
+// console.log({ classification })
