@@ -9,7 +9,7 @@ _Structured extraction in Typescript, powered by llms, designed for simplicity, 
 [![Documentation](https://img.shields.io/badge/docs-available-brightgreen)](https://jxnl.github.io/instructor-js)
 [![GitHub issues](https://img.shields.io/github/issues/instructor-ai/instructor-js.svg)](https://github.com/instructor-ai/instructor-js/issues)
 
-Dive into the world of Typescript-based structured extraction, by OpenAI's function calling API and Zod, typeScript-first schema validation with static type inference. Instructor stands out for its simplicity, transparency, and user-centric design. Whether you're a seasoned developer or just starting out, you'll find Instructor's approach intuitive and steerable.
+Dive into the world of Typescript-based structured extraction, by OpenAI's function calling API and Zod, Typescript-first schema validation with static type inference. Instructor stands out for its simplicity, transparency, and user-centric design. Whether you're a seasoned developer or just starting out, you'll find Instructor's approach intuitive and steerable.
 
 !!! tip "Support in other languages"
 
@@ -56,7 +56,7 @@ console.log(user)
 
 ## Why use Instructor?
 
-The question of using Instructor is fundamentally a question of why to use Pydantic.
+The question of using Instructor is fundamentally a question of why to use Zod.
 
 1. **Powered by OpenAI** — Instructor is powered by OpenAI's function calling API. This means you can use the same API for both prompting and extraction.
 
