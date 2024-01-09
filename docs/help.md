@@ -7,7 +7,7 @@
 
 If you need help getting started with Instructor or with advanced usage, the following sources may be useful.
 
-## :material-discord: Discord
+## :fontawesome-brands-discord: Discord
 
 The [Discord](https://discord.gg/CV8sPM5k5Y) is the best place to get help. You can ask questions, get help with debugging, and discuss Instructor with other users.
 
