@@ -38,8 +38,7 @@ async function extractUser(model: string, mode: Mode) {
 
   const client = Instructor({
     client: oai,
-    mode: mode,
-    streamOutputType: "STREAM"
+    mode: mode
   })
 
   const user = await client.chat.completions.create({

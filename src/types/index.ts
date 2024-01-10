@@ -6,13 +6,12 @@ import { z } from "zod"
 import { MODE } from "@/constants/modes"
 
 export type Mode = keyof typeof MODE
-export type StreamOutput = "STREAM" | "GENERATOR"
+export type StreamOutput = "READABLE" | "GENERATOR"
 
 export type InstructorConfig = {
   client: OpenAI
   mode: Mode
   debug?: boolean
-  streamOutputType?: StreamOutput
 }
 
 export type ResponseModel<T extends z.ZodTypeAny> = {
@@ -30,8 +29,8 @@ export type InstructorChatCompletionParams<T extends z.ZodTypeAny> = {
 export type ChatCompletionCreateParamsWithModel<T extends z.ZodTypeAny> =
   InstructorChatCompletionParams<T> & ChatCompletionCreateParams
 
-export type StreamType<S, T extends z.ZodTypeAny> = S extends "STREAM"
-  ? Promise<ReadableStream<Partial<T>>>
+export type StreamType<S, T extends z.ZodTypeAny> = S extends "READABLE"
+  ? Promise<ReadableStream<Uint8Array>>
   : Promise<AsyncGenerator<Partial<T>, void, unknown>>
 
 export type NonStreamType<T> = Promise<T>
@@ -49,10 +48,10 @@ export type ReturnWithoutModel<P> = P extends { stream: true }
 
 export type ReturnTypeBasedOnParams<P> = P extends {
   stream: true
-  streamOutputType: "STREAM"
+  streamOutputType: "READABLE"
   response_model: ResponseModel<infer T>
 }
-  ? ReadableStream<Partial<z.infer<T>>>
+  ? ReadableStream<Uint8Array> & { _encodedType?: Partial<z.infer<T>> }
   : P extends {
         stream: true
         streamOutputType?: "GENERATOR"

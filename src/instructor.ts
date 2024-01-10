@@ -6,7 +6,6 @@ import {
   NonStreamType,
   ReturnTypeBasedOnParams,
   ReturnWithModel,
-  StreamOutput,
   StreamType
 } from "@/types"
 import OpenAI from "openai"
@@ -140,7 +139,7 @@ class Instructor {
   }: ChatCompletionCreateParamsWithModel<T>): ReturnWithModel<
     P,
     z.infer<T>,
-    "STREAM" | "GENERATOR"
+    "READABLE" | "GENERATOR"
   > {
     const completionParams = this.buildChatCompletionParams(params)
 
@@ -227,7 +226,7 @@ class Instructor {
     stream.pipeThrough(parser)
     parser.readable.pipeThrough(validationStream)
 
-    if (streamOutputType === "STREAM") {
+    if (streamOutputType === "READABLE") {
       return validationStream.readable
     }
 
@@ -278,7 +277,7 @@ class Instructor {
 
   private handleStreamWithModel<T extends z.ZodTypeAny>(
     params: ChatCompletionCreateParamsWithModel<T>
-  ): Promise<StreamType<"STREAM" | "GENERATOR", z.infer<T>>> {
+  ): Promise<StreamType<"READABLE" | "GENERATOR", z.infer<T>>> {
     if (this.isOutputTypeStream(params.streamOutputType)) {
       return this.chatCompletionStream(params)
     }
@@ -302,12 +301,24 @@ class Instructor {
     return "response_model" in params
   }
 
-  private isOutputTypeStream(streamOutputType): streamOutputType is "STREAM" {
-    return streamOutputType === "STREAM"
+  private isOutputTypeStream(streamOutputType): streamOutputType is "READABLE" {
+    return streamOutputType === "READABLE"
   }
 
   private isOutputTypeGenerator(streamOutputType): streamOutputType is "GENERATOR" {
     return streamOutputType === "GENERATOR"
+  }
+
+  public getSchemaStub({ schema, defaultData = {} }) {
+    const streamParser = new SchemaStream(schema, {
+      typeDefaults: {
+        string: null,
+        number: null,
+        boolean: null
+      }
+    })
+
+    return streamParser.getSchemaStub(schema, defaultData)
   }
 
   public chat = {
@@ -371,12 +382,7 @@ type OAIClientExtended = OpenAI & Instructor
  * @param args
  * @returns
  */
-export default function (args: {
-  client: OpenAI
-  mode: Mode
-  debug?: boolean
-  streamOutputType?: StreamOutput
-}): OAIClientExtended {
+export default function (args: { client: OpenAI; mode: Mode; debug?: boolean }): OAIClientExtended {
   const instructor = new Instructor(args)
 
   const instructorWithProxy = new Proxy(instructor, {
