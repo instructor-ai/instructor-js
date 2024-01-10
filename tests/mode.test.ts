@@ -1,4 +1,5 @@
 import Instructor from "@/instructor"
+import { Mode } from "@/types"
 import { describe, expect, test } from "bun:test"
 import OpenAI from "openai"
 import { z } from "zod"
@@ -9,7 +10,7 @@ const models_latest = ["gpt-3.5-turbo-1106", "gpt-4-1106-preview"]
 const models_old = ["gpt-3.5-turbo", "gpt-4"]
 const models_anyscale = ["Open-Orca/Mistral-7B-OpenOrca"]
 
-const createTestCases = (): { model: string; mode: MODE }[] => {
+const createTestCases = (): { model: string; mode: Mode }[] => {
   const { FUNCTIONS, JSON_SCHEMA, ...rest } = MODE
   const modes = Object.values(rest)
 
@@ -27,7 +28,7 @@ const UserSchema = z.object({
   })
 })
 
-async function extractUser(model: string, mode: MODE) {
+async function extractUser(model: string, mode: Mode) {
   const anyscale = mode === MODE.JSON_SCHEMA
   const oai = new OpenAI({
     baseURL: anyscale ? "https://api.endpoints.anyscale.com/v1" : undefined,

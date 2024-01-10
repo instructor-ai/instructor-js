@@ -48,8 +48,7 @@
   },
   "homepage": "https://github.com/instructor-ai/instructor-js#readme",
   "dependencies": {
-    "schema-stream": "1.6.0",
-    "ts-inference-check": "^0.3.0",
+    "schema-stream": "2.0.1",
     "zod-to-json-schema": "^3.22.3",
     "zod-validation-error": "^2.1.0"
   },
@@ -73,6 +72,7 @@
     "husky": "^8.0.3",
     "prettier": "3.0.0",
     "tsup": "^8.0.1",
+    "ts-inference-check": "^0.3.0",
     "typescript": "^5.3.3"
   }
 }

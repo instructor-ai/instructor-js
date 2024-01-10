@@ -49,7 +49,7 @@ const client = Instructor({
   mode: "TOOLS"
 })
 
-let extraction = {}
+const extraction = {}
 
 const extractionStream = await client.chat.completions.create({
   messages: [{ role: "user", content: textBlock }],
@@ -58,21 +58,30 @@ const extractionStream = await client.chat.completions.create({
     schema: ExtractionValuesSchema,
     name: "value extraction"
   },
-  streamOutputType: "GENERATOR",
+  streamOutputType: "READABLE",
   max_retries: 3,
   stream: true,
   seed: 1
 })
 
-for await (const result of extractionStream) {
-  try {
-    extraction = result
-    console.clear()
-    console.table(extraction)
-  } catch (e) {
-    console.log(e)
+const reader = extractionStream.getReader()
+const decoder = new TextDecoder()
+
+let result = client.getSchemaStub({ schema: ExtractionValuesSchema })
+
+let done = false
+while (!done) {
+  const { value, done: doneReading } = await reader.read()
+  done = doneReading
+
+  if (done) {
     break
   }
+
+  const chunkValue = decoder.decode(value)
+
+  result = JSON.parse(chunkValue)
+  console.log(result)
 }
 
 console.clear()

@@ -73,7 +73,16 @@ describe("Inference Checking", () => {
     })
 
     expect(
-      type(userStream).strictly.is<AsyncGenerator<z.infer<typeof UserSchema>, void, unknown>>(true)
+      type(userStream).strictly.is<
+        AsyncGenerator<
+          Partial<{
+            name: string
+            age: number
+          }>,
+          void,
+          unknown
+        >
+      >(true)
     ).toBe(true)
   })
 
@@ -88,7 +97,16 @@ describe("Inference Checking", () => {
     })
 
     expect(
-      type(userStream).strictly.is<AsyncGenerator<z.infer<typeof UserSchema>, void, unknown>>(true)
+      type(userStream).strictly.is<
+        AsyncGenerator<
+          Partial<{
+            name: string
+            age: number
+          }>,
+          void,
+          unknown
+        >
+      >(true)
     ).toBe(true)
   })
 
