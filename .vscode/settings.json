@@ -6,7 +6,7 @@
   "editor.formatOnPaste": false,
   "editor.trimAutoWhitespace": true,
   "editor.codeActionsOnSave": {
-    "source.fixAll.eslint": "explicit"
+    "source.fixAll.eslint": "always"
   },
   "[html]": {
     "editor.defaultFormatter": "GitHub.copilot"
