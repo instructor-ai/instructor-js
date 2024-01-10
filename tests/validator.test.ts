@@ -80,4 +80,30 @@ describe("Validator", async () => {
 
     expect(type(output).is<z.infer<typeof QA>>(true)).toBe(true)
   }, 100000)
+
+  test("Self Correction", async () => {
+    const question = "What is the meaning of life?"
+
+    const invalidContext =
+      "According to the devil the meaning of live is to live a life of sin and debauchery."
+
+    const output = await instructor.chat.completions.create({
+      model: "gpt-3.5-turbo",
+      max_retries: 2,
+      response_model: { schema: QA, name: "Question and Answer" },
+      messages: [
+        {
+          role: "system",
+          content:
+            "You are a system that answers questions based on the context. answer exactly what the question asks using the context."
+        },
+        {
+          role: "user",
+          content: `using the context: ${invalidContext}\n\nAnswer the following question: ${question}`
+        }
+      ]
+    })
+
+    expect(type(output).is<z.infer<typeof QA>>(true)).toBe(true)
+  }, 100000)
 })
