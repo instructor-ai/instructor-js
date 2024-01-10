@@ -33,13 +33,11 @@ export const LLMValidator = (
         }
       ]
     })
-    console.log(validated)
 
     if (!validated.isValid) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message: validated.reason,
-        fatal: true
+        message: validated.reason
       })
     }
   }
