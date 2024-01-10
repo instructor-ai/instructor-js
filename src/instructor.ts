@@ -100,7 +100,7 @@ class Instructor {
       try {
         const data = await makeCompletionCall()
 
-        const validation = params.response_model.schema.safeParse(data)
+        const validation = await params.response_model.schema.safeParseAsync(data)
         this.log("Completion validation: ", validation)
 
         if (!validation.success) {
@@ -360,7 +360,7 @@ class Instructor {
   }
 }
 
-type OAIClientExtended = OpenAI & Instructor
+export type OAIClientExtended = OpenAI & Instructor
 
 /**
  * Creates an instance of the `Instructor` class.
