@@ -14,7 +14,7 @@ When using Zod for schema definition and validation, adhere to principles ensuri
 
 Leverage Zod's flexibility for modular 'chain of thought', enhancing data quality.
 
-```javascript
+```ts
 import { z } from 'zod';
 
 const Role = z.object({
@@ -33,7 +33,7 @@ const UserDetail = z.object({
 
 For optional fields, use `z.union` with `z.undefined()`.
 
-```javascript
+```ts
 const UserDetail = z.object({
   age: z.number(),
   name: z.string(),
@@ -45,7 +45,7 @@ const UserDetail = z.object({
 
 Create a wrapper schema for handling both successful and error states.
 
-```javascript
+```ts
 const MaybeUser = z.object({
   result: UserDetail.optional(),
   error: z.boolean(),
@@ -59,7 +59,7 @@ const MaybeUser = z.object({
 
 Utilize Zod's dynamic schema creation for streamlining error handling.
 
-```javascript
+```ts
 const Maybe = (schema) => z.object({
   result: schema.optional(),
   error: z.boolean(),
@@ -73,7 +73,7 @@ const MaybeUser = Maybe(UserDetail);
 
 Implement `z.enum` for standardized fields, including an 'Other' option.
 
-```javascript
+```ts
 const Role = z.enum(["PRINCIPAL", "TEACHER", "STUDENT", "OTHER"]);
 
 const UserDetail = z.object({
@@ -87,7 +87,7 @@ const UserDetail = z.object({
 
 For complex attributes, restate instructions in the field's description.
 
-```javascript
+```ts
 const Role = z.object({
   instructions: z.string().describe("Repeat the rules for determining the title."),
   title: z.string(),
@@ -98,7 +98,7 @@ const Role = z.object({
 
 Use `z.record(z.string())` for undefined attributes.
 
-```javascript
+```ts
 const UserDetail = z.object({
   age: z.number(),
   name: z.string(),
@@ -110,7 +110,7 @@ const UserDetail = z.object({
 
 Control list lengths through Zod's array validations.
 
-```javascript
+```ts
 const Property = z.object({
   key: z.string(),
   value: z.string(),
@@ -127,7 +127,7 @@ const UserDetail = z.object({
 
 Explicitly define relationships in your schemas, like user friends' IDs.
 
-```javascript
+```ts
 const UserDetail = z.object({
   id: z.number(),
   age: z.number(),
@@ -140,7 +140,7 @@ const UserDetail = z.object({
 
 Reuse components in various contexts by defining them separately.
 
-```javascript
+```ts
 const TimeRange = z.object({
   startTime: z.number().describe("Start time in hours."),
   endTime: z.number().describe("End time in hours."),
