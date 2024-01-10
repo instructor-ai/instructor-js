@@ -2,14 +2,14 @@ import { LLMValidator } from "@/dsl/validator"
 import Instructor from "@/instructor"
 import { describe, expect, test } from "bun:test"
 import OpenAI from "openai"
+import { type } from "ts-inference-check"
 import { z, ZodError } from "zod"
 
 const openAi = new OpenAI({ apiKey: process.env.OPENAI_API_KEY ?? "" })
 
 const instructor = Instructor({
   client: openAi,
-  mode: "TOOLS",
-  debug: true
+  mode: "TOOLS"
 })
 
 const statement = "Do not say questionable things"
@@ -61,7 +61,7 @@ describe("Validator", async () => {
     const question = "What is the meaning of life?"
     const context = "Happiness is the meaning of life."
 
-    await instructor.chat.completions.create({
+    const output = await instructor.chat.completions.create({
       model: "gpt-4",
       max_retries: 2,
       response_model: { schema: QA, name: "Question and Answer" },
@@ -77,5 +77,7 @@ describe("Validator", async () => {
         }
       ]
     })
+
+    expect(type(output).is<z.infer<typeof QA>>(true)).toBe(true)
   }, 100000)
 })
