@@ -39,8 +39,6 @@ const ExtractionValuesSchema = z.object({
   deadline: z.string().min(1)
 })
 
-type Extraction = Partial<z.infer<typeof ExtractionValuesSchema>>
-
 const oai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY ?? undefined,
   organization: process.env.OPENAI_ORG_ID ?? undefined
@@ -51,6 +49,8 @@ const client = Instructor({
   mode: "TOOLS"
 })
 
+let extraction = {}
+
 const extractionStream = await client.chat.completions.create({
   messages: [{ role: "user", content: textBlock }],
   model: "gpt-4-1106-preview",
@@ -58,12 +58,11 @@ const extractionStream = await client.chat.completions.create({
     schema: ExtractionValuesSchema,
     name: "value extraction"
   },
+  streamOutputType: "GENERATOR",
   max_retries: 3,
   stream: true,
   seed: 1
 })
-
-let extraction: Extraction = {}
 
 for await (const result of extractionStream) {
   try {

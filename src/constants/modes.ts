@@ -1,3 +1,14 @@
+import {
+  OAIBuildFunctionParams,
+  OAIBuildMessageBasedParams,
+  OAIBuildToolFunctionParams
+} from "@/oai/params"
+import {
+  OAIResponseFnArgsParser,
+  OAIResponseJSONStringParser,
+  OAIResponseToolArgsParser
+} from "@/oai/parser"
+
 export const MODE = {
   FUNCTIONS: "FUNCTIONS",
   TOOLS: "TOOLS",
@@ -6,4 +17,18 @@ export const MODE = {
   JSON_SCHEMA: "JSON_SCHEMA"
 } as const
 
-export type MODE = keyof typeof MODE
+export const MODE_TO_PARSER = {
+  [MODE.FUNCTIONS]: OAIResponseFnArgsParser,
+  [MODE.TOOLS]: OAIResponseToolArgsParser,
+  [MODE.JSON]: OAIResponseJSONStringParser,
+  [MODE.MD_JSON]: OAIResponseJSONStringParser,
+  [MODE.JSON_SCHEMA]: OAIResponseJSONStringParser
+}
+
+export const MODE_TO_PARAMS = {
+  [MODE.FUNCTIONS]: OAIBuildFunctionParams,
+  [MODE.TOOLS]: OAIBuildToolFunctionParams,
+  [MODE.JSON]: OAIBuildMessageBasedParams,
+  [MODE.MD_JSON]: OAIBuildMessageBasedParams,
+  [MODE.JSON_SCHEMA]: OAIBuildMessageBasedParams
+}

@@ -70,7 +70,7 @@ async function extractUser() {
 describe("StreamFunctionCall", () => {
   test("Should return extracted users and budget", async () => {
     const extraction = await extractUser()
-
+    console.log(extraction)
     expect(extraction.users).toHaveLength(3)
     expect(extraction.users![0]).toHaveProperty("name")
     expect(extraction.users![0]).toHaveProperty("handle")

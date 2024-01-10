@@ -1,5 +1,5 @@
-import { ChatCompletionCreateParamsWithModel } from "@/instructor"
 import { omit } from "@/lib"
+import { ChatCompletionCreateParamsWithModel, Mode } from "@/types"
 import { ChatCompletionCreateParams } from "openai/resources/index.mjs"
 import { z } from "zod"
 import { JsonSchema7Type } from "zod-to-json-schema"
@@ -62,7 +62,7 @@ export function OAIBuildToolFunctionParams<T extends z.ZodTypeAny>(
 export function OAIBuildMessageBasedParams<T extends z.ZodTypeAny>(
   definition: ParseParams,
   params: Omit<ChatCompletionCreateParamsWithModel<T>, "response_model">,
-  mode: MODE // This type should be typeof MODE.JSON | typeof MODE.JSON_SCHEMA | typeof MODE.MD_JSON
+  mode: Mode
 ): ChatCompletionCreateParams {
   const MODE_SPECIFIC_CONFIGS = {
     [MODE.JSON]: {
