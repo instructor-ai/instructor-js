@@ -17,11 +17,10 @@ export const LLMValidator = (
 
   const fn = async (value, ctx) => {
     const validated = await instructor.chat.completions.create({
+      max_retries: 0,
       ...params,
-      model: "gpt-4",
       response_model: { schema, name: "Validator" },
       stream: false,
-      max_retries: 0,
       messages: [
         {
           role: "system",
