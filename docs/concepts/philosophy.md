@@ -23,7 +23,7 @@ It should be that simple.
 
 ## My Goals
 
-The goal for the library, [documentation](https://jxnl.github.io/instructor-js/), and [blog](https://jxnl.github.io/instructor-js/blog/), is to help you be a better Typescript programmer and as a result a better AI engineer.
+The goal for the library, [documentation](https://instructor-ai.github.io/instructor-js/), and [blog](https://instructor-ai.github.io/instructor-js/blog/), is to help you be a better Typescript programmer and as a result a better AI engineer.
 
 - The library is a result of my desire for simplicity.
 - The library should help maintain simplicity in your codebase.
