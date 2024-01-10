@@ -13,3 +13,4 @@
 - [How do I do classification?](./classification.md)
 - [How are complex queries decomposed into subqueries for a single request?](./query_decomposition.md)
 - [How are action items and dependencies generated from transcripts?](./action_items.md)
+- [How is AI self-assessment implemented with llm_validator?](./self-correction.md)
