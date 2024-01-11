@@ -139,6 +139,7 @@ nav:
     - Classification: 'examples/classification.md'
     - Query Decomposition: 'examples/query_decomposition.md'
     - Action Item and Dependency Mapping: 'examples/action_items.md'
+    - Self Correction: 'examples/self_correction.md'
   - Blog:
     - "blog/index.md"
   
