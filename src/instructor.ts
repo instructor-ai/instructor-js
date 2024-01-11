@@ -84,7 +84,7 @@ class Instructor {
           }
         }
 
-        this.log("making completion call with params: ", resolvedParams)
+        this.log(params.response_model.name, "making completion call with params: ", resolvedParams)
 
         const completion = await this.client.chat.completions.create(resolvedParams)
         const parser = MODE_TO_PARSER[this.mode]
@@ -100,8 +100,8 @@ class Instructor {
       try {
         const data = await makeCompletionCall()
 
-        const validation = params.response_model.schema.safeParse(data)
-        this.log("Completion validation: ", validation)
+        const validation = await params.response_model.schema.safeParseAsync(data)
+        this.log(params.response_model.name, "Completion validation: ", validation)
 
         if (!validation.success) {
           if ("error" in validation) {
@@ -120,11 +120,11 @@ class Instructor {
         return validation.data
       } catch (error) {
         if (attempts < max_retries) {
-          this.log("Retrying, attempt: ", attempts)
+          this.log(params.response_model.name, "Retrying, attempt: ", attempts)
           attempts++
           return await makeCompletionCallWithRetries()
         } else {
-          this.log("Max attempts reached: ", attempts)
+          this.log(params.response_model.name, "Max attempts reached: ", attempts)
           throw error
         }
       }
@@ -147,7 +147,7 @@ class Instructor {
       const resolvedParams = completionParams
 
       try {
-        this.log("making completion call with params: ", resolvedParams)
+        this.log(params.response_model.name, "making completion call with params: ", resolvedParams)
 
         const completion = await this.client.chat.completions.create(resolvedParams)
         const parser = MODE_TO_PARSER[this.mode]
@@ -255,7 +255,7 @@ class Instructor {
       throw new Error("Could not extract json schema definitions from your schema")
     }
 
-    this.log("JSON Schema from zod: ", definitions)
+    this.log(name, "JSON Schema from zod: ", definitions)
 
     const definition = {
       name: safeName,
@@ -360,7 +360,7 @@ class Instructor {
   }
 }
 
-type OAIClientExtended = OpenAI & Instructor
+export type OAIClientExtended = OpenAI & Instructor
 
 /**
  * Creates an instance of the `Instructor` class.
