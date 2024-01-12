@@ -2,7 +2,6 @@ import { LLMValidator } from "@/dsl/validator"
 import Instructor from "@/instructor"
 import OpenAI from "openai"
 import { z } from "zod"
-import { ZodError } from "zod-validation-error"
 
 const openAi = new OpenAI({ apiKey: process.env.OPENAI_API_KEY ?? "" })
 
