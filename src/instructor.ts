@@ -1,4 +1,5 @@
 import { OAIStream, readableStreamToAsyncGenerator } from "@/oai/stream"
+import { withResponseModel } from "@/response-model"
 import {
   ChatCompletionCreateParamsWithModel,
   InstructorConfig,
@@ -58,13 +59,18 @@ class Instructor {
 
   private async chatCompletionStandard<T extends z.ZodTypeAny>({
     max_retries = MAX_RETRIES_DEFAULT,
+    response_model,
     ...params
   }: ChatCompletionCreateParamsWithModel<T>): Promise<Promise<z.infer<T>>> {
     let attempts = 0
     let validationIssues = ""
     let lastMessage: ChatCompletionMessageParam | null = null
 
-    const completionParams = this.buildChatCompletionParams(params)
+    const completionParams = withResponseModel({
+      params,
+      mode: this.mode,
+      response_model
+    })
 
     const makeCompletionCall = async () => {
       let resolvedParams = completionParams
@@ -84,7 +90,7 @@ class Instructor {
           }
         }
 
-        this.log(params.response_model.name, "making completion call with params: ", resolvedParams)
+        this.log(response_model.name, "making completion call with params: ", resolvedParams)
 
         const completion = await this.client.chat.completions.create(resolvedParams)
         const parser = MODE_TO_PARSER[this.mode]
@@ -100,8 +106,8 @@ class Instructor {
       try {
         const data = await makeCompletionCall()
 
-        const validation = await params.response_model.schema.safeParseAsync(data)
-        this.log(params.response_model.name, "Completion validation: ", validation)
+        const validation = await response_model.schema.safeParseAsync(data)
+        this.log(response_model.name, "Completion validation: ", validation)
 
         if (!validation.success) {
           if ("error" in validation) {
@@ -120,11 +126,11 @@ class Instructor {
         return validation.data
       } catch (error) {
         if (attempts < max_retries) {
-          this.log(params.response_model.name, "Retrying, attempt: ", attempts)
+          this.log(response_model.name, "Retrying, attempt: ", attempts)
           attempts++
           return await makeCompletionCallWithRetries()
         } else {
-          this.log(params.response_model.name, "Max attempts reached: ", attempts)
+          this.log(response_model.name, "Max attempts reached: ", attempts)
           throw error
         }
       }
@@ -135,19 +141,29 @@ class Instructor {
 
   private chatCompletionStream<P, T extends z.ZodTypeAny>({
     streamOutputType = "GENERATOR",
+    max_retries,
+    response_model,
     ...params
   }: ChatCompletionCreateParamsWithModel<T>): ReturnWithModel<
     P,
     z.infer<T>,
     "READABLE" | "GENERATOR"
   > {
-    const completionParams = this.buildChatCompletionParams(params)
+    if (max_retries) {
+      console.warn("max_retries is not supported for streaming completions")
+    }
+
+    const completionParams = withResponseModel({
+      params,
+      response_model,
+      mode: this.mode
+    })
 
     const makeCompletionCall = async () => {
       const resolvedParams = completionParams
 
       try {
-        this.log(params.response_model.name, "making completion call with params: ", resolvedParams)
+        this.log(response_model.name, "making completion call with params: ", resolvedParams)
 
         const completion = await this.client.chat.completions.create(resolvedParams)
         const parser = MODE_TO_PARSER[this.mode]
@@ -166,7 +182,7 @@ class Instructor {
 
         return this.partialStreamResponse({
           stream: data,
-          schema: params.response_model.schema,
+          schema: response_model.schema,
           streamOutputType
         })
       } catch (error) {
