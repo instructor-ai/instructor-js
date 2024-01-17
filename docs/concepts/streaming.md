@@ -1,5 +1,6 @@
-A common use case of structured extraction is defining a single schema class and then making another schema to create a list to do multiple extraction
-By enabling streaming, you can do multiple extractions in a single request, and then iterate over the results as they come in.
+A common use case of structured extraction is defining a single schema class and then making another schema to create a list to do multiple extraction By enabling streaming, you can do multiple extractions in a single request, and then iterate over the results as they come in.
+
+To see an example of streamin in production checkout this [example](https://ss.dimitri.link/j17CVTMK)
 
 !!! warning "Important: Changes in Response Behavior with Streaming Enabled"
 
@@ -12,8 +13,8 @@ Enabling streaming alters the nature of the response you receive:
 **Final Value**: The last value yielded by the generator represents the completed extraction. This value should be used as the final result.
 
 **Example**: Extracting Conference Information
-The following TypeScript example demonstrates how to use an Async Generator for streaming responses. It includes a schema definition for extraction and iterates over a stream of data to incrementally update and display the extracted information.
 
+The following TypeScript example demonstrates how to use an Async Generator for streaming responses. It includes a schema definition for extraction and iterates over a stream of data to incrementally update and display the extracted information.
 
 ```ts
 import Instructor from "@/instructor"
@@ -98,8 +99,8 @@ console.table(extraction)
 
 ```
 
-
 ## Understanding OpenAI Completion Requests and Streaming Responses
+
 **Server-Sent Events (SSE) and Async Generators**
 
 OpenAI's completion requests return responses using Server-Sent Events (SSE), a protocol used to push real-time updates from a server to a client. In this context, the Async Generator in our TypeScript example closely mirrors the behavior of SSE. Each yield from the Async Generator corresponds to an update from the server, providing a continuous stream of data until the completion of the request.
@@ -111,40 +112,39 @@ While the Async Generator is suitable for server-side processing of streaming da
 Here's how you can transform an Async Generator to a ReadableStream:
 
 ```typescript
-import { ReadableStream } from 'stream';
+import { ReadableStream } from "stream"
 
 function asyncGeneratorToReadableStream(generator) {
-  const encoder = new TextEncoder();
+  const encoder = new TextEncoder()
 
   return new ReadableStream({
     async start(controller) {
       for await (const parsedData of generator) {
-        controller.enqueue(encoder.encode(JSON.stringify(parsedData)));
+        controller.enqueue(encoder.encode(JSON.stringify(parsedData)))
       }
-      controller.close();
+      controller.close()
     },
     cancel() {
       if (cancelGenerator) {
-        cancelGenerator(); 
+        cancelGenerator()
       }
     }
-  });
+  })
 }
 
 // Usage Example
-const readableStream = asyncGeneratorToReadableStream(extractionStream);
+const readableStream = asyncGeneratorToReadableStream(extractionStream)
 
 // This ReadableStream can now be returned in an API endpoint or used in a similar context
 ```
 
-***In this example:***
+**_In this example:_**
 
 The asyncGeneratorToReadableStream function takes an Async Generator and an optional cancellation function.
 
 It creates a new ReadableStream that, upon starting, iterates over the Async Generator using a for await...of loop.
 
-Each piece of parsed data from the generator is encoded and enqueued into the stream.
-Once the generator completes, the stream is closed using controller.close().
+Each piece of parsed data from the generator is encoded and enqueued into the stream. Once the generator completes, the stream is closed using controller.close().
 
 If the stream is canceled (e.g., client disconnects), an optional cancelGenerator function can be invoked to stop the generator.
 
