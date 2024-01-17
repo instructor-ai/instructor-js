@@ -1,10 +1,11 @@
 name: Test
 on:
   push:
-    branches: [master]
-  pull_request:
-    branches: [master]
-  
+    branches: 
+      - main
+  pull_request_target:
+    branches:
+      - main
 jobs:
   test:
     name: run-tests
@@ -31,7 +32,7 @@ jobs:
 
       - name: Install Dependencies
         run: bun i
-        
+
       - run: bun run type-check
       - run: bun run lint
       - run: bun test --timeout=15000
