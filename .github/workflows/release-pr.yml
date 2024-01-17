@@ -40,8 +40,11 @@ jobs:
         with:
           bun-version: latest
 
-      - name: Setup npmrc
-        run: echo "//npm.pkg.github.com/:_authToken=$NPM_TOKEN" > .npmrc
+      - name: Creating .npmrc
+        run: |
+          cat << EOF > "$HOME/.npmrc"
+            //registry.npmjs.org/:_authToken=$NPM_TOKEN
+          EOF
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
