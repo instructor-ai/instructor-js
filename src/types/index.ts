@@ -6,6 +6,7 @@ import { z } from "zod"
 import { MODE } from "@/constants/modes"
 
 export type Mode = keyof typeof MODE
+
 export type LogLevel = "debug" | "info" | "warn" | "error"
 
 export type InstructorConfig = {
