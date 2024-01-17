@@ -6,7 +6,8 @@ import { z } from "zod"
 import { MODE } from "@/constants/modes"
 
 export type Mode = keyof typeof MODE
-export type StreamOutput = "READABLE" | "GENERATOR"
+
+export type LogLevel = "debug" | "info" | "warn" | "error"
 
 export type InstructorConfig = {
   client: OpenAI
@@ -14,33 +15,19 @@ export type InstructorConfig = {
   debug?: boolean
 }
 
-export type ResponseModel<T extends z.ZodTypeAny> = {
+export type ResponseModel<T extends z.AnyZodObject> = {
   schema: T
   name: string
   description?: string
 }
 
-export type InstructorChatCompletionParams<T extends z.ZodTypeAny> = {
+export type InstructorChatCompletionParams<T extends z.AnyZodObject> = {
   response_model: ResponseModel<T>
   max_retries?: number
-  streamOutputType?: StreamOutput
 }
 
-export type ChatCompletionCreateParamsWithModel<T extends z.ZodTypeAny> =
+export type ChatCompletionCreateParamsWithModel<T extends z.AnyZodObject> =
   InstructorChatCompletionParams<T> & ChatCompletionCreateParams
-
-export type StreamType<S, T extends z.ZodTypeAny> = S extends "READABLE"
-  ? Promise<ReadableStream<Uint8Array>>
-  : Promise<AsyncGenerator<Partial<T>, void, unknown>>
-
-export type NonStreamType<T> = Promise<T>
-
-export type ReturnWithModel<P, U extends z.ZodTypeAny, S extends StreamOutput> = P extends {
-  stream: true
-  response_model: ResponseModel<U>
-}
-  ? StreamType<S, U>
-  : NonStreamType<U>
 
 export type ReturnWithoutModel<P> = P extends { stream: true }
   ? Stream<OpenAI.Chat.Completions.ChatCompletionChunk>
@@ -48,18 +35,11 @@ export type ReturnWithoutModel<P> = P extends { stream: true }
 
 export type ReturnTypeBasedOnParams<P> = P extends {
   stream: true
-  streamOutputType: "READABLE"
   response_model: ResponseModel<infer T>
 }
-  ? ReadableStream<Uint8Array> & { _encodedType?: Partial<z.infer<T>> }
-  : P extends {
-        stream: true
-        streamOutputType?: "GENERATOR"
-        response_model: ResponseModel<infer T>
-      }
-    ? AsyncGenerator<Partial<z.infer<T>>, void, unknown>
-    : P extends { response_model: ResponseModel<infer T> }
-      ? Promise<z.infer<T>>
-      : P extends { stream: true }
-        ? Stream<OpenAI.Chat.Completions.ChatCompletionChunk>
-        : OpenAI.Chat.Completions.ChatCompletion
+  ? Promise<AsyncGenerator<Partial<z.infer<T>>, void, unknown>>
+  : P extends { response_model: ResponseModel<infer T> }
+    ? Promise<z.infer<T>>
+    : P extends { stream: true }
+      ? Stream<OpenAI.Chat.Completions.ChatCompletionChunk>
+      : OpenAI.Chat.Completions.ChatCompletion

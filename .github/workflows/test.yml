@@ -1,13 +1,11 @@
 name: Test
 on:
   push:
-    branches: 
-      - main
-  pull_request_target:
-    branches:
-      - main
+    branches: [master]
+  pull_request:
+    branches: [master]
+  
 jobs:
-
   test:
     name: run-tests
     runs-on: ubuntu-latest
@@ -17,7 +15,7 @@ jobs:
       ANYSCALE_API_KEY: ${{ secrets.ANYSCALE_API_KEY }}
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
@@ -33,7 +31,7 @@ jobs:
 
       - name: Install Dependencies
         run: bun i
-
+        
       - run: bun run type-check
       - run: bun run lint
       - run: bun test --timeout=15000

@@ -1,27 +1,16 @@
-import { OAIStream, readableStreamToAsyncGenerator } from "@/oai/stream"
 import {
   ChatCompletionCreateParamsWithModel,
   InstructorConfig,
+  LogLevel,
   Mode,
-  NonStreamType,
-  ReturnTypeBasedOnParams,
-  ReturnWithModel,
-  StreamType
+  ReturnTypeBasedOnParams
 } from "@/types"
 import OpenAI from "openai"
-import type {
-  ChatCompletionCreateParams,
-  ChatCompletionMessageParam
-} from "openai/resources/index.mjs"
-import { Stream } from "openai/streaming.mjs"
-import { SchemaStream } from "schema-stream"
 import { z } from "zod"
-import zodToJsonSchema from "zod-to-json-schema"
+import ZodStream, { OAIStream, withResponseModel } from "zod-stream"
 import { fromZodError } from "zod-validation-error"
 
-import { MODE, MODE_TO_PARAMS, MODE_TO_PARSER } from "@/constants/modes"
-
-import { omit } from "./lib"
+import { MODE, MODE_TO_PARSER } from "@/constants/modes"
 
 const MAX_RETRIES_DEFAULT = 0
 
@@ -49,22 +38,45 @@ class Instructor {
     }
   }
 
-  private log = (...args) => {
-    if (this.debug) {
-      // ! is there a better way to do this?
-      console.log("INSTRUCTOR DEBUG: ", ...args)
+  private log<T extends unknown[]>(level: LogLevel, ...args: T) {
+    if (!this.debug && level === "debug") {
+      return
+    }
+
+    const timestamp = new Date().toISOString()
+    switch (level) {
+      case "debug":
+        console.debug(`[Instructor:DEBUG] ${timestamp}:`, ...args)
+        break
+      case "info":
+        console.info(`[Instructor:INFO] ${timestamp}:`, ...args)
+        break
+      case "warn":
+        console.warn(`[Instructor:WARN] ${timestamp}:`, ...args)
+        break
+      case "error":
+        console.error(`[Instructor:ERROR] ${timestamp}:`, ...args)
+        break
     }
   }
 
-  private async chatCompletionStandard<T extends z.ZodTypeAny>({
+  private async chatCompletionStandard<T extends z.AnyZodObject>({
     max_retries = MAX_RETRIES_DEFAULT,
+    response_model,
     ...params
-  }: ChatCompletionCreateParamsWithModel<T>): Promise<Promise<z.infer<T>>> {
+  }: ChatCompletionCreateParamsWithModel<T>): Promise<z.infer<T>> {
     let attempts = 0
     let validationIssues = ""
-    let lastMessage: ChatCompletionMessageParam | null = null
+    let lastMessage: OpenAI.ChatCompletionMessageParam | null = null
 
-    const completionParams = this.buildChatCompletionParams(params)
+    const completionParams = withResponseModel({
+      params: {
+        ...params,
+        stream: false
+      },
+      mode: this.mode,
+      response_model
+    })
 
     const makeCompletionCall = async () => {
       let resolvedParams = completionParams
@@ -84,12 +96,17 @@ class Instructor {
           }
         }
 
-        this.log(params.response_model.name, "making completion call with params: ", resolvedParams)
+        this.log(
+          "debug",
+          response_model.name,
+          "making completion call with params: ",
+          resolvedParams
+        )
 
         const completion = await this.client.chat.completions.create(resolvedParams)
         const parser = MODE_TO_PARSER[this.mode]
 
-        const parsedCompletion = parser(completion)
+        const parsedCompletion = parser(completion as OpenAI.Chat.Completions.ChatCompletion)
         return JSON.parse(parsedCompletion) as z.infer<T>
       } catch (error) {
         throw error
@@ -100,8 +117,8 @@ class Instructor {
       try {
         const data = await makeCompletionCall()
 
-        const validation = await params.response_model.schema.safeParseAsync(data)
-        this.log(params.response_model.name, "Completion validation: ", validation)
+        const validation = await response_model.schema.safeParseAsync(data)
+        this.log("debug", response_model.name, "Completion validation: ", validation)
 
         if (!validation.success) {
           if ("error" in validation) {
@@ -120,11 +137,11 @@ class Instructor {
         return validation.data
       } catch (error) {
         if (attempts < max_retries) {
-          this.log(params.response_model.name, "Retrying, attempt: ", attempts)
+          this.log("debug", response_model.name, "Retrying, attempt: ", attempts)
           attempts++
           return await makeCompletionCallWithRetries()
         } else {
-          this.log(params.response_model.name, "Max attempts reached: ", attempts)
+          this.log("debug", response_model.name, "Max attempts reached: ", attempts)
           throw error
         }
       }
@@ -133,227 +150,74 @@ class Instructor {
     return makeCompletionCallWithRetries()
   }
 
-  private chatCompletionStream<P, T extends z.ZodTypeAny>({
-    streamOutputType = "GENERATOR",
+  private async chatCompletionStream<T extends z.AnyZodObject>({
+    max_retries,
+    response_model,
     ...params
-  }: ChatCompletionCreateParamsWithModel<T>): ReturnWithModel<
-    P,
-    z.infer<T>,
-    "READABLE" | "GENERATOR"
-  > {
-    const completionParams = this.buildChatCompletionParams(params)
-
-    const makeCompletionCall = async () => {
-      const resolvedParams = completionParams
-
-      try {
-        this.log(params.response_model.name, "making completion call with params: ", resolvedParams)
-
-        const completion = await this.client.chat.completions.create(resolvedParams)
-        const parser = MODE_TO_PARSER[this.mode]
-
-        if (!("choices" in completion)) {
-          return OAIStream({ res: completion, parser })
-        }
-      } catch (error) {
-        throw error
-      }
+  }: ChatCompletionCreateParamsWithModel<T>): Promise<AsyncGenerator<Partial<T>, void, unknown>> {
+    if (max_retries) {
+      this.log("warn", "max_retries is not supported for streaming completions")
     }
 
-    const getStream = async () => {
-      try {
-        const data = await makeCompletionCall()
+    const completionParams = withResponseModel({
+      params: {
+        ...params,
+        stream: true
+      },
+      response_model,
+      mode: this.mode
+    })
 
-        return this.partialStreamResponse({
-          stream: data,
-          schema: params.response_model.schema,
-          streamOutputType
+    const streamClient = new ZodStream({
+      debug: this.debug ?? false
+    })
+
+    return streamClient.create({
+      completionPromise: async () => {
+        const completion = await this.client.chat.completions.create(completionParams)
+
+        return OAIStream({
+          res: completion
         })
-      } catch (error) {
-        console.error("Instructor: error making completion call")
-        throw error
-      }
-    }
-
-    return getStream() as ReturnWithModel<P, T, typeof streamOutputType>
-  }
-
-  private async partialStreamResponse({ stream, schema, streamOutputType }) {
-    let _activePath: (string | number | undefined)[] = []
-    let _completedPaths: (string | number | undefined)[][] = []
-
-    const streamParser = new SchemaStream(schema, {
-      typeDefaults: {
-        string: null,
-        number: null,
-        boolean: null
       },
-      onKeyComplete: ({ activePath, completedPaths }) => {
-        _activePath = activePath
-        _completedPaths = completedPaths
-      }
+      response_model
     })
-
-    const parser = streamParser.parse({})
-    const textEncoder = new TextEncoder()
-    const textDecoder = new TextDecoder()
-
-    const validationStream = new TransformStream({
-      transform: async (chunk, controller): Promise<void> => {
-        try {
-          const parsedChunk = JSON.parse(textDecoder.decode(chunk))
-          const validation = schema.safeParse(parsedChunk)
-
-          controller.enqueue(
-            textEncoder.encode(
-              JSON.stringify({
-                ...parsedChunk,
-                _isValid: validation.success,
-                _activePath,
-                _completedPaths
-              })
-            )
-          )
-        } catch (e) {
-          console.error(`Error in the partial stream validation stream`, e, chunk)
-        }
-      },
-      flush() {
-        this.activePath = undefined
-      }
-    })
-
-    stream.pipeThrough(parser)
-    parser.readable.pipeThrough(validationStream)
-
-    if (streamOutputType === "READABLE") {
-      return validationStream.readable
-    }
-
-    return readableStreamToAsyncGenerator(validationStream.readable)
   }
 
-  /**
-   * Builds the chat completion parameters.
-   * @param {ChatCompletionCreateParamsWithModel} params - The parameters for chat completion.
-   * @returns {ChatCompletionCreateParams} The chat completion parameters.
-   */
-  private buildChatCompletionParams = <T extends z.ZodTypeAny>({
-    response_model: { name, schema, description },
-
-    ...params
-  }: ChatCompletionCreateParamsWithModel<T>): ChatCompletionCreateParams => {
-    const safeName = name.replace(/[^a-zA-Z0-9]/g, "_").replace(/\s/g, "_")
-
-    const { definitions } = zodToJsonSchema(schema, {
-      name: safeName,
-      errorMessages: true
-    })
-
-    if (!definitions || !definitions?.[safeName]) {
-      console.warn("Could not extract json schema definitions from your schema", schema)
-      throw new Error("Could not extract json schema definitions from your schema")
-    }
-
-    this.log(name, "JSON Schema from zod: ", definitions)
-
-    const definition = {
-      name: safeName,
-      description,
-      ...definitions[safeName]
-    }
-
-    const paramsForMode = MODE_TO_PARAMS[this.mode](
-      definition,
-      omit(["max_retries"], params),
-      this.mode
-    )
-
-    return {
-      stream: false,
-      ...paramsForMode
-    }
-  }
-
-  private handleStreamWithModel<T extends z.ZodTypeAny>(
-    params: ChatCompletionCreateParamsWithModel<T>
-  ): Promise<StreamType<"READABLE" | "GENERATOR", z.infer<T>>> {
-    if (this.isOutputTypeStream(params.streamOutputType)) {
-      return this.chatCompletionStream(params)
-    }
-
-    if (this.isOutputTypeGenerator(params.streamOutputType)) {
-      return this.chatCompletionStream(params)
-    }
-
-    throw new Error("Invalid streamOutputType")
-  }
-
-  private async handleStandardWithModel<T extends z.ZodTypeAny>(
-    params: ChatCompletionCreateParamsWithModel<T>
-  ): Promise<NonStreamType<z.infer<T>>> {
-    return this.chatCompletionStandard(params)
-  }
-
-  private isChatCompletionCreateParamsWithModel<T extends z.ZodTypeAny>(
+  private isChatCompletionCreateParamsWithModel<T extends z.AnyZodObject>(
     params: ChatCompletionCreateParamsWithModel<T>
   ): params is ChatCompletionCreateParamsWithModel<T> {
     return "response_model" in params
   }
 
-  private isOutputTypeStream(streamOutputType): streamOutputType is "READABLE" {
-    return streamOutputType === "READABLE"
-  }
-
-  private isOutputTypeGenerator(streamOutputType): streamOutputType is "GENERATOR" {
-    return streamOutputType === "GENERATOR"
-  }
-
-  public getSchemaStub({ schema, defaultData = {} }) {
-    const streamParser = new SchemaStream(schema, {
-      typeDefaults: {
-        string: null,
-        number: null,
-        boolean: null
-      }
-    })
-
-    return streamParser.getSchemaStub(schema, defaultData)
+  private isStandardStream(
+    params: OpenAI.ChatCompletionCreateParams
+  ): params is OpenAI.ChatCompletionCreateParams {
+    return "stream" in params && params.stream === true
   }
 
   public chat = {
     completions: {
       create: async <
-        T extends z.ZodTypeAny | undefined,
-        P extends T extends z.ZodTypeAny
+        T extends z.AnyZodObject,
+        P extends T extends z.AnyZodObject
           ? ChatCompletionCreateParamsWithModel<T>
-          : ChatCompletionCreateParams & { response_model: never }
+          : OpenAI.ChatCompletionCreateParams & { response_model: never }
       >(
         params: P
-      ): Promise<ReturnTypeBasedOnParams<typeof params>> => {
+      ): Promise<ReturnTypeBasedOnParams<P>> => {
         if (this.isChatCompletionCreateParamsWithModel(params)) {
-          const paramsWithDefaults = {
-            ...params,
-            max_retries: params.max_retries ?? MAX_RETRIES_DEFAULT,
-            streamOutputType: params.stream ? params.streamOutputType ?? "GENERATOR" : undefined
-          }
           if (params.stream) {
-            return this.handleStreamWithModel(paramsWithDefaults) as ReturnTypeBasedOnParams<
-              typeof paramsWithDefaults
-            >
+            return this.chatCompletionStream(params) as ReturnTypeBasedOnParams<P>
           } else {
-            return this.handleStandardWithModel(paramsWithDefaults) as ReturnTypeBasedOnParams<
-              typeof paramsWithDefaults
-            >
+            return this.chatCompletionStandard(params) as ReturnTypeBasedOnParams<P>
           }
         } else {
-          const result:
-            | Stream<OpenAI.Chat.Completions.ChatCompletionChunk>
-            | OpenAI.Chat.Completions.ChatCompletion = params.stream
+          const result: OpenAI.Chat.Completions.ChatCompletion = this.isStandardStream(params)
             ? await this.client.chat.completions.create(params)
             : await this.client.chat.completions.create(params)
 
-          return result as ReturnTypeBasedOnParams<typeof params>
+          return result as ReturnTypeBasedOnParams<P>
         }
       }
     }
@@ -368,6 +232,7 @@ export type OAIClientExtended = OpenAI & Instructor
  * @param {string} mode - The mode of operation.
  * @param {boolean} debug - Whether to log debug messages.
  * @returns {OAIClientExtended} The extended OpenAI client.
+ *
  * @example
  * import createInstructor from "@instructor-ai/instructor"
  * import OpenAI from "openai

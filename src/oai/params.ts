@@ -11,7 +11,7 @@ type ParseParams = {
   description?: string
 } & JsonSchema7Type
 
-export function OAIBuildFunctionParams<T extends z.ZodTypeAny>(
+export function OAIBuildFunctionParams<T extends z.AnyZodObject>(
   definition: ParseParams,
   params: Omit<ChatCompletionCreateParamsWithModel<T>, "response_model">
 ): ChatCompletionCreateParams {
@@ -33,7 +33,7 @@ export function OAIBuildFunctionParams<T extends z.ZodTypeAny>(
   }
 }
 
-export function OAIBuildToolFunctionParams<T extends z.ZodTypeAny>(
+export function OAIBuildToolFunctionParams<T extends z.AnyZodObject>(
   definition: ParseParams,
   params: Omit<ChatCompletionCreateParamsWithModel<T>, "response_model">
 ): ChatCompletionCreateParams {
@@ -59,7 +59,7 @@ export function OAIBuildToolFunctionParams<T extends z.ZodTypeAny>(
   }
 }
 
-export function OAIBuildMessageBasedParams<T extends z.ZodTypeAny>(
+export function OAIBuildMessageBasedParams<T extends z.AnyZodObject>(
   definition: ParseParams,
   params: Omit<ChatCompletionCreateParamsWithModel<T>, "response_model">,
   mode: Mode
