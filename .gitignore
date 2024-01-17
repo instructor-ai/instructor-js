@@ -90,3 +90,4 @@ dist
 tsconfig.tsbuildinfo
 
 .cache/
+.npmrc
