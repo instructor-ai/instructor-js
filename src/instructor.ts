@@ -81,36 +81,33 @@ class Instructor {
     const makeCompletionCall = async () => {
       let resolvedParams = completionParams
 
-      try {
-        if (validationIssues) {
-          resolvedParams = {
-            ...completionParams,
-            messages: [
-              ...completionParams.messages,
-              ...(lastMessage ? [lastMessage] : []),
-              {
-                role: "user",
-                content: `Please correct the function call; errors encountered:\n ${validationIssues}`
-              }
-            ]
-          }
+      if (validationIssues) {
+        resolvedParams = {
+          ...completionParams,
+          messages: [
+            ...completionParams.messages,
+            ...(lastMessage ? [lastMessage] : []),
+            {
+              role: "user",
+              content: `Please correct the function call; errors encountered:\n ${validationIssues}`
+            }
+          ]
         }
-
-        this.log(
-          "debug",
-          response_model.name,
-          "making completion call with params: ",
-          resolvedParams
-        )
-
-        const completion = await this.client.chat.completions.create(resolvedParams)
-        const parser = MODE_TO_PARSER[this.mode]
-
-        const parsedCompletion = parser(completion as OpenAI.Chat.Completions.ChatCompletion)
-        return JSON.parse(parsedCompletion) as z.infer<T>
-      } catch (error) {
-        throw error
       }
+
+      this.log(
+        "debug",
+        response_model.name,
+        "making completion call with params: ",
+        resolvedParams
+      )
+
+      const completion = await this.client.chat.completions.create(resolvedParams)
+      const parser = MODE_TO_PARSER[this.mode]
+
+      const parsedCompletion = parser(completion as OpenAI.Chat.Completions.ChatCompletion)
+      return JSON.parse(parsedCompletion) as z.infer<T>
+
     }
 
     const makeCompletionCallWithRetries = async () => {
@@ -201,8 +198,8 @@ class Instructor {
       create: async <
         T extends z.AnyZodObject,
         P extends T extends z.AnyZodObject
-          ? ChatCompletionCreateParamsWithModel<T>
-          : OpenAI.ChatCompletionCreateParams & { response_model: never }
+        ? ChatCompletionCreateParamsWithModel<T>
+        : OpenAI.ChatCompletionCreateParams & { response_model: never }
       >(
         params: P
       ): Promise<ReturnTypeBasedOnParams<P>> => {

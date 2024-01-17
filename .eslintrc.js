@@ -5,15 +5,16 @@ module.exports = {
     project: true,
     tsconfigRootDir: __dirname
   },
-  parser: "@typescript-eslint/parser",
-  plugins: ["@typescript-eslint", "prettier"],
   extends: [
+    "eslint:recommended",
     "plugin:@typescript-eslint/recommended",
-    "prettier"
+    "prettier",
   ],
+  parser: '@typescript-eslint/parser',
+  plugins: ['@typescript-eslint'],
   rules: {
-    "prettier/prettier": "error",
     "linebreak-style": "off",
+    "no-prototype-builtins": "off",
     "semi": "off",
     "indent": "off",
     "@typescript-eslint/semi": "off",

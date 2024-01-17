@@ -1,12 +1,15 @@
 {
   "editor.defaultFormatter": "GitHub.copilot",
   "editor.tabSize": 2,
-  "editor.formatOnSave": false,
   "editor.formatOnType": false,
   "editor.formatOnPaste": false,
   "editor.trimAutoWhitespace": true,
+  "editor.formatOnSave": true,
+  "[javascript, javascriptreact, typescript, typescriptreact]": {
+    "editor.formatOnSave": false
+  },
   "editor.codeActionsOnSave": {
-    "source.fixAll.eslint": "always"
+    "source.fixAll": true
   },
   "[html]": {
     "editor.defaultFormatter": "GitHub.copilot"
@@ -25,9 +28,15 @@
     "editor.formatOnType": false,
     "editor.formatOnPaste": true
   },
-  "eslint.validate": ["javascript", "typescript", "typescriptreact"],
+  "eslint.validate": [
+    "javascript",
+    "typescript",
+    "typescriptreact"
+  ],
   "eslint.debug": true,
-  "github-actions.workflows.pinned.workflows": [".github/workflows/release.yml"],
+  "github-actions.workflows.pinned.workflows": [
+    ".github/workflows/release.yml"
+  ],
   "typescript.tsdk": "node_modules/typescript/lib",
   "typescript.enablePromptUseWorkspaceTsdk": true,
   "typescript.validate.enable": true,
