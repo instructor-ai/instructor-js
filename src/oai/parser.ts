@@ -1,5 +1,4 @@
 import OpenAI from "openai"
-import { Stream } from "openai/streaming"
 
 /**
  * `OAIResponseTextParser` parses a JSON string and extracts the text content.
@@ -11,7 +10,7 @@ import { Stream } from "openai/streaming"
 export function OAIResponseTextParser(
   data:
     | string
-    | Stream<OpenAI.Chat.Completions.ChatCompletionChunk>
+    | OpenAI.Chat.Completions.ChatCompletionChunk
     | OpenAI.Chat.Completions.ChatCompletion
 ) {
   const parsedData = typeof data === "string" ? JSON.parse(data) : data
@@ -31,7 +30,7 @@ export function OAIResponseTextParser(
 export function OAIResponseFnArgsParser(
   data:
     | string
-    | Stream<OpenAI.Chat.Completions.ChatCompletionChunk>
+    | OpenAI.Chat.Completions.ChatCompletionChunk
     | OpenAI.Chat.Completions.ChatCompletion
 ) {
   const parsedData = typeof data === "string" ? JSON.parse(data) : data
@@ -53,7 +52,7 @@ export function OAIResponseFnArgsParser(
 export function OAIResponseToolArgsParser(
   data:
     | string
-    | Stream<OpenAI.Chat.Completions.ChatCompletionChunk>
+    | OpenAI.Chat.Completions.ChatCompletionChunk
     | OpenAI.Chat.Completions.ChatCompletion
 ) {
   const parsedData = typeof data === "string" ? JSON.parse(data) : data
@@ -76,7 +75,7 @@ export function OAIResponseToolArgsParser(
 export function OAIResponseJSONStringParser(
   data:
     | string
-    | Stream<OpenAI.Chat.Completions.ChatCompletionChunk>
+    | OpenAI.Chat.Completions.ChatCompletionChunk
     | OpenAI.Chat.Completions.ChatCompletion
 ) {
   const parsedData = typeof data === "string" ? JSON.parse(data) : data
