@@ -1,11 +1,10 @@
 name: Test
 on:
   push:
-    branches: 
-      - main
-  pull_request_target:
-    branches:
-      - main
+    branches: [master]
+  pull_request:
+    branches: [master]
+  
 jobs:
   test:
     name: run-tests
@@ -34,7 +33,7 @@ jobs:
         run: bun i
       - name: Build
         run: bun run build
-        
+
       - run: bun run type-check
       - run: bun run lint
       - run: bun test --timeout=15000
