@@ -23,7 +23,9 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsup",
     "lint": "eslint \"**/*.{js,json,jsx,ts,tsx}\"",
-    "lint:fix": "eslint --fix \"**/*.{js,json,jsx,ts,tsx}\"",
+    "lint:fix": "eslint --fix \"**/*.{ts,tsx}\"",
+    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "format:write": "prettier --write \"**/*.{ts,tsx}\"",
     "type-check": "tsc --noEmit",
     "prepare": "husky install",
     "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist",
@@ -62,17 +64,17 @@
     "@ianvs/prettier-plugin-sort-imports": "4.1.0",
     "@types/bun": "^1.0.0",
     "@types/node": "^20.10.6",
-    "@typescript-eslint/eslint-plugin": "latest",
-    "@typescript-eslint/parser": "latest",
+    "@typescript-eslint/eslint-plugin": "6.5.0",
+    "@typescript-eslint/parser": "6.5.0",
     "eslint": "^8.40.0",
     "eslint-config-prettier": "9.0.0",
     "eslint-import-resolver-typescript": "^3.5.5",
     "eslint-plugin-import": "^2.27.5",
-    "eslint-plugin-prettier": "^5.0.0",
+    "eslint-plugin-prettier": "5.0.0",
     "husky": "^8.0.3",
-    "prettier": "3.0.0",
+    "prettier": "^3.2.4",
     "tsup": "^8.0.1",
     "ts-inference-check": "^0.3.0",
-    "typescript": "^5.3.3"
+    "typescript": "^5.2.2"
   }
 }
