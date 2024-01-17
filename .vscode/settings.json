@@ -27,14 +27,8 @@
   },
   "eslint.validate": ["javascript", "typescript", "typescriptreact"],
   "eslint.debug": true,
-  "eslint.workingDirectories": [
-    // Monorepo directories
-    {
-      "pattern": "./src/*"
-    }
-  ],
   "github-actions.workflows.pinned.workflows": [".github/workflows/release.yml"],
-  "typescript.tsdk": "./node_modules/typescript/lib",
+  "typescript.tsdk": "node_modules/typescript/lib",
   "typescript.enablePromptUseWorkspaceTsdk": true,
   "typescript.validate.enable": true,
   "editor.quickSuggestions": {
