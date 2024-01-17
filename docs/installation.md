@@ -1,10 +1,7 @@
 Installation is as simple as:
 
-!!! warning
-    "We haven't released instructor-js to npm yet. Please directly clone the repository and use"
-    
 ```bash
-npm install instructor-js
+npm install @instructor-ai/instructor
 ```
 
 Instructor-js has a few dependencies:
