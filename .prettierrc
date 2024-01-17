@@ -1,4 +1,5 @@
 {
+  "$schema": "https://json.schemastore.org/prettierrc",
   "endOfLine": "lf",
   "semi": false,
   "trailingComma": "none",
@@ -18,7 +19,11 @@
     "",
     "^[./]"
   ],
-  "importOrderParserPlugins": ["typescript", "jsx", "decorators-legacy"],
+  "importOrderParserPlugins": [
+    "typescript",
+    "jsx",
+    "decorators-legacy"
+  ],
   "plugins": [
     "@ianvs/prettier-plugin-sort-imports"
   ],

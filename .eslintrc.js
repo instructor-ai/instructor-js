@@ -5,12 +5,16 @@ module.exports = {
     project: true,
     tsconfigRootDir: __dirname
   },
-  parser: "@typescript-eslint/parser",
-  plugins: ["@typescript-eslint", "prettier"],
-  extends: ["plugin:@typescript-eslint/recommended", "plugin:prettier/recommended"],
+  extends: [
+    "eslint:recommended",
+    "plugin:@typescript-eslint/recommended",
+    "prettier",
+  ],
+  parser: '@typescript-eslint/parser',
+  plugins: ['@typescript-eslint'],
   rules: {
-    "prettier/prettier": "error",
     "linebreak-style": "off",
+    "no-prototype-builtins": "off",
     "semi": "off",
     "indent": "off",
     "@typescript-eslint/semi": "off",
@@ -24,5 +28,13 @@ module.exports = {
       }
     ]
   },
-  ignorePatterns: ["node_modules/", "dist/", "coverage/", "docs/", ".eslintrc.js", "package.json", "tsconfig.json"]
+  ignorePatterns: [
+    "node_modules/",
+    "dist/",
+    "coverage/",
+    "docs/",
+    ".eslintrc.js",
+    "package.json",
+    "tsconfig.json"
+  ]
 }

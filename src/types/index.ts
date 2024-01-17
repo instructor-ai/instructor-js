@@ -39,7 +39,7 @@ export type ReturnTypeBasedOnParams<P> = P extends {
 }
   ? Promise<AsyncGenerator<Partial<z.infer<T>>, void, unknown>>
   : P extends { response_model: ResponseModel<infer T> }
-    ? Promise<z.infer<T>>
-    : P extends { stream: true }
-      ? Stream<OpenAI.Chat.Completions.ChatCompletionChunk>
-      : OpenAI.Chat.Completions.ChatCompletion
+  ? Promise<z.infer<T>>
+  : P extends { stream: true }
+  ? Stream<OpenAI.Chat.Completions.ChatCompletionChunk>
+  : OpenAI.Chat.Completions.ChatCompletion
