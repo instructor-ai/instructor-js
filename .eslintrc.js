@@ -1,6 +1,10 @@
 module.exports = {
   $schema: "https://json.schemastore.org/eslintrc",
   root: true,
+  parserOptions: {
+    project: true,
+    tsconfigRootDir: __dirname
+  },
   parser: "@typescript-eslint/parser",
   plugins: ["@typescript-eslint", "prettier"],
   extends: ["plugin:@typescript-eslint/recommended", "plugin:prettier/recommended"],
@@ -20,5 +24,5 @@ module.exports = {
       }
     ]
   },
-  ignorePatterns: ["node_modules/", "dist/", "coverage/", "docs/"]
+  ignorePatterns: ["node_modules/", "dist/", "coverage/", "docs/", ".eslintrc.js", "package.json", "tsconfig.json"]
 }
