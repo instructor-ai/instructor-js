@@ -6,7 +6,8 @@ import {
 import {
   OAIResponseFnArgsParser,
   OAIResponseJSONStringParser,
-  OAIResponseToolArgsParser
+  OAIResponseToolArgsParser,
+  OAIResponseJSONParser
 } from "@/oai/parser"
 
 export const MODE = {
@@ -21,7 +22,7 @@ export const MODE_TO_PARSER = {
   [MODE.FUNCTIONS]: OAIResponseFnArgsParser,
   [MODE.TOOLS]: OAIResponseToolArgsParser,
   [MODE.JSON]: OAIResponseJSONStringParser,
-  [MODE.MD_JSON]: OAIResponseJSONStringParser,
+  [MODE.MD_JSON]: OAIResponseJSONParser,
   [MODE.JSON_SCHEMA]: OAIResponseJSONStringParser
 }
 
