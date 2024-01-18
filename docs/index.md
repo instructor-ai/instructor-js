@@ -23,7 +23,7 @@ Dive into the world of Typescript-based structured extraction, by OpenAI's funct
 ## Usage
 
 ```ts
-import Instructor from "@/instructor"
+import Instructor from "@instructor-ai/instructor"
 import OpenAI from "openai"
 import { z } from "zod"
 

@@ -1,6 +1,6 @@
 A common use case of structured extraction is defining a single schema class and then making another schema to create a list to do multiple extraction By enabling streaming, you can do multiple extractions in a single request, and then iterate over the results as they come in.
 
-To see an example of streamin in production checkout this [example](https://ss.dimitri.link/j17CVTMK)
+To see an example of streaming in production checkout this [example](https://ss.dimitri.link/j17CVTMK)
 
 !!! warning "Important: Changes in Response Behavior with Streaming Enabled"
 
@@ -105,47 +105,28 @@ console.table(extraction)
 
 OpenAI's completion requests return responses using Server-Sent Events (SSE), a protocol used to push real-time updates from a server to a client. In this context, the Async Generator in our TypeScript example closely mirrors the behavior of SSE. Each yield from the Async Generator corresponds to an update from the server, providing a continuous stream of data until the completion of the request.
 
-**Transforming Async Generators to Readable Streams**
 
-While the Async Generator is suitable for server-side processing of streaming data, there may be scenarios where you need to stream data to a client, such as a web browser. In such cases, you can transform the Async Generator into a ReadableStream, which is more suitable for client-side consumption.
+## Streaming to the Browser or other clients
 
-Here's how you can transform an Async Generator to a ReadableStream:
+### Challenges of Browser Streaming with Instructor
+Instructor, while powerful for server-side data validation and extraction, presents certain challenges when streaming directly to the browser:
 
-```typescript
-import { ReadableStream } from "stream"
+- **Complexity in Data Transfer**: Instructor's focus on full lifecycle validation means that streaming to the browser often involves transferring fully hydrated models. This can lead to larger data chunks, increasing the amount of data transferred.
 
-function asyncGeneratorToReadableStream(generator) {
-  const encoder = new TextEncoder()
+- **Handling Data Chunks in the UI**: When streaming complete objects, there's the added complexity of managing multiple chunks, splitting, diffing, etc. This can make real-time updates in the browser more challenging to implement efficiently.
 
-  return new ReadableStream({
-    async start(controller) {
-      for await (const parsedData of generator) {
-        controller.enqueue(encoder.encode(JSON.stringify(parsedData)))
-      }
-      controller.close()
-    },
-    cancel() {
-      if (cancelGenerator) {
-        cancelGenerator()
-      }
-    }
-  })
-}
+### Utilizing WebSockets
+- **WebSocket Streaming**: A viable solution for streaming Instructor's data to the browser is through WebSockets. This allows for continuous streaming of the partially hydrated model, enabling immediate use in the UI.
 
-// Usage Example
-const readableStream = asyncGeneratorToReadableStream(extractionStream)
+- **Ease of Use**: Using WebSockets, developers can stream the entire partially hydrated model to the client, simplifying the process of updating the UI in real time.
 
-// This ReadableStream can now be returned in an API endpoint or used in a similar context
-```
+### Alternatives in Serverless Environments
+- **Challenges in Serverless**: In serverless environments or scenarios where WebSockets may not be feasible, streaming large, fully hydrated models becomes more complicated due to limitations in transferring large data chunks efficiently.
 
-**_In this example:_**
+### Leveraging zod-stream and stream-hooks
+- **Integration with zod-stream**: Instructor is built on top of [`zod-stream`](https://island.novy.work/docs/zod-stream/introduction), a library that handles the streaming aspects provided by Instructor. [`zod-stream`](https://island.novy.work/docs/zod-stream/introduction) facilitates the construction of structured completions from an API endpoint, streamlining the data handling process, and provides a client for parsing the raw stream and producing the partially hydrated model.
 
-The asyncGeneratorToReadableStream function takes an Async Generator and an optional cancellation function.
+- **Simplifying UI Updates with stream-hooks**: For React applications, integrating [`stream-hooks` ](https://island.novy.work/docs/stream-hooks/introduction)with [`zod-stream`](https://island.novy.work/docs/zod-stream/introduction) can significantly simplify building dynamic UIs. [`stream-hooks` ](https://island.novy.work/docs/stream-hooks/introduction)manage the streaming connection and data updates efficiently, reducing overhead and complexity in real-time UI interactions.
 
-It creates a new ReadableStream that, upon starting, iterates over the Async Generator using a for await...of loop.
 
-Each piece of parsed data from the generator is encoded and enqueued into the stream. Once the generator completes, the stream is closed using controller.close().
-
-If the stream is canceled (e.g., client disconnects), an optional cancelGenerator function can be invoked to stop the generator.
-
-This approach allows for seamless integration of OpenAI's streaming completion responses into web applications and other scenarios where streaming data directly to a client is required.
+While Instructor provides robust server-side capabilities, streaming to the browser introduces complexities that can be effectively managed either through the use of WebSockets or [`zod-stream`](https://island.novy.work/docs/zod-stream/introduction), and `stream-hooks`. These tools complement Instructor's server-side strengths, enabling a more streamlined approach to building dynamic, real-time UIs in various environments, including serverless architectures.
