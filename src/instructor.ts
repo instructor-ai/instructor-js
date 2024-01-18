@@ -106,7 +106,11 @@ class Instructor {
       const parser = MODE_TO_PARSER[this.mode]
 
       const parsedCompletion = parser(completion as OpenAI.Chat.Completions.ChatCompletion)
-      return JSON.parse(parsedCompletion) as z.infer<T>
+      try {
+        return JSON.parse(parsedCompletion) as z.infer<T>
+      } catch (error) {
+        this.log("error", "failed to parse completion", parsedCompletion, this.mode)
+      }
 
     }
 
