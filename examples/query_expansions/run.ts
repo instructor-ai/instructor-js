@@ -71,7 +71,7 @@ const runExtraction = async (query: string) => {
     try {
       extraction = result
       console.clear()
-      console.table(extraction)
+      console.log(extraction)
     } catch (e) {
       console.log(e)
       break
