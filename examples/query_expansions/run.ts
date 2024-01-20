@@ -62,7 +62,6 @@ const runExtraction = async (query: string) => {
       schema: ExtractionValuesSchema,
       name: "value_extraction"
     },
-    streamOutputType: "READABLE",
     stream: true,
     seed: 1
   })
