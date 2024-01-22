@@ -1,6 +1,6 @@
 {
   "name": "@instructor-ai/instructor",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "structured outputs for llms",
   "publishConfig": {
     "access": "public"
