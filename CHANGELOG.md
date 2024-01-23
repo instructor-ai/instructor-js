@@ -1,5 +1,13 @@
 # @instructor-ai/instructor
 
+## 0.0.3
+
+### Patch Changes
+
+- [#86](https://github.com/instructor-ai/instructor-js/pull/86) [`205c6cb`](https://github.com/instructor-ai/instructor-js/commit/205c6cbc4e276b792953352e546ada356467aab5) Thanks [@roodboi](https://github.com/roodboi)! - update zodstream and schema stream to support zod defaults
+
+- [#74](https://github.com/instructor-ai/instructor-js/pull/74) [`f93d93b`](https://github.com/instructor-ai/instructor-js/commit/f93d93b7553af81a727bd8783d18c2901bb0d11a) Thanks [@roodboi](https://github.com/roodboi)! - Type updates
+
 ## 0.0.2
 
 ### Patch Changes
