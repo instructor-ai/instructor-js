@@ -29,17 +29,18 @@ export type InstructorChatCompletionParams<T extends z.AnyZodObject> = {
 export type ChatCompletionCreateParamsWithModel<T extends z.AnyZodObject> =
   InstructorChatCompletionParams<T> & ChatCompletionCreateParams
 
-export type ReturnWithoutModel<P> = P extends { stream: true }
-  ? Stream<OpenAI.Chat.Completions.ChatCompletionChunk>
+export type ReturnWithoutModel<P> =
+  P extends { stream: true } ? Stream<OpenAI.Chat.Completions.ChatCompletionChunk>
   : OpenAI.Chat.Completions.ChatCompletion
 
-export type ReturnTypeBasedOnParams<P> = P extends {
-  stream: true
-  response_model: ResponseModel<infer T>
-}
-  ? Promise<AsyncGenerator<Partial<z.infer<T>>, void, unknown>>
-  : P extends { response_model: ResponseModel<infer T> }
-  ? Promise<z.infer<T>>
-  : P extends { stream: true }
-  ? Stream<OpenAI.Chat.Completions.ChatCompletionChunk>
+export type ReturnTypeBasedOnParams<P> =
+  P extends (
+    {
+      stream: true
+      response_model: ResponseModel<infer T>
+    }
+  ) ?
+    Promise<AsyncGenerator<Partial<z.infer<T>>, void, unknown>>
+  : P extends { response_model: ResponseModel<infer T> } ? Promise<z.infer<T>>
+  : P extends { stream: true } ? Stream<OpenAI.Chat.Completions.ChatCompletionChunk>
   : OpenAI.Chat.Completions.ChatCompletion

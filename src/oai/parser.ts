@@ -85,14 +85,13 @@ export function OAIResponseJSONStringParser(
   return text
 }
 
-
 /**
  * `OAIResponseJSONParser` parses a JSON string and extracts the JSON content.
- * 
+ *
  * @param {string} data - The JSON string to parse.
  * @returns {Object} - The extracted JSON content.
- * 
- * 
+ *
+ *
  */
 export function OAIResponseJSONParser(
   data:
@@ -104,9 +103,8 @@ export function OAIResponseJSONParser(
   const text =
     parsedData.choices?.[0].delta?.content ?? parsedData?.choices[0]?.message?.content ?? null
 
-  const jsonRegex = /```json\n([\s\S]*?)\n```/;
-  const match = text.match(jsonRegex);
+  const jsonRegex = /```json\n([\s\S]*?)\n```/
+  const match = text.match(jsonRegex)
 
-
-  return match ? match[1] : text;
+  return match ? match[1] : text
 }
