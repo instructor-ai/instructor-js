@@ -1,5 +1,11 @@
 # @instructor-ai/instructor
 
+## 0.0.4
+
+### Patch Changes
+
+- [#90](https://github.com/instructor-ai/instructor-js/pull/90) [`771d175`](https://github.com/instructor-ai/instructor-js/commit/771d1750361b409ed8a59adfdf79a29174b67c87) Thanks [@roodboi](https://github.com/roodboi)! - Updating build and exports for wider range of support
+
 ## 0.0.3
 
 ### Patch Changes
