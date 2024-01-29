@@ -3,10 +3,7 @@ import { describe, expect, test } from "bun:test"
 import OpenAI from "openai"
 import { z } from "zod"
 
-async function extractUser({
-  schema
-}) {
-
+async function extractUser({ schema }) {
   const oai = new OpenAI({
     apiKey: process.env.OPENAI_API_KEY ?? undefined,
     organization: process.env.OPENAI_ORG_ID ?? undefined

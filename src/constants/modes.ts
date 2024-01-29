@@ -5,9 +5,9 @@ import {
 } from "@/oai/params"
 import {
   OAIResponseFnArgsParser,
+  OAIResponseJSONParser,
   OAIResponseJSONStringParser,
-  OAIResponseToolArgsParser,
-  OAIResponseJSONParser
+  OAIResponseToolArgsParser
 } from "@/oai/parser"
 
 export const MODE = {

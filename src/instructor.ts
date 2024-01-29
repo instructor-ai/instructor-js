@@ -95,12 +95,7 @@ class Instructor {
         }
       }
 
-      this.log(
-        "debug",
-        response_model.name,
-        "making completion call with params: ",
-        resolvedParams
-      )
+      this.log("debug", response_model.name, "making completion call with params: ", resolvedParams)
 
       const completion = await this.client.chat.completions.create(resolvedParams)
       const parser = MODE_TO_PARSER[this.mode]
@@ -111,7 +106,6 @@ class Instructor {
       } catch (error) {
         this.log("error", "failed to parse completion", parsedCompletion, this.mode)
       }
-
     }
 
     const makeCompletionCallWithRetries = async () => {
@@ -201,8 +195,7 @@ class Instructor {
     completions: {
       create: async <
         T extends z.AnyZodObject,
-        P extends T extends z.AnyZodObject
-        ? ChatCompletionCreateParamsWithModel<T>
+        P extends T extends z.AnyZodObject ? ChatCompletionCreateParamsWithModel<T>
         : OpenAI.ChatCompletionCreateParams & { response_model: never }
       >(
         params: P
@@ -214,8 +207,9 @@ class Instructor {
             return this.chatCompletionStandard(params) as ReturnTypeBasedOnParams<P>
           }
         } else {
-          const result: OpenAI.Chat.Completions.ChatCompletion = this.isStandardStream(params)
-            ? await this.client.chat.completions.create(params)
+          const result: OpenAI.Chat.Completions.ChatCompletion =
+            this.isStandardStream(params) ?
+              await this.client.chat.completions.create(params)
             : await this.client.chat.completions.create(params)
 
           return result as ReturnTypeBasedOnParams<P>

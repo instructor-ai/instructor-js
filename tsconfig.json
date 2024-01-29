@@ -4,25 +4,33 @@
     "strictNullChecks": true,
     "noEmit": true,
     "allowJs": true,
-    "jsx": "preserve",
+    "lib": ["es2020", "dom"],
     "module": "esnext",
-    "target": "ESNext",
+    "target": "es2020",
     "skipLibCheck": true,
     "esModuleInterop": true,
     "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,
     "moduleDetection": "force",
     "baseUrl": ".",
-    "lib": ["ESNext", "dom", "dom.iterable", "esnext"],
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
     "incremental": true,
     "tsBuildInfoFile": "tsconfig.tsbuildinfo",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": [
+        "./src/*"
+      ]
     }
   },
-  "include": ["**/*.ts", "**/*.tsx"],
-  "exclude": ["node_modules", "dist"]
+  "include": [
+    "**/*.ts",
+    "**/*.tsx"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    ".eslintrc.cjs"
+  ]
 }

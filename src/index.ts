@@ -1,1 +1,3 @@
-export * as Instructor from "./instructor"
+import Instructor from "./instructor"
+
+export default Instructor
