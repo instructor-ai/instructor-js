@@ -40,7 +40,7 @@ const QueryPlanSchema = z.object({
 
 !!! warning "Graph Generation"
 
-    Notice that this example produces a flat list of items with dependencies that resemble a graph, while pydantic allows for recursive definitions, it's much easier and less confusing for the model to generate flat schemas rather than recursive schemas. If you want to see a recursive example, see [recursive schemas](recursive.md)
+    Notice that this example produces a flat list of items with dependencies that resemble a graph, while Zod allows for recursive definitions, it's much easier and less confusing for the model to generate flat schemas rather than recursive schemas. If you want to see a recursive example, see [recursive schemas](recursive.md)
 
 ## Planning a Query Plan
 
@@ -126,4 +126,4 @@ In the above code, we define a `createQueryPlan` function that takes a question 
 
 ## Conclusion
 
-In this example, we demonstrated how to use the OpenAI Function Call `ChatCompletion` model to plan and execute a query plan using a question-answering system. We defined the necessary structures using Pydantic and created a query planner function.
+In this example, we demonstrated how to use the OpenAI Function Call `ChatCompletion` model to plan and execute a query plan using a question-answering system. We defined the necessary structures using Zod and created a query planner function.

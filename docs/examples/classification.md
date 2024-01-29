@@ -10,7 +10,7 @@ This tutorial showcases how to implement text classification tasks—specificall
 
 ### Defining the Structures
 
-For single-label classification, we first define an **`enum`** for possible labels and a Pydantic model for the output.
+For single-label classification, we first define an **`enum`** for possible labels and a Zod schema for the output.
 
 ```ts
 import Instructor from "@/instructor"
@@ -68,7 +68,7 @@ console.log({ classification })
 
 ### Defining the Structures
 
-For multi-label classification, we introduce a new enum class and a different Pydantic model to handle multiple labels.
+For multi-label classification, we introduce a new enum class and a different Zod schema to handle multiple labels.
 
 ```ts
 enum MULTI_CLASSIFICATION_LABELS {
