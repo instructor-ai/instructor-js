@@ -21,7 +21,6 @@ import Instructor from "@/instructor"
 import OpenAI from "openai"
 import { z } from "zod"
 
-
 const textBlock = `
 In our recent online meeting, participants from various backgrounds joined to discuss the upcoming tech conference. The names and contact details of the participants were as follows:
 
@@ -43,13 +42,12 @@ The budget for the event is set at $50,000, covering venue costs, speaker fees, 
 A follow-up meeting is scheduled for January 25th at 3 PM GMT to finalize the agenda and confirm the list of speakers.
 `
 
-
 const ExtractionValuesSchema = z.object({
   users: z
     .array(
       z.object({
         name: z.string(),
-        handle: z.string(),
+        email: z.string(),
         twitter: z.string()
       })
     )
@@ -59,8 +57,6 @@ const ExtractionValuesSchema = z.object({
   budget: z.number(),
   deadline: z.string().min(1)
 })
-
-type Extraction = Partial<z.infer<typeof ExtractionValuesSchema>>
 
 const oai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY ?? undefined,
@@ -75,28 +71,24 @@ const client = Instructor({
 const extractionStream = await client.chat.completions.create({
   messages: [{ role: "user", content: textBlock }],
   model: "gpt-4-1106-preview",
-  response_model: { schema ExtractionValuesSchema },
+  response_model: {
+    schema: ExtractionValuesSchema,
+    name: "value extraction"
+  },
   max_retries: 3,
-  stream: true
+  stream: true,
+  seed: 1
 })
-
-let extraction: Extraction = {}
 
 for await (const result of extractionStream) {
   try {
-    extraction = result
     console.clear()
-    console.table(extraction)
+    console.log(result)
   } catch (e) {
     console.log(e)
     break
   }
 }
-
-console.clear()
-console.log("completed extraction:")
-console.table(extraction)
-
 ```
 
 ## Understanding OpenAI Completion Requests and Streaming Responses
