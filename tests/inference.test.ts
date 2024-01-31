@@ -9,7 +9,7 @@
 import Instructor from "@/instructor"
 import { describe, expect, test } from "bun:test"
 import OpenAI from "openai"
-import { Stream } from "openai/streaming.mjs"
+import { Stream } from "openai/streaming"
 import { type } from "ts-inference-check"
 import { z } from "zod"
 

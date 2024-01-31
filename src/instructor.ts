@@ -202,7 +202,9 @@ class Instructor {
       ): Promise<ReturnTypeBasedOnParams<P>> => {
         if (this.isChatCompletionCreateParamsWithModel(params)) {
           if (params.stream) {
-            return this.chatCompletionStream(params) as ReturnTypeBasedOnParams<P>
+            return this.chatCompletionStream(params) as ReturnTypeBasedOnParams<
+              P & { stream: true }
+            >
           } else {
             return this.chatCompletionStandard(params) as ReturnTypeBasedOnParams<P>
           }

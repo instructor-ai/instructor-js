@@ -1,6 +1,5 @@
 import OpenAI from "openai"
-import type { ChatCompletionCreateParams } from "openai/resources/index.mjs"
-import { Stream } from "openai/streaming.mjs"
+import { Stream } from "openai/streaming"
 import { z } from "zod"
 
 import { MODE } from "@/constants/modes"
@@ -27,10 +26,10 @@ export type InstructorChatCompletionParams<T extends z.AnyZodObject> = {
 }
 
 export type ChatCompletionCreateParamsWithModel<T extends z.AnyZodObject> =
-  InstructorChatCompletionParams<T> & ChatCompletionCreateParams
+  InstructorChatCompletionParams<T> & OpenAI.ChatCompletionCreateParams
 
 export type ReturnWithoutModel<P> =
-  P extends { stream: true } ? Stream<OpenAI.Chat.Completions.ChatCompletionChunk>
+  P extends { stream: true } ? OpenAI.Chat.Completions.ChatCompletion
   : OpenAI.Chat.Completions.ChatCompletion
 
 export type ReturnTypeBasedOnParams<P> =
