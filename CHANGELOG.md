@@ -1,5 +1,13 @@
 # @instructor-ai/instructor
 
+## 0.0.5
+
+### Patch Changes
+
+- [#99](https://github.com/instructor-ai/instructor-js/pull/99) [`c9ab910`](https://github.com/instructor-ai/instructor-js/commit/c9ab9104e554e4f24b55f69cf24b784091c7bfb1) Thanks [@roodboi](https://github.com/roodboi)! - Adding explicit support for non-oai providers - currently anyscale and together ai - will do explicit checks on mode selected vs provider and model
+
+- [#97](https://github.com/instructor-ai/instructor-js/pull/97) [`c7aec7c`](https://github.com/instructor-ai/instructor-js/commit/c7aec7c072aaa6921a30995332a9fb61938dce9d) Thanks [@roodboi](https://github.com/roodboi)! - Fixing inference on stream types when using npm or pnpm
+
 ## 0.0.4
 
 ### Patch Changes
