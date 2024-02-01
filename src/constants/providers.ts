@@ -61,7 +61,6 @@ export const PROVIDER_SUPPORTED_MODES_BY_MODEL = {
       "mistralai/Mistral-7B-Instruct-v0.1",
       "mistralai/Mixtral-8x7B-Instruct-v0.1"
     ],
-    [MODE.MD_JSON]: ["*"],
     [MODE.TOOLS]: ["mistralai/Mistral-7B-Instruct-v0.1", "mistralai/Mixtral-8x7B-Instruct-v0.1"]
   }
 }
