@@ -1,23 +1,17 @@
 import OpenAI from "openai"
 import { Stream } from "openai/streaming"
 import { z } from "zod"
-
-import { MODE } from "@/constants/modes"
-
-export type Mode = keyof typeof MODE
+import { type Mode as ZMode, type ResponseModel as ZResponseModel } from "zod-stream"
 
 export type LogLevel = "debug" | "info" | "warn" | "error"
+
+export type Mode = ZMode
+export type ResponseModel<T extends z.AnyZodObject> = ZResponseModel<T>
 
 export type InstructorConfig = {
   client: OpenAI
   mode: Mode
   debug?: boolean
-}
-
-export type ResponseModel<T extends z.AnyZodObject> = {
-  schema: T
-  name: string
-  description?: string
 }
 
 export type InstructorChatCompletionParams<T extends z.AnyZodObject> = {
