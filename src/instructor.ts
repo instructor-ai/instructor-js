@@ -38,7 +38,8 @@ class Instructor {
     const provider =
       this.client?.baseURL.includes(NON_OAI_PROVIDER_URLS.ANYSCALE) ? PROVIDERS.ANYSCALE
       : this.client?.baseURL.includes(NON_OAI_PROVIDER_URLS.TOGETHER) ? PROVIDERS.TOGETHER
-      : PROVIDERS.OAI
+      : this.client?.baseURL.includes(NON_OAI_PROVIDER_URLS.TOGETHER) ? PROVIDERS.OAI
+      : PROVIDERS.OTHER
 
     this.provider = provider
 
@@ -47,6 +48,10 @@ class Instructor {
 
   private validateOptions() {
     const isModeSupported = PROVIDER_SUPPORTED_MODES[this.provider].includes(this.mode)
+
+    if (this.provider === PROVIDERS.OTHER) {
+      this.log("debug", "Unknown provider - cant validate options.")
+    }
 
     if (!isModeSupported) {
       throw new Error(`Mode ${this.mode} is not supported by provider ${this.provider}`)
