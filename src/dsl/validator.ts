@@ -2,8 +2,7 @@ import { OAIClientExtended } from "@/instructor"
 import type { ChatCompletionCreateParams } from "openai/resources/chat/completions.mjs"
 import { RefinementCtx, z } from "zod"
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type AsyncSuperRefineFunction = (data: any, ctx: RefinementCtx) => Promise<any>
+type AsyncSuperRefineFunction = (data: string, ctx: RefinementCtx) => Promise<void>
 
 export const LLMValidator = (
   instructor: OAIClientExtended,
@@ -15,7 +14,7 @@ export const LLMValidator = (
     reason: z.string().optional()
   })
 
-  const fn = async (value, ctx) => {
+  return async (value, ctx) => {
     const validated = await instructor.chat.completions.create({
       max_retries: 0,
       ...params,
@@ -41,5 +40,4 @@ export const LLMValidator = (
       })
     }
   }
-  return fn
 }

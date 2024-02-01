@@ -51,8 +51,7 @@
   },
   "homepage": "https://github.com/instructor-ai/instructor-js#readme",
   "dependencies": {
-    "zod-stream": "^0.0.5",
-    "zod-to-json-schema": "^3.22.3",
+    "zod-stream": "0.0.6",
     "zod-validation-error": "^2.1.0"
   },
   "peerDependencies": {

@@ -2,21 +2,27 @@ import {
   ChatCompletionCreateParamsWithModel,
   InstructorConfig,
   LogLevel,
-  Mode,
   ReturnTypeBasedOnParams
 } from "@/types"
 import OpenAI from "openai"
 import { z } from "zod"
-import ZodStream, { OAIStream, withResponseModel } from "zod-stream"
+import ZodStream, { OAIResponseParser, OAIStream, withResponseModel, type Mode } from "zod-stream"
 import { fromZodError } from "zod-validation-error"
 
-import { MODE, MODE_TO_PARSER } from "@/constants/modes"
+import {
+  NON_OAI_PROVIDER_URLS,
+  Provider,
+  PROVIDER_SUPPORTED_MODES,
+  PROVIDER_SUPPORTED_MODES_BY_MODEL,
+  PROVIDERS
+} from "./constants/providers"
 
 const MAX_RETRIES_DEFAULT = 0
 
 class Instructor {
   readonly client: OpenAI
   readonly mode: Mode
+  readonly provider: Provider
   readonly debug: boolean = false
 
   /**
@@ -29,11 +35,39 @@ class Instructor {
     this.mode = mode
     this.debug = debug
 
-    //TODO: probably some more sophisticated validation we can do here re: modes and otherwise.
-    // but just throwing quick here for now.
-    if (mode === MODE.JSON_SCHEMA) {
-      if (!this.client.baseURL.includes("anyscale")) {
-        throw new Error("JSON_SCHEMA mode is only support on Anyscale.")
+    const provider =
+      this.client?.baseURL.includes(NON_OAI_PROVIDER_URLS.ANYSCALE) ? PROVIDERS.ANYSCALE
+      : this.client?.baseURL.includes(NON_OAI_PROVIDER_URLS.TOGETHER) ? PROVIDERS.TOGETHER
+      : this.client?.baseURL.includes(NON_OAI_PROVIDER_URLS.TOGETHER) ? PROVIDERS.OAI
+      : PROVIDERS.OTHER
+
+    this.provider = provider
+
+    this.validateOptions()
+  }
+
+  private validateOptions() {
+    const isModeSupported = PROVIDER_SUPPORTED_MODES[this.provider].includes(this.mode)
+
+    if (this.provider === PROVIDERS.OTHER) {
+      this.log("debug", "Unknown provider - cant validate options.")
+    }
+
+    if (!isModeSupported) {
+      throw new Error(`Mode ${this.mode} is not supported by provider ${this.provider}`)
+    }
+  }
+
+  private validateModelModeSupport<T extends z.AnyZodObject>(
+    params: ChatCompletionCreateParamsWithModel<T>
+  ) {
+    if (this.provider !== PROVIDERS.OAI) {
+      const modelSupport = PROVIDER_SUPPORTED_MODES_BY_MODEL[this.provider][this.mode]
+
+      if (!modelSupport.includes("*") && !modelSupport.includes(params.model)) {
+        throw new Error(
+          `Model ${params.model} is not supported by provider ${this.provider} in mode ${this.mode}`
+        )
       }
     }
   }
@@ -98,9 +132,10 @@ class Instructor {
       this.log("debug", response_model.name, "making completion call with params: ", resolvedParams)
 
       const completion = await this.client.chat.completions.create(resolvedParams)
-      const parser = MODE_TO_PARSER[this.mode]
 
-      const parsedCompletion = parser(completion as OpenAI.Chat.Completions.ChatCompletion)
+      const parsedCompletion = OAIResponseParser(
+        completion as OpenAI.Chat.Completions.ChatCompletion
+      )
       try {
         return JSON.parse(parsedCompletion) as z.infer<T>
       } catch (error) {
@@ -200,6 +235,8 @@ class Instructor {
       >(
         params: P
       ): Promise<ReturnTypeBasedOnParams<P>> => {
+        this.validateModelModeSupport(params)
+
         if (this.isChatCompletionCreateParamsWithModel(params)) {
           if (params.stream) {
             return this.chatCompletionStream(params) as ReturnTypeBasedOnParams<
