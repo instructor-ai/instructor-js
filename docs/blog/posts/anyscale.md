@@ -19,7 +19,7 @@ By the end of this blog post, you will learn how to effectively utilize instruct
 
 ## Understanding Modes
 
-Instructor's patch enhances a openai api it with the following features, you can learn more about them [here](../../concepts/modes.md), for anyscale they support `JSON_SCHEMA` and `FUNCTIONS` modes. and with instructor we'll be able to use the following features:
+Instructor's patch enhances a openai api it with the following features, you can learn more about them [here](../../concepts/modes.md), for anyscale they support `JSON_SCHEMA` and `TOOLS` modes. and with instructor we'll be able to use the following features:
 
 - `response_model` in `create` calls that returns a Zod schema
 - `max_retries` in `create` calls that retries the call if it fails by using a backoff strategy
