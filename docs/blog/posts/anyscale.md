@@ -1,7 +1,7 @@
 ---
 draft: False
 date: 2024-01-01
-slug: patching
+slug: anyscale 
 tags:
   - patching
   - open source
@@ -14,6 +14,8 @@ authors:
 Open-source LLMS are gaining popularity, and the release of Anyscale's Mistral model has made it possible to obtain structured outputs using JSON schema at any scale. Instead of relying on a model's default output mode, you can utilize JSON schema to obtain structured outputs. This approach is a time-saving alternative to extensive prompt engineering.
 
 By the end of this blog post, you will learn how to effectively utilize instructor with Anyscale. But before we proceed, let's first explore the concept of patching.
+
+<!-- more -->
 
 ## Understanding Modes
 
