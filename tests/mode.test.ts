@@ -69,7 +69,7 @@ const createTestCases = (): { model: string; mode: Mode; provider: Provider }[] 
       }
     }
   )
-
+  console.log(testCases)
   return testCases
 }
 
