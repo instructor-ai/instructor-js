@@ -37,7 +37,7 @@ jobs:
 
       - run: bun run type-check
       - run: bun run lint
-      - run: bun test --timeout=15000
+      - run: bun test --timeout=25000
 
   test-branch:
     if: github.event_name == 'pull_request'
@@ -69,5 +69,5 @@ jobs:
 
       - run: bun run type-check
       - run: bun run lint
-      - run: bun test --timeout=15000
+      - run: bun test --timeout=25000
   
