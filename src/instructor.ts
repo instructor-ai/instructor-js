@@ -6,14 +6,9 @@ import {
 } from "@/types"
 import OpenAI from "openai"
 import { z } from "zod"
+import ZodStream, { OAIResponseParser, OAIStream, withResponseModel, type Mode } from "zod-stream"
 import { fromZodError } from "zod-validation-error"
 
-import ZodStream, {
-  OAIResponseParser,
-  OAIStream,
-  withResponseModel,
-  type Mode
-} from "../../ai-ui/public-packages/zod-stream"
 import {
   NON_OAI_PROVIDER_URLS,
   Provider,
