@@ -1,13 +1,46 @@
 name: Test
 on:
   push:
-    branches: 
+    branches:
       - main
-  pull_request_target:
+  pull_request:
     branches:
       - main
 jobs:
-  test:
+  test-main:
+    if: github.ref == 'refs/heads/main'
+    name: run-tests
+    runs-on: ubuntu-latest
+    environment: TEST-MAIN
+    env:
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      ANYSCALE_API_KEY: ${{ secrets.ANYSCALE_API_KEY }}
+      TOGETHER_API_KEY: ${{ secrets.TOGETHER_API_KEY }}
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Setup bun
+        uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: latest
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20.9.0
+
+      - name: Install Dependencies
+        run: bun i
+
+      - run: bun run type-check
+      - run: bun run lint
+      - run: bun test --timeout=15000
+
+  test-branch:
+    if: github.event_name == 'pull_request'
     name: run-tests
     runs-on: ubuntu-latest
     environment: OPENAI
@@ -37,3 +70,4 @@ jobs:
       - run: bun run type-check
       - run: bun run lint
       - run: bun test --timeout=15000
+  

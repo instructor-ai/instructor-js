@@ -36,7 +36,6 @@ describe("zod-schema test", () => {
     const user = await extractUser({
       schema: UserSchema
     })
-    console.log("test", user)
 
     expect(user.name).toEqual("Jason Liu")
     expect(user.age).toEqual(30)
