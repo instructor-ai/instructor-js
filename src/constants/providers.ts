@@ -4,6 +4,7 @@ export const PROVIDERS = {
   OAI: "OAI",
   ANYSCALE: "ANYSCALE",
   TOGETHER: "TOGETHER",
+  PPLX: "PPLX",
   OTHER: "OTHER"
 } as const
 
@@ -15,13 +16,15 @@ export const PROVIDER_SUPPORTED_MODES: {
   [PROVIDERS.OTHER]: [MODE.FUNCTIONS, MODE.TOOLS, MODE.JSON, MODE.JSON_SCHEMA],
   [PROVIDERS.OAI]: [MODE.FUNCTIONS, MODE.TOOLS, MODE.JSON, MODE.MD_JSON],
   [PROVIDERS.ANYSCALE]: [MODE.TOOLS, MODE.JSON, MODE.JSON_SCHEMA],
-  [PROVIDERS.TOGETHER]: [MODE.TOOLS, MODE.JSON, MODE.JSON_SCHEMA]
+  [PROVIDERS.TOGETHER]: [MODE.TOOLS, MODE.JSON, MODE.JSON_SCHEMA],
+  [PROVIDERS.PPLX]: [MODE.MD_JSON]
 } as const
 
 export const NON_OAI_PROVIDER_URLS = {
   [PROVIDERS.ANYSCALE]: "api.endpoints.anyscale",
   [PROVIDERS.TOGETHER]: "api.together.xyz",
-  [PROVIDERS.OAI]: "api.openai.com"
+  [PROVIDERS.OAI]: "api.openai.com",
+  [PROVIDERS.PPLX]: "api.perplexity.ai"
 } as const
 
 export const PROVIDER_SUPPORTED_MODES_BY_MODEL = {
@@ -42,6 +45,9 @@ export const PROVIDER_SUPPORTED_MODES_BY_MODEL = {
       "gpt-4-turbo-preview"
     ],
     [MODE.MD_JSON]: ["*"]
+  },
+  [PROVIDERS.PPLX]: {
+    [MODE.MD_JSON]: ["pplx-7b-chat", "pplx-70b-chat"]
   },
   [PROVIDERS.TOGETHER]: {
     [MODE.JSON_SCHEMA]: [
