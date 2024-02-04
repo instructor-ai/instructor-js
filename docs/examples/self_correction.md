@@ -127,10 +127,29 @@ Now, we throw validation error that its objectionable and provide a helpful erro
 
 ## Retrying with Corrections
 
-By adding the `max_retries` parameter, we can retry the request with corrections. and use the error message to correct the output.
+By adding the `max_retries` parameter, we can retry the request with corrections and use the error message to correct the output.
 
 ```ts
-
+try {
+  await instructor.chat.completions.create({
+    model: "gpt-4",
+    max_retries: 2,
+    response_model: { schema: QuestionAnswer, name: "Question and Answer" },
+    messages: [
+      {
+        role: "system",
+        content:
+          "You are a system that answers questions based on the context. answer exactly what the question asks using the context."
+      },
+      {
+        role: "user",
+        content: `using the context: ${context}\n\nAnswer the following question: ${question}`
+      }
+    ]
+  })
+} catch (e as ZodError[]) {
+  console.error(e[0].message)
+}
 ```
 
 ### Final Output
