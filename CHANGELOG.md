@@ -1,5 +1,11 @@
 # @instructor-ai/instructor
 
+## 0.0.6
+
+### Patch Changes
+
+- [#104](https://github.com/instructor-ai/instructor-js/pull/104) [`95aa27f`](https://github.com/instructor-ai/instructor-js/commit/95aa27f75a6ac719b1640eee1c48c5861573defc) Thanks [@roodboi](https://github.com/roodboi)! - explicit check for oai url vs falling through to other
+
 ## 0.0.5
 
 ### Patch Changes
