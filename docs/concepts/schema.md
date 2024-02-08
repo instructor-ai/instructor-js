@@ -62,7 +62,7 @@ const schema = z.object({
 
 ## Nested Schemas
 
-Powerful schemas can be created by nesting schemas.s
+Powerful schemas can be created by nesting schemas.
 
 ```ts
 const schema = z.object({
