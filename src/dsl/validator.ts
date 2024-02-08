@@ -1,6 +1,7 @@
 import { OAIClientExtended } from "@/instructor"
 import type { ChatCompletionCreateParams } from "openai/resources/chat/completions.mjs"
 import { RefinementCtx, z } from "zod"
+import OpenAI from "openai"
 
 type AsyncSuperRefineFunction = (data: string, ctx: RefinementCtx) => Promise<void>
 
@@ -37,6 +38,38 @@ export const LLMValidator = (
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         message: validated.reason
+      })
+    }
+  }
+}
+
+export const moderationValidator = (client: OAIClientExtended | OpenAI) => {
+  return async (value: string, ctx: z.RefinementCtx) => {
+    try {
+      const response = await client.moderations.create({ input: value })
+      const flaggedResults = response.results.filter(result => result.flagged)
+
+      if (flaggedResults.length > 0) {
+        const flaggedCategories: string[] = []
+        flaggedResults.forEach(result => {
+          Object.keys(result.categories).forEach(category => {
+            if (result.categories[category] === true) {
+              flaggedCategories.push(category)
+            }
+          })
+        })
+
+        if (flaggedCategories.length > 0) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: `Moderation error, \`${value}\` was flagged for ${flaggedCategories.join(", ")}`
+          })
+        }
+      }
+    } catch (error) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: `Unexpected error during moderation: ${error instanceof Error ? error.message : 'Unknown error'}`
       })
     }
   }
