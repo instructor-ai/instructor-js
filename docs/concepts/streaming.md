@@ -66,7 +66,6 @@ const extractionStream = await client.chat.completions.create({
     schema: ExtractionValuesSchema,
     name: "value extraction"
   },
-  max_retries: 3,
   stream: true,
   seed: 1
 })
