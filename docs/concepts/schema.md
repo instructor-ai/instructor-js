@@ -1,6 +1,6 @@
 # Zod Schemas 
 
-Zod is a TypeScript-first schema declaration and validation library. It is designed to be easy to use with TypeScript and to be a good fit for the language. It is the primary way of prompt engineering, the schemas that we use. 
+Zod is a TypeScript-first schema declaration and validation library. It is designed to be easy to use with TypeScript and to be a good fit for the language. It is the primary way of prompt engineering, just note that the room of response_model must be `z.object`.
 
 ## Basic Usage
 
