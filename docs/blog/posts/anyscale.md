@@ -35,7 +35,7 @@ The good news is that Anyscale employs the same OpenAI client, and its models su
 Let's explore one of the models available in Anyscale's extensive collection!
 
 ```ts
-import Instructor from "@/instructor"
+import Instructor from "@instructor-ai/instructor";
 import OpenAI from "openai"
 import { z } from "zod"
 

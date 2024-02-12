@@ -35,53 +35,50 @@ The good news is that Anyscale employs the same OpenAI client, and its models su
 Let's explore one of the models available in Together's extensive collection!
 
 ```ts
-import Instructor from "@/instructor"
+import Instructor from "@instructor-ai/instructor";
 import OpenAI from "openai"
 import { z } from "zod"
 
-const property = z.object({
-  name: z.string(),
-  value: z.string()
-}).describe("A property defined by a name and value")
-
-const UserSchema = z.object({
-  age: z.number(),
-  name: z.string(),
-  properties: z.array(property)
-})
 
 const oai = new OpenAI({
-  baseUrl='https://api.together.xyz',
-  apiKey: process.env.TOGETHER_API_KEY ?? undefined,
+  baseURL: "https://api.together.xyz",
+  apiKey: process.env.TOGETHER_API_KEY ?? undefined
 })
 
 const client = Instructor({
   client: oai,
-  mode: "JSON_SCHEMA"
+  mode: "TOOLS"
 })
 
-const user = await client.chat.completions.create({
-  messages: [{ role: "user", content: "Harry Potter" }],
-  model: "mistralai/Mixtral-8x7B-Instruct-v0.1",
-  response_model: { schema: UserSchema, name: "UserSchema" },
-  max_retries: 3
+const Summary = z.object({
+  title: z.string().describe("Short Descriptive Title"),
+  actionItems: z.array(z.string()).describe("A list of action items, short and to the point")
 })
 
-console.log(user)
-/**
- * {
-  age: 17,
-  name: "Harry Potter",
-  properties: [
+const extract = await client.chat.completions.create({
+  messages: [
     {
-      name: "House",
-      value: "Gryffindor",
-    }, {
-      name: "Wand",
-      value: "Holly and Phoenix feather",
+      role: "system",
+      content:
+        "The following is a transcript of a voice message, extract the relevant actions, correctly return JSON"
+    },
+    {
+      role: "user",
+      content:
+        "This week I have to get some groceries, pack for my trip to peru and also buy the plane tickets."
     }
   ],
-}
+  model: "mistralai/Mixtral-8x7B-Instruct-v0.1",
+  response_model: { schema: Summary, name: "SummarizeNotes" },
+  max_retries: 2
+})
+
+console.log(extract)
+/**
+ * {
+ *  title: "Weekly Tasks",
+ *  actionItems: ["get some groceries", "pack for my trip to peru", "buy the plane tickets"]
+ * }
  */
 ```
 You can find more information about Togethers's output mode support [here](https://docs.together.ai/docs/json-mode/).
