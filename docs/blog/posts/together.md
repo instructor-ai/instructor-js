@@ -63,7 +63,7 @@ const client = Instructor({
 const user = await client.chat.completions.create({
   messages: [{ role: "user", content: "Harry Potter" }],
   model: "mistralai/Mixtral-8x7B-Instruct-v0.1",
-  response_model: { schema: UserSchema },
+  response_model: { schema: UserSchema, name: "UserSchema" },
   max_retries: 3
 })
 
