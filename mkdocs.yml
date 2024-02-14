@@ -141,6 +141,7 @@ nav:
     - Action Item and Dependency Mapping: 'examples/action_items.md'
     - Self Correction: 'examples/self_correction.md'
     - Citing Sources: 'examples/validated_citations.md'
+    - Content Moderation: 'examples/content_moderation.md'
   - Blog:
     - "blog/index.md"
   
