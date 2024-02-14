@@ -1,14 +1,13 @@
 import { OAIClientExtended } from "@/instructor"
-import type { ChatCompletionCreateParams } from "openai/resources/chat/completions.mjs"
-import { RefinementCtx, z } from "zod"
 import OpenAI from "openai"
+import { RefinementCtx, z } from "zod"
 
 type AsyncSuperRefineFunction = (data: string, ctx: RefinementCtx) => Promise<void>
 
 export const LLMValidator = (
   instructor: OAIClientExtended,
   statement: string,
-  params: Omit<ChatCompletionCreateParams, "messages">
+  params: Omit<OpenAI.ChatCompletionCreateParams, "messages">
 ): AsyncSuperRefineFunction => {
   const schema = z.object({
     isValid: z.boolean(),
@@ -69,7 +68,7 @@ export const moderationValidator = (client: OAIClientExtended | OpenAI) => {
     } catch (error) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message: `Unexpected error during moderation: ${error instanceof Error ? error.message : 'Unknown error'}`
+        message: `Unexpected error during moderation: ${error instanceof Error ? error.message : "Unknown error"}`
       })
     }
   }
