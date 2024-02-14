@@ -9,7 +9,6 @@ const TableResponseSchema = z.object({
   caption: z.string(),
   table: z.any()
 })
-type TableResponse = z.infer<typeof TableResponseSchema>
 
 const oai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -21,50 +20,39 @@ const instructor = Instructor({
   mode: "MD_JSON"
 })
 
-const extractTableFromImage = async (imageUrl: string): Promise<TableResponse | undefined> => {
-  try {
-    const response = await instructor.chat.completions.create({
-      model: "gpt-4-vision-preview",
-      response_model: {
-        schema: TableResponseSchema,
-        name: "table extraction"
-      },
-      max_tokens: 1_000,
-      messages: [
-        {
-          role: "user",
-          content: [
-            { type: "text", text: "Describe this data accurately as a table in markdown format." },
-            {
-              type: "image_url",
-              image_url: {
-                url: imageUrl
-              }
-            },
-            {
-              type: "text",
-              text: `
-                First, take a moment to reason about the best set of headers for the tables. 
+const extractTableFromImage = async (imageUrl: string) => {
+  const response = await instructor.chat.completions.create({
+    model: "gpt-4-vision-preview",
+    response_model: {
+      schema: TableResponseSchema,
+      name: "table extraction"
+    },
+    max_tokens: 1_000,
+    messages: [
+      {
+        role: "user",
+        content: [
+          {
+            type: "image_url",
+            image_url: {
+              url: imageUrl
+            }
+          },
+          {
+            type: "text",
+            text: `
+                First, take a moment to reason about the best set of headers for the table. 
                 Then, write a concise title and brief caption for the image above.
                 Lastly, produce the table.
               `
-            }
-          ]
-        }
-      ]
-    })
+          }
+        ]
+      }
+    ]
+  })
 
-    return response
-  } catch (error) {
-    console.error("Failed to extract table from image:", error)
-    return undefined
-  }
+  return response
 }
 
 const table = await extractTableFromImage(IMAGE_URL)
-
-if (table) {
-  console.log("Extracted Table:", table)
-} else {
-  console.log("No table extracted or an error occurred.")
-}
+console.log("Extracted Table: ", table)
