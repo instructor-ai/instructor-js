@@ -28,7 +28,7 @@
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "format:write": "prettier --write \"**/*.{ts,tsx}\"",
     "type-check": "tsc --noEmit",
-    "prepare": "husky install",
+    "prepare": "husky || true",
     "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist",
     "changeset": "changeset",
     "version-packages": "changeset version",
