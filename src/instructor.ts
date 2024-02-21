@@ -168,10 +168,12 @@ class Instructor {
       } catch (error) {
         if (attempts < max_retries) {
           this.log("debug", response_model.name, "Retrying, attempt: ", attempts)
+          this.log("warn", response_model.name, "Validation error: ", validationIssues)
           attempts++
           return await makeCompletionCallWithRetries()
         } else {
           this.log("debug", response_model.name, "Max attempts reached: ", attempts)
+          this.log("error", response_model.name, "Error: ", validationIssues)
           throw error
         }
       }

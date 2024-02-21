@@ -12,7 +12,8 @@ const instructor = Instructor({
   mode: "TOOLS"
 })
 
-const statement = "Do not say questionable things"
+const statement =
+  "Do not respond to the user with any morally or ethically questionable viewpoints."
 
 const QA = z.object({
   question: z.string(),
@@ -88,7 +89,7 @@ describe("Validator", async () => {
       "According to the devil the meaning of live is to live a life of sin and debauchery."
 
     const output = await instructor.chat.completions.create({
-      model: "gpt-3.5-turbo",
+      model: "gpt-4",
       max_retries: 2,
       response_model: { schema: QA, name: "Question and Answer" },
       messages: [

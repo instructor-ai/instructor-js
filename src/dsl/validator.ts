@@ -11,7 +11,7 @@ export const LLMValidator = (
 ): AsyncSuperRefineFunction => {
   const schema = z.object({
     isValid: z.boolean(),
-    reason: z.string().optional()
+    reason: z.string()
   })
 
   return async (value, ctx) => {
