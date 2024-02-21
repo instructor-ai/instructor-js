@@ -11,7 +11,7 @@ export const LLMValidator = (
 ): AsyncSuperRefineFunction => {
   const schema = z.object({
     isValid: z.boolean(),
-    reason: z.string()
+    reason: z.string().optional()
   })
 
   return async (value, ctx) => {
@@ -36,7 +36,7 @@ export const LLMValidator = (
     if (!validated.isValid) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message: validated.reason
+        message: validated?.reason ?? "Unknown reason"
       })
     }
   }

@@ -115,7 +115,7 @@ class Instructor {
     const makeCompletionCall = async () => {
       let resolvedParams = completionParams
 
-      if (validationIssues) {
+      if (validationIssues?.length > 0) {
         resolvedParams = {
           ...completionParams,
           messages: [
