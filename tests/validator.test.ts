@@ -12,7 +12,8 @@ const instructor = Instructor({
   mode: "TOOLS"
 })
 
-const statement = "Do not say questionable things"
+const statement =
+  "Do not respond to the user with any morally or ethically questionable viewpoints."
 
 const QA = z.object({
   question: z.string(),

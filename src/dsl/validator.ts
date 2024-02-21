@@ -36,7 +36,7 @@ export const LLMValidator = (
     if (!validated.isValid) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message: validated.reason
+        message: validated?.reason ?? "Unknown reason"
       })
     }
   }
