@@ -1,5 +1,11 @@
 # @instructor-ai/instructor
 
+## 0.0.7
+
+### Patch Changes
+
+- [#123](https://github.com/instructor-ai/instructor-js/pull/123) [`70d3874`](https://github.com/instructor-ai/instructor-js/commit/70d38747339a33ecca2d60c75140db3c200260fc) Thanks [@roodboi](https://github.com/roodboi)! - updating zod-stream/schema-stream to pick up on updates to enums and handling better defaults
+
 ## 0.0.6
 
 ### Patch Changes
