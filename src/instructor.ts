@@ -6,7 +6,13 @@ import {
 } from "@/types"
 import OpenAI from "openai"
 import { z } from "zod"
-import ZodStream, { OAIResponseParser, OAIStream, withResponseModel, type Mode } from "zod-stream"
+import ZodStream, {
+  CompletionMeta,
+  OAIResponseParser,
+  OAIStream,
+  withResponseModel,
+  type Mode
+} from "zod-stream"
 import { fromZodError } from "zod-validation-error"
 
 import {
@@ -186,7 +192,9 @@ class Instructor {
     max_retries,
     response_model,
     ...params
-  }: ChatCompletionCreateParamsWithModel<T>): Promise<AsyncGenerator<Partial<T>, void, unknown>> {
+  }: ChatCompletionCreateParamsWithModel<T>): Promise<
+    AsyncGenerator<Partial<T> & { _meta: CompletionMeta }, void, unknown>
+  > {
     if (max_retries) {
       this.log("warn", "max_retries is not supported for streaming completions")
     }
