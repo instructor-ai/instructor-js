@@ -16,3 +16,4 @@
 - [How is AI self-assessment implemented with llm_validator?](./self_correction.md)
 - [How are exact citations retrieved using regular expressions and smart prompting?](./validated_citations.md)
 - [How to enable OpenAI's moderation](./content_moderation.md)
+- [How are search queries segmented through function calling and multi-task definitions?](./segmenting_search.md)
