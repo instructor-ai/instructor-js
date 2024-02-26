@@ -19,7 +19,7 @@ const SearchTypeSchema = z
 const SearchSchema = z
   .object({
     title: z.string().describe("Title of the request"),
-    query: z.string().describe("Query to search fro relevant content"),
+    query: z.string().describe("Query to search for relevant content"),
     type: SearchTypeSchema.describe("Type of search")
   })
   .describe(
@@ -78,5 +78,5 @@ const queries = await segment(
 )
 executeMultiSearch(queries)
 
-// >>> Searching for `Video` with query `investment case study` using `SearchType.VIDEO`
-// >>> Searching for `Documents` with query `GPDR policy` using `SearchType.EMAIL`
+// >>> Searching for Investment Case Study Video with video from last week about the investment case study using VIDEO
+// >>> Searching for GDPR Policy Documents with documents about GDPR policy using EMAIL
