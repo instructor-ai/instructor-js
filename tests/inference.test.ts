@@ -12,6 +12,7 @@ import OpenAI from "openai"
 import { Stream } from "openai/streaming"
 import { type } from "ts-inference-check"
 import { z } from "zod"
+import { CompletionMeta } from "zod-stream"
 
 describe("Inference Checking", () => {
   const UserSchema = z.object({
@@ -78,7 +79,7 @@ describe("Inference Checking", () => {
           Partial<{
             name: string
             age: number
-          }>,
+          }> & { _meta: CompletionMeta },
           void,
           unknown
         >
@@ -102,7 +103,7 @@ describe("Inference Checking", () => {
           Partial<{
             name: string
             age: number
-          }>,
+          }> & { _meta: CompletionMeta },
           void,
           unknown
         >
