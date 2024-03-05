@@ -7,12 +7,12 @@
 // 6. response_model, no stream, max_retries
 
 import Instructor from "@/instructor"
+import { type CompletionMeta } from "@/types"
 import { describe, expect, test } from "bun:test"
 import OpenAI from "openai"
 import { Stream } from "openai/streaming"
 import { type } from "ts-inference-check"
 import { z } from "zod"
-import { CompletionMeta } from "zod-stream"
 
 describe("Inference Checking", () => {
   const UserSchema = z.object({
@@ -61,7 +61,9 @@ describe("Inference Checking", () => {
       stream: false
     })
 
-    expect(type(user).strictly.is<z.infer<typeof UserSchema>>(true)).toBe(true)
+    expect(
+      type(user).strictly.is<z.infer<typeof UserSchema> & { _meta?: CompletionMeta }>(true)
+    ).toBe(true)
   })
 
   test("response_model, stream", async () => {
@@ -79,7 +81,7 @@ describe("Inference Checking", () => {
           Partial<{
             name: string
             age: number
-          }> & { _meta: CompletionMeta },
+          }> & { _meta?: CompletionMeta },
           void,
           unknown
         >
@@ -103,7 +105,7 @@ describe("Inference Checking", () => {
           Partial<{
             name: string
             age: number
-          }> & { _meta: CompletionMeta },
+          }> & { _meta?: CompletionMeta },
           void,
           unknown
         >
@@ -120,6 +122,8 @@ describe("Inference Checking", () => {
       max_retries: 3
     })
 
-    expect(type(user).strictly.is<z.infer<typeof UserSchema>>(true)).toBe(true)
+    expect(
+      type(user).strictly.is<z.infer<typeof UserSchema> & { _meta?: CompletionMeta }>(true)
+    ).toBe(true)
   })
 })
