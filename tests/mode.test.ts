@@ -96,8 +96,7 @@ async function extractUser(model: string, mode: Mode, provider: Provider) {
     messages: [{ role: "user", content: "Jason Liu is 30 years old" }],
     model: model,
     response_model: { schema: UserSchema, name: "User" },
-    max_retries: 4,
-    seed: provider === PROVIDERS.OAI ? 1 : undefined
+    max_retries: 4
   })
 
   return user
