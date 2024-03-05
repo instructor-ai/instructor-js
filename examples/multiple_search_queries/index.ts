@@ -12,15 +12,11 @@ const client = Instructor({
   mode: "FUNCTIONS"
 })
 
-const SearchTypeSchema = z
-  .enum(["VIDEO", "EMAIL"])
-  .describe("Enumeration representing the types of searchs that can be performed")
-
 const SearchSchema = z
   .object({
     title: z.string().describe("Title of the request"),
     query: z.string().describe("Query to search for relevant content"),
-    type: SearchTypeSchema.describe("Type of search")
+    type: z.enum(["VIDEO", "EMAIL"]).describe("Type of search")
   })
   .describe(
     "Object representing a single search query which contains title, query, and the search type"
