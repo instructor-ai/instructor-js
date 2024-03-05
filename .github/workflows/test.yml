@@ -1,14 +1,14 @@
 name: Test
 on:
-  push:
+  pull_request_target:
     branches:
       - main
-  pull_request:
+  push:
     branches:
       - main
 jobs:
   test-main:
-    if: github.ref == 'refs/heads/main'
+    if: github.repository == 'instructor-ai/instructor-js' && github.ref == 'refs/heads/main'
     name: run-tests
     runs-on: ubuntu-latest
     environment: TEST-MAIN
@@ -39,10 +39,19 @@ jobs:
       - run: bun run lint
       - run: bun test --timeout=25000
 
+  approve:
+    if: github.ref != 'refs/heads/main'
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Approve
+      run: echo For security reasons, all pull requests need to be approved first before running any automated CI.
+    
   test-branch:
-    if: github.event_name == 'pull_request'
+    if: github.ref != 'refs/heads/main'
     name: run-tests
     runs-on: ubuntu-latest
+    needs: [approve]
     environment: OPENAI
     env:
       OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
@@ -52,7 +61,8 @@ jobs:
     steps:
       - uses: actions/checkout@v3
         with:
-          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 2
 
       - name: Setup bun
         uses: oven-sh/setup-bun@v1
