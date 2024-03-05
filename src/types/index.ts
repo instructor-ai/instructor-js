@@ -1,7 +1,11 @@
 import OpenAI from "openai"
 import { Stream } from "openai/streaming"
 import { z } from "zod"
-import { type Mode as ZMode, type ResponseModel as ZResponseModel } from "zod-stream"
+import {
+  CompletionMeta,
+  type Mode as ZMode,
+  type ResponseModel as ZResponseModel
+} from "zod-stream"
 
 export type LogLevel = "debug" | "info" | "warn" | "error"
 
@@ -33,7 +37,7 @@ export type ReturnTypeBasedOnParams<P> =
       response_model: ResponseModel<infer T>
     }
   ) ?
-    Promise<AsyncGenerator<Partial<z.infer<T>>, void, unknown>>
+    Promise<AsyncGenerator<Partial<z.infer<T>> & { _meta: CompletionMeta }, void, unknown>>
   : P extends { response_model: ResponseModel<infer T> } ? Promise<z.infer<T>>
   : P extends { stream: true } ? Stream<OpenAI.Chat.Completions.ChatCompletionChunk>
   : OpenAI.Chat.Completions.ChatCompletion
