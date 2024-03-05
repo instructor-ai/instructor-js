@@ -29,7 +29,7 @@ export const NON_OAI_PROVIDER_URLS = {
 
 export const PROVIDER_PARAMS_TRANSFORMERS = {
   [PROVIDERS.ANYSCALE]: {
-    [MODE.JSON_SCHEMA]: function removeAdditionalPropertiesKey<
+    [MODE.JSON_SCHEMA]: function removeAdditionalPropertiesKeyJSONSchema<
       T extends z.AnyZodObject,
       P extends OpenAI.ChatCompletionCreateParams
     >(params: ReturnType<typeof withResponseModel<T, "JSON_SCHEMA", P>>) {
@@ -45,7 +45,7 @@ export const PROVIDER_PARAMS_TRANSFORMERS = {
 
       return params
     },
-    [MODE.TOOLS]: function removeAdditionalPropertiesKey<
+    [MODE.TOOLS]: function removeAdditionalPropertiesKeyTools<
       T extends z.AnyZodObject,
       P extends OpenAI.ChatCompletionCreateParams
     >(params: ReturnType<typeof withResponseModel<T, "TOOLS", P>>) {
