@@ -1,4 +1,7 @@
-import { MODE, type Mode } from "zod-stream"
+import { omit } from "@/lib"
+import OpenAI from "openai"
+import { z } from "zod"
+import { MODE, withResponseModel, type Mode } from "zod-stream"
 
 export const PROVIDERS = {
   OAI: "OAI",
@@ -22,6 +25,52 @@ export const NON_OAI_PROVIDER_URLS = {
   [PROVIDERS.ANYSCALE]: "api.endpoints.anyscale",
   [PROVIDERS.TOGETHER]: "api.together.xyz",
   [PROVIDERS.OAI]: "api.openai.com"
+} as const
+
+export const PROVIDER_PARAMS_TRANSFORMERS = {
+  [PROVIDERS.ANYSCALE]: {
+    [MODE.JSON_SCHEMA]: function removeAdditionalPropertiesKeyJSONSchema<
+      T extends z.AnyZodObject,
+      P extends OpenAI.ChatCompletionCreateParams
+    >(params: ReturnType<typeof withResponseModel<T, "JSON_SCHEMA", P>>) {
+      if ("additionalProperties" in params.response_format.schema) {
+        return {
+          ...params,
+          response_format: {
+            ...params.response_format,
+            schema: omit(["additionalProperties"], params.response_format.schema)
+          }
+        }
+      }
+
+      return params
+    },
+    [MODE.TOOLS]: function removeAdditionalPropertiesKeyTools<
+      T extends z.AnyZodObject,
+      P extends OpenAI.ChatCompletionCreateParams
+    >(params: ReturnType<typeof withResponseModel<T, "TOOLS", P>>) {
+      if (params.tools.some(tool => tool.function?.parameters)) {
+        return {
+          ...params,
+          tools: params.tools.map(tool => {
+            if (tool.function?.parameters) {
+              return {
+                ...tool,
+                function: {
+                  ...tool.function,
+                  parameters: omit(["additionalProperties"], tool.function.parameters)
+                }
+              }
+            }
+
+            return tool
+          })
+        }
+      }
+
+      return params
+    }
+  }
 } as const
 
 export const PROVIDER_SUPPORTED_MODES_BY_MODEL = {

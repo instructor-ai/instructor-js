@@ -6,22 +6,18 @@ import {
 } from "@/types"
 import OpenAI from "openai"
 import { z } from "zod"
-import ZodStream, {
-  CompletionMeta,
-  OAIResponseParser,
-  OAIStream,
-  withResponseModel,
-  type Mode
-} from "zod-stream"
+import ZodStream, { OAIResponseParser, OAIStream, withResponseModel, type Mode } from "zod-stream"
 import { fromZodError } from "zod-validation-error"
 
 import {
   NON_OAI_PROVIDER_URLS,
   Provider,
+  PROVIDER_PARAMS_TRANSFORMERS,
   PROVIDER_SUPPORTED_MODES,
   PROVIDER_SUPPORTED_MODES_BY_MODEL,
   PROVIDERS
 } from "./constants/providers"
+import { CompletionMeta } from "./types"
 
 const MAX_RETRIES_DEFAULT = 0
 
@@ -109,7 +105,9 @@ class Instructor {
     let validationIssues = ""
     let lastMessage: OpenAI.ChatCompletionMessageParam | null = null
 
-    const completionParams = withResponseModel({
+    const paramsTransformer = PROVIDER_PARAMS_TRANSFORMERS?.[this.provider]?.[this.mode]
+
+    let completionParams = withResponseModel({
       params: {
         ...params,
         stream: false
@@ -117,6 +115,10 @@ class Instructor {
       mode: this.mode,
       response_model
     })
+
+    if (!!paramsTransformer) {
+      completionParams = paramsTransformer(completionParams)
+    }
 
     const makeCompletionCall = async () => {
       let resolvedParams = completionParams
@@ -135,17 +137,33 @@ class Instructor {
         }
       }
 
-      this.log("debug", response_model.name, "making completion call with params: ", resolvedParams)
+      let completion: OpenAI.Chat.Completions.ChatCompletion | null = null
 
-      const completion = await this.client.chat.completions.create(resolvedParams)
+      try {
+        completion = await this.client.chat.completions.create(resolvedParams)
+        this.log("debug", "raw standard completion response: ", completion)
+      } catch (error) {
+        this.log(
+          "error",
+          `Error making completion call - mode: ${this.mode} | Client base URL: ${this.client.baseURL} | with params:`,
+          resolvedParams,
+          `raw error`,
+          error
+        )
+
+        throw error
+      }
 
       const parsedCompletion = OAIResponseParser(
         completion as OpenAI.Chat.Completions.ChatCompletion
       )
+
       try {
-        return JSON.parse(parsedCompletion) as z.infer<T>
+        const data = JSON.parse(parsedCompletion) as z.infer<T> & { _meta?: CompletionMeta }
+        return { ...data, _meta: { usage: completion?.usage ?? undefined } }
       } catch (error) {
         this.log("error", "failed to parse completion", parsedCompletion, this.mode)
+        throw error
       }
     }
 
@@ -173,13 +191,29 @@ class Instructor {
         return validation.data
       } catch (error) {
         if (attempts < max_retries) {
-          this.log("debug", response_model.name, "Retrying, attempt: ", attempts)
-          this.log("warn", response_model.name, "Validation error: ", validationIssues)
+          this.log(
+            "debug",
+            `response model: ${response_model.name} - Retrying, attempt: `,
+            attempts
+          )
+          this.log(
+            "warn",
+            `response model: ${response_model.name} - Validation issues: `,
+            validationIssues
+          )
           attempts++
           return await makeCompletionCallWithRetries()
         } else {
-          this.log("debug", response_model.name, "Max attempts reached: ", attempts)
-          this.log("error", response_model.name, "Error: ", validationIssues)
+          this.log(
+            "debug",
+            `response model: ${response_model.name} - Max attempts reached: ${attempts}`
+          )
+          this.log(
+            "error",
+            `response model: ${response_model.name} - Validation issues: `,
+            validationIssues
+          )
+
           throw error
         }
       }
@@ -193,13 +227,15 @@ class Instructor {
     response_model,
     ...params
   }: ChatCompletionCreateParamsWithModel<T>): Promise<
-    AsyncGenerator<Partial<T> & { _meta: CompletionMeta }, void, unknown>
+    AsyncGenerator<Partial<T> & { _meta?: CompletionMeta }, void, unknown>
   > {
     if (max_retries) {
       this.log("warn", "max_retries is not supported for streaming completions")
     }
 
-    const completionParams = withResponseModel({
+    const paramsTransformer = PROVIDER_PARAMS_TRANSFORMERS?.[this.provider]?.[this.mode]
+
+    let completionParams = withResponseModel({
       params: {
         ...params,
         stream: true
@@ -208,6 +244,10 @@ class Instructor {
       mode: this.mode
     })
 
+    if (paramsTransformer) {
+      completionParams = paramsTransformer(completionParams)
+    }
+
     const streamClient = new ZodStream({
       debug: this.debug ?? false
     })
@@ -215,6 +255,7 @@ class Instructor {
     return streamClient.create({
       completionPromise: async () => {
         const completion = await this.client.chat.completions.create(completionParams)
+        this.log("debug", "raw stream completion response: ", completion)
 
         return OAIStream({
           res: completion
