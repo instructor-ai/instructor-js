@@ -7,7 +7,7 @@ export type Maybe<T extends z.ZodTypeAny> = z.ZodObject<{
 }>
 
 /**
- * Create a Maybe model for a given Zod schema. This allows you to return a model that includes fields for `result`, `error`, and `message` for sitatations where the data may not be present in the context.
+ * Create a Maybe model for a given Zod schema. This allows you to return a model that includes fields for `result`, `error`, and `message` for situations where the data may not be present in the context.
  * @param schema The Zod schema to wrap with maybe.
  * @returns A Zod schema that includes fields for `result`, `error`, and `message`.
  */
