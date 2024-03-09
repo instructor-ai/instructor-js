@@ -60,7 +60,7 @@ console.log(user)
 
 The question of using Instructor is fundamentally a question of why to use zod.
 
-1. **Powered by OpenAI** — Instructor is powered by OpenAI's function calling API. This means you can use the same API for both prompting and extraction.
+1. **Powered by OpenAI SDK** — Instructor is powered by OpenAI's API. This means you can use the same API for both prompting and extraction across multiple providers that support the OpenAI API.
 
 2. **Customizable** — Zod is highly customizable. You can define your own validators, custom error messages, and more.
 
@@ -72,7 +72,7 @@ The question of using Instructor is fundamentally a question of why to use zod.
 
 If you'd like to see more check out our [cookbook](examples/index.md).
 
-[Installing Instructor](docs/installation.md) is a breeze. 
+[Installing Instructor](docs/installation.md) is a breeze.
 
 ## Contributing
 
@@ -81,16 +81,3 @@ If you want to help out, checkout some of the issues marked as `good-first-issue
 ## License
 
 This project is licensed under the terms of the MIT License.
-
-## TODO
-- [ ] Logging for Distillation / Finetuning
-- [ ] Add Tutorials, include in docs
-    - [ ] Citations
-    - [ ] Self Critique
-    - [ ] Image Extracting Tables
-    - [ ] Moderation
-    - [ ] Entity Resolution
-    - [ ] Action Item and Dependency Mapping
-
-These translations provide a structured approach to creating TypeScript schemas with Zod, mirroring the functionality and intent of the original Python examples.
-
