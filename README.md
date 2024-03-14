@@ -18,6 +18,10 @@ If you want to port Instructor to another language, please reach out to us on [T
 
 ## Usage
 
+```bash
+npm install instructor-ai/instructor-js
+```
+
 To check out all the tips and tricks to prompt and extract data, check out the [documentation](https://instructor-ai.github.io/instructor-js/tips/prompting/).
 
 ```ts
