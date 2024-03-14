@@ -16,6 +16,12 @@ Check us out in [Python](https://jxnl.github.io/instructor/), [Elixir](https://g
 
 If you want to port Instructor to another language, please reach out to us on [Twitter](https://twitter.com/jxnlco) we'd love to help you get started!
 
+## Installation
+
+```bash
+npm i @instructor-ai/instructor
+```
+
 ## Usage
 
 To check out all the tips and tricks to prompt and extract data, check out the [documentation](https://instructor-ai.github.io/instructor-js/tips/prompting/).
