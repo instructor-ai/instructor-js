@@ -13,6 +13,7 @@ _Structured extraction in Typescript, powered by llms, designed for simplicity, 
 
 Dive into the world of Typescript-based structured extraction, by OpenAI's function calling API and Zod, typeScript-first schema validation with static type inference. Instructor stands out for its simplicity, transparency, and user-centric design. Whether you're a seasoned developer or just starting out, you'll find Instructor's approach intuitive and steerable.
 
+
 ## Installation
 
 ```bash
@@ -28,7 +29,11 @@ pnpm add @instructor-ai/instructor zod openai
 ```
 
 ## Basic Usage
+To check out all the tips and tricks to prompt and extract data, check out the [documentation](https://instructor-ai.github.io/instructor-js/tips/prompting/).
+
+
 ```typescript
+
 import Instructor from "@instructor-ai/instructor";
 import OpenAI from "openai"
 import { z } from "zod"
@@ -48,10 +53,21 @@ const client = Instructor({
   mode: "TOOLS"
 })
 
+const UserSchema = z.object({
+  // Description will be used in the prompt
+  age: z.number().describe("The age of the user"), 
+  name: z.string()
+})
+
+
+// User will be of type z.infer<typeof UserSchema>
 const user = await client.chat.completions.create({
   messages: [{ role: "user", content: "Jason Liu is 30 years old" }],
   model: "gpt-3.5-turbo",
-  response_model: { schema: UserSchema, name: "User" }
+  response_model: { 
+    schema: UserSchema, 
+    name: "User"
+  }
 })
 
 console.log(user)
@@ -62,7 +78,7 @@ console.log(user)
 
 The question of using Instructor is fundamentally a question of why to use zod.
 
-1. **Powered by OpenAI** — Instructor is powered by OpenAI's function calling API. This means you can use the same API for both prompting and extraction.
+1. **Powered by OpenAI SDK** — Instructor is powered by OpenAI's API. This means you can use the same API for both prompting and extraction across multiple providers that support the OpenAI API.
 
 2. **Customizable** — Zod is highly customizable. You can define your own validators, custom error messages, and more.
 
@@ -74,7 +90,7 @@ The question of using Instructor is fundamentally a question of why to use zod.
 
 If you'd like to see more check out our [cookbook](examples/index.md).
 
-[Installing Instructor](docs/installation.md) is a breeze. 
+[Installing Instructor](docs/installation.md) is a breeze.
 
 
 
@@ -93,28 +109,6 @@ Checkout the [contribution guide]() for details on how to set things up, testing
 
     If you want to port Instructor to another language, please reach out to us on [Twitter](https://twitter.com/jxnlco) we'd love to help you get started!
 
-
-
 ## License
 
 This project is licensed under the terms of the MIT License.
-
-## TODO
-- [ ] Add `llm_validator`
-- [ ] Logging for Distillation / Finetuning
-- [x] Support Streaming
-- [x] Optional/Maybe types
-- [ ] Add Tutorials, include in docs
-    - [x] Text Classification
-    - [ ] Search Queries
-    - [x] Query Decomposition
-    - [ ] Citations
-    - [x] Knowledge Graph
-    - [ ] Self Critique
-    - [ ] Image Extracting Tables
-    - [ ] Moderation
-    - [ ] Entity Resolution
-    - [ ] Action Item and Dependency Mapping
-
-These translations provide a structured approach to creating TypeScript schemas with Zod, mirroring the functionality and intent of the original Python examples.
-
