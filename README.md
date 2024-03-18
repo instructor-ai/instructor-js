@@ -88,7 +88,7 @@ The question of using Instructor is fundamentally a question of why to use zod.
 
 ## More Examples
 
-If you'd like to see more check out our [cookbook](examples/index.md).
+If you'd like to see more check out our [cookbook](docs/examples/index.md).
 
 [Installing Instructor](docs/installation.md) is a breeze.
 
