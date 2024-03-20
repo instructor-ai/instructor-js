@@ -22,6 +22,10 @@ const provider_config = {
   [PROVIDERS.TOGETHER]: {
     baseURL: "https://api.together.xyz",
     apiKey: process.env.TOGETHER_API_KEY
+  },
+  [PROVIDERS.PPLX]: {
+    baseURL: "https://api.perplexity.ai",
+    apiKey: process.env.PPLX_API_KEY
   }
 }
 
@@ -54,6 +58,12 @@ const createTestCases = (): { model: string; mode: Mode; provider: Provider }[] 
         })
       }
 
+      if (provider === PROVIDERS.PPLX) {
+        Object.entries(modesByModel).forEach(([mode, models]: [Mode, string[]]) => {
+          models.forEach(model => testCases.push({ model, mode, provider }))
+        })
+      }
+
       if (provider === PROVIDERS.TOGETHER) {
         Object.entries(modesByModel).forEach(([mode, models]: [Mode, string[]]) => {
           if (models.includes("*")) {
@@ -77,14 +87,18 @@ const UserSchema = z.object({
   age: z.number(),
   name: z.string().refine(name => name.includes(" "), {
     message: "Name must contain a space"
-  })
+  }),
+  twitterHandle: z
+    .string()
+    .optional()
+    .describe("Possible Twitter handle for this person, given what we know about them - @...")
 })
 
 async function extractUser(model: string, mode: Mode, provider: Provider) {
   const config = provider_config[provider]
+
   const oai = new OpenAI({
-    ...config,
-    organization: process.env.OPENAI_ORG_ID ?? undefined
+    ...config
   })
 
   const client = Instructor({

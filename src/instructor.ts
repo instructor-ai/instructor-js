@@ -41,6 +41,7 @@ class Instructor {
       this.client?.baseURL.includes(NON_OAI_PROVIDER_URLS.ANYSCALE) ? PROVIDERS.ANYSCALE
       : this.client?.baseURL.includes(NON_OAI_PROVIDER_URLS.TOGETHER) ? PROVIDERS.TOGETHER
       : this.client?.baseURL.includes(NON_OAI_PROVIDER_URLS.OAI) ? PROVIDERS.OAI
+      : this.client?.baseURL.includes(NON_OAI_PROVIDER_URLS.PPLX) ? PROVIDERS.PPLX
       : PROVIDERS.OTHER
 
     this.provider = provider
