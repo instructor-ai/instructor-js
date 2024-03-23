@@ -55,7 +55,7 @@
     "zod-validation-error": "^2.1.0"
   },
   "peerDependencies": {
-    "openai": ">=4.24.1",
+    "openai": ">=4.28.0",
     "zod": ">=3.22.4"
   },
   "devDependencies": {
@@ -64,19 +64,20 @@
     "@ianvs/prettier-plugin-sort-imports": "4.1.0",
     "@types/bun": "^1.0.0",
     "@types/node": "^20.10.6",
-    "eslint-config-turbo": "^1.10.12",
-    "eslint-config-prettier": "^9.0.0",
+    "@typescript-eslint/eslint-plugin": "^6.11.0",
+    "@typescript-eslint/parser": "^6.11.0",
     "eslint-config": "^0.3.0",
-    "eslint-plugin-prettier": "^5.1.2",
+    "eslint-config-prettier": "^9.0.0",
+    "eslint-config-turbo": "^1.10.12",
     "eslint-import-resolver-typescript": "^3.5.5",
     "eslint-plugin-import": "^2.27.5",
     "eslint-plugin-only-warn": "^1.1.0",
-    "@typescript-eslint/parser": "^6.11.0",
-    "@typescript-eslint/eslint-plugin": "^6.11.0",
+    "eslint-plugin-prettier": "^5.1.2",
     "husky": "^8.0.3",
+    "llm-polyglot": "^0.0.1--alpha.0",
     "prettier": "latest",
-    "tsup": "^8.0.1",
     "ts-inference-check": "^0.3.0",
+    "tsup": "^8.0.1",
     "typescript": "^5.2.2"
   }
 }

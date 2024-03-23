@@ -1,7 +1,9 @@
 import {
   ChatCompletionCreateParamsWithModel,
+  GenericChatCompletion,
   InstructorConfig,
   LogLevel,
+  OpenAILikeClient,
   ReturnTypeBasedOnParams
 } from "@/types"
 import OpenAI from "openai"
@@ -21,18 +23,18 @@ import { CompletionMeta } from "./types"
 
 const MAX_RETRIES_DEFAULT = 0
 
-class Instructor {
-  readonly client: OpenAI
+class Instructor<C extends OpenAILikeClient> {
+  readonly client: C
   readonly mode: Mode
   readonly provider: Provider
   readonly debug: boolean = false
 
   /**
    * Creates an instance of the `Instructor` class.
-   * @param {OpenAI} client - The OpenAI client.
+   * @param {OpenAILikeClient} client - An OpenAI-like client.
    * @param {string} mode - The mode of operation.
    */
-  constructor({ client, mode, debug = false }: InstructorConfig) {
+  constructor({ client, mode, debug = false }: InstructorConfig<C>) {
     this.client = client
     this.mode = mode
     this.debug = debug
@@ -137,10 +139,12 @@ class Instructor {
         }
       }
 
-      let completion: OpenAI.Chat.Completions.ChatCompletion | null = null
+      let completion: GenericChatCompletion | null = null
 
       try {
-        completion = await this.client.chat.completions.create(resolvedParams)
+        completion = (await this.client.chat.completions.create(
+          resolvedParams
+        )) as GenericChatCompletion
         this.log("debug", "raw standard completion response: ", completion)
       } catch (error) {
         this.log(
@@ -258,7 +262,8 @@ class Instructor {
         this.log("debug", "raw stream completion response: ", completion)
 
         return OAIStream({
-          res: completion
+          //TODO: we need to move away from strict openai types - need to cast here but should update to be more flexible
+          res: completion as AsyncIterable<OpenAI.ChatCompletionChunk>
         })
       },
       response_model
@@ -285,35 +290,36 @@ class Instructor {
         : OpenAI.ChatCompletionCreateParams & { response_model: never }
       >(
         params: P
-      ): Promise<ReturnTypeBasedOnParams<P>> => {
+      ): Promise<ReturnTypeBasedOnParams<C, P>> => {
         this.validateModelModeSupport(params)
 
         if (this.isChatCompletionCreateParamsWithModel(params)) {
           if (params.stream) {
             return this.chatCompletionStream(params) as ReturnTypeBasedOnParams<
+              C,
               P & { stream: true }
             >
           } else {
-            return this.chatCompletionStandard(params) as ReturnTypeBasedOnParams<P>
+            return this.chatCompletionStandard(params) as ReturnTypeBasedOnParams<C, P>
           }
         } else {
-          const result: OpenAI.Chat.Completions.ChatCompletion =
+          const result =
             this.isStandardStream(params) ?
               await this.client.chat.completions.create(params)
             : await this.client.chat.completions.create(params)
 
-          return result as ReturnTypeBasedOnParams<P>
+          return result as ReturnTypeBasedOnParams<C, P>
         }
       }
     }
   }
 }
 
-export type OAIClientExtended = OpenAI & Instructor
+export type OAIClientExtended<C extends OpenAILikeClient> = OpenAILikeClient & Instructor<C>
 
 /**
  * Creates an instance of the `Instructor` class.
- * @param {OpenAI} client - The OpenAI client.
+ * @param {OpenAILikeClient} client - The OpenAI client.
  * @param {string} mode - The mode of operation.
  * @param {boolean} debug - Whether to log debug messages.
  * @returns {OAIClientExtended} The extended OpenAI client.
@@ -326,14 +332,18 @@ export type OAIClientExtended = OpenAI & Instructor
  *
  * const client = createInstructor({
  *  client: OAI,
- * mode: "TOOLS",
+ *  mode: "TOOLS",
  * })
  *
  * @param args
  * @returns
  */
-export default function (args: { client: OpenAI; mode: Mode; debug?: boolean }): OAIClientExtended {
-  const instructor = new Instructor(args)
+export default function <C extends OpenAILikeClient = OpenAI>(args: {
+  client: C
+  mode: Mode
+  debug?: boolean
+}): OAIClientExtended<C> {
+  const instructor = new Instructor<C>(args)
 
   const instructorWithProxy = new Proxy(instructor, {
     get: (target, prop, receiver) => {
@@ -345,5 +355,5 @@ export default function (args: { client: OpenAI; mode: Mode; debug?: boolean }):
     }
   })
 
-  return instructorWithProxy as OAIClientExtended
+  return instructorWithProxy as OAIClientExtended<C>
 }

@@ -9,6 +9,7 @@ import { Provider, PROVIDER_SUPPORTED_MODES_BY_MODEL, PROVIDERS } from "@/consta
 const default_oai_model = "gpt-4-1106-preview"
 const default_anyscale_model = "mistralai/Mixtral-8x7B-Instruct-v0.1"
 const default_together_model = "mistralai/Mixtral-8x7B-Instruct-v0.1"
+const default_anthropic_model = "claude-3-opus-20240229"
 
 const provider_config = {
   [PROVIDERS.OAI]: {
@@ -22,6 +23,10 @@ const provider_config = {
   [PROVIDERS.TOGETHER]: {
     baseURL: "https://api.together.xyz",
     apiKey: process.env.TOGETHER_API_KEY
+  },
+  [PROVIDERS.ANTHROPIC]: {
+    baseURL: "https://api.anthropic.com/v1/messages",
+    apiKey: process.env.ANTHROPIC_API_KEY
   }
 }
 
@@ -59,6 +64,20 @@ const createTestCases = (): { model: string; mode: Mode; provider: Provider }[] 
           if (models.includes("*")) {
             testCases.push({
               model: default_together_model,
+              mode,
+              provider
+            })
+          } else {
+            models.forEach(model => testCases.push({ model, mode, provider }))
+          }
+        })
+      }
+
+      if (provider === PROVIDERS.ANTHROPIC) {
+        Object.entries(modesByModel).forEach(([mode, models]: [Mode, string[]]) => {
+          if (models.includes("*")) {
+            testCases.push({
+              model: default_anthropic_model,
               mode,
               provider
             })

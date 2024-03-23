@@ -7,6 +7,42 @@ import {
   type ResponseModel as ZResponseModel
 } from "zod-stream"
 
+export type GenericCreateParams = Omit<Partial<OpenAI.ChatCompletionCreateParams>, "model"> & {
+  model: string
+  messages: OpenAI.ChatCompletionCreateParams["messages"]
+  stream?: boolean
+  max_tokens?: number | null
+}
+
+export type GenericChatCompletion = Partial<OpenAI.Chat.Completions.ChatCompletion> & {
+  [key: string]: unknown
+}
+
+export type GenericChatCompletionStream = AsyncIterable<
+  Partial<OpenAI.Chat.Completions.ChatCompletionChunk> & { [key: string]: unknown }
+>
+
+export type CreateMethodReturnType<
+  P extends GenericCreateParams,
+  Completion = GenericChatCompletion,
+  Chunk = GenericChatCompletionStream
+> = P extends { stream: true } ? Promise<Chunk> : Promise<Completion>
+
+export type OpenAILikeClient<
+  P extends GenericCreateParams = GenericCreateParams,
+  Completion = GenericChatCompletion,
+  Chunk = GenericChatCompletionStream
+> =
+  | OpenAI
+  | {
+      baseURL: string
+      chat: {
+        completions: {
+          create: (params: P) => CreateMethodReturnType<P, Completion, Chunk>
+        }
+      }
+    }
+
 export type LogLevel = "debug" | "info" | "warn" | "error"
 export type CompletionMeta = Partial<ZCompletionMeta> & {
   usage?: OpenAI.CompletionUsage
@@ -14,8 +50,8 @@ export type CompletionMeta = Partial<ZCompletionMeta> & {
 export type Mode = ZMode
 export type ResponseModel<T extends z.AnyZodObject> = ZResponseModel<T>
 
-export type InstructorConfig = {
-  client: OpenAI
+export interface InstructorConfig<C extends OpenAILikeClient> {
+  client: C
   mode: Mode
   debug?: boolean
 }
@@ -26,13 +62,9 @@ export type InstructorChatCompletionParams<T extends z.AnyZodObject> = {
 }
 
 export type ChatCompletionCreateParamsWithModel<T extends z.AnyZodObject> =
-  InstructorChatCompletionParams<T> & OpenAI.ChatCompletionCreateParams
+  InstructorChatCompletionParams<T> & GenericCreateParams
 
-export type ReturnWithoutModel<P> =
-  P extends { stream: true } ? OpenAI.Chat.Completions.ChatCompletion
-  : OpenAI.Chat.Completions.ChatCompletion
-
-export type ReturnTypeBasedOnParams<P> =
+export type ReturnTypeBasedOnParams<C, P> =
   P extends (
     {
       stream: true
@@ -42,5 +74,9 @@ export type ReturnTypeBasedOnParams<P> =
     Promise<AsyncGenerator<Partial<z.infer<T>> & { _meta?: CompletionMeta }, void, unknown>>
   : P extends { response_model: ResponseModel<infer T> } ?
     Promise<z.infer<T> & { _meta?: CompletionMeta }>
-  : P extends { stream: true } ? Stream<OpenAI.Chat.Completions.ChatCompletionChunk>
-  : OpenAI.Chat.Completions.ChatCompletion
+  : C extends OpenAI ?
+    P extends { stream: true } ?
+      Stream<OpenAI.Chat.Completions.ChatCompletionChunk>
+    : OpenAI.Chat.Completions.ChatCompletion
+  : P extends { stream: true } ? Promise<GenericChatCompletionStream>
+  : Promise<GenericChatCompletion>

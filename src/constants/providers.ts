@@ -7,6 +7,7 @@ export const PROVIDERS = {
   OAI: "OAI",
   ANYSCALE: "ANYSCALE",
   TOGETHER: "TOGETHER",
+  ANTHROPIC: "ANTHROPIC",
   OTHER: "OTHER"
 } as const
 
@@ -15,16 +16,18 @@ export type Provider = keyof typeof PROVIDERS
 export const PROVIDER_SUPPORTED_MODES: {
   [key in Provider]: Mode[]
 } = {
-  [PROVIDERS.OTHER]: [MODE.FUNCTIONS, MODE.TOOLS, MODE.JSON, MODE.JSON_SCHEMA],
+  [PROVIDERS.OTHER]: [MODE.FUNCTIONS, MODE.TOOLS, MODE.JSON, MODE.JSON_SCHEMA, MODE.MD_JSON],
   [PROVIDERS.OAI]: [MODE.FUNCTIONS, MODE.TOOLS, MODE.JSON, MODE.MD_JSON],
   [PROVIDERS.ANYSCALE]: [MODE.TOOLS, MODE.JSON, MODE.JSON_SCHEMA],
-  [PROVIDERS.TOGETHER]: [MODE.TOOLS, MODE.JSON, MODE.JSON_SCHEMA]
+  [PROVIDERS.TOGETHER]: [MODE.TOOLS, MODE.JSON, MODE.JSON_SCHEMA],
+  [PROVIDERS.ANTHROPIC]: [MODE.MD_JSON]
 } as const
 
 export const NON_OAI_PROVIDER_URLS = {
   [PROVIDERS.ANYSCALE]: "api.endpoints.anyscale",
   [PROVIDERS.TOGETHER]: "api.together.xyz",
-  [PROVIDERS.OAI]: "api.openai.com"
+  [PROVIDERS.OAI]: "api.openai.com",
+  [PROVIDERS.ANTHROPIC]: "api.anthropic.com"
 } as const
 
 export const PROVIDER_PARAMS_TRANSFORMERS = {
@@ -110,5 +113,8 @@ export const PROVIDER_SUPPORTED_MODES_BY_MODEL = {
       "mistralai/Mixtral-8x7B-Instruct-v0.1"
     ],
     [MODE.TOOLS]: ["mistralai/Mistral-7B-Instruct-v0.1", "mistralai/Mixtral-8x7B-Instruct-v0.1"]
+  },
+  [PROVIDERS.ANTHROPIC]: {
+    [MODE.MD_JSON]: ["*"]
   }
 }

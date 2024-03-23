@@ -49,7 +49,9 @@ describe("Inference Checking", () => {
       stream: true
     })
 
-    expect(type(userStream).strictly.is<Stream<OpenAI.Chat.ChatCompletionChunk>>(true)).toBe(true)
+    expect(
+      type(userStream).strictly.is<Stream<OpenAI.Chat.Completions.ChatCompletionChunk>>(true)
+    ).toBe(true)
   })
 
   test("response_model, no stream", async () => {
