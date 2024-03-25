@@ -1,6 +1,6 @@
-import Instructor, { OAIClientExtended } from "./instructor"
+import Instructor, { InstructorClient } from "./instructor"
 
-export { type OAIClientExtended }
+export { type InstructorClient }
 export * from "./types"
 
 export default Instructor

@@ -82,6 +82,7 @@ const UserSchema = z.object({
 
 async function extractUser(model: string, mode: Mode, provider: Provider) {
   const config = provider_config[provider]
+
   const oai = new OpenAI({
     ...config,
     organization: process.env.OPENAI_ORG_ID ?? undefined
