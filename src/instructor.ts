@@ -4,7 +4,8 @@ import {
   InstructorConfig,
   LogLevel,
   OpenAILikeClient,
-  ReturnTypeBasedOnParams
+  ReturnTypeBasedOnParams,
+  SupportedInstructorClient
 } from "@/types"
 import OpenAI from "openai"
 import { z } from "zod"
@@ -19,12 +20,12 @@ import {
   PROVIDER_SUPPORTED_MODES_BY_MODEL,
   PROVIDERS
 } from "./constants/providers"
-import { CompletionMeta } from "./types"
+import { ClientTypeChatCompletionParams, CompletionMeta } from "./types"
 
 const MAX_RETRIES_DEFAULT = 0
 
-class Instructor<C extends OpenAILikeClient> {
-  readonly client: C
+class Instructor<C extends SupportedInstructorClient> {
+  readonly client: OpenAILikeClient<C>
   readonly mode: Mode
   readonly provider: Provider
   readonly debug: boolean = false
@@ -43,6 +44,7 @@ class Instructor<C extends OpenAILikeClient> {
       this.client?.baseURL.includes(NON_OAI_PROVIDER_URLS.ANYSCALE) ? PROVIDERS.ANYSCALE
       : this.client?.baseURL.includes(NON_OAI_PROVIDER_URLS.TOGETHER) ? PROVIDERS.TOGETHER
       : this.client?.baseURL.includes(NON_OAI_PROVIDER_URLS.OAI) ? PROVIDERS.OAI
+      : this.client?.baseURL.includes(NON_OAI_PROVIDER_URLS.ANTHROPIC) ? PROVIDERS.ANTHROPIC
       : PROVIDERS.OTHER
 
     this.provider = provider
@@ -287,20 +289,23 @@ class Instructor<C extends OpenAILikeClient> {
       create: async <
         T extends z.AnyZodObject,
         P extends T extends z.AnyZodObject ? ChatCompletionCreateParamsWithModel<T>
-        : OpenAI.ChatCompletionCreateParams & { response_model: never }
+        : ClientTypeChatCompletionParams<typeof this.client> & { response_model: never }
       >(
         params: P
-      ): Promise<ReturnTypeBasedOnParams<C, P>> => {
+      ): Promise<ReturnTypeBasedOnParams<typeof this.client, P>> => {
         this.validateModelModeSupport(params)
 
         if (this.isChatCompletionCreateParamsWithModel(params)) {
           if (params.stream) {
             return this.chatCompletionStream(params) as ReturnTypeBasedOnParams<
-              C,
+              typeof this.client,
               P & { stream: true }
             >
           } else {
-            return this.chatCompletionStandard(params) as ReturnTypeBasedOnParams<C, P>
+            return this.chatCompletionStandard(params) as ReturnTypeBasedOnParams<
+              typeof this.client,
+              P
+            >
           }
         } else {
           const result =
@@ -308,21 +313,22 @@ class Instructor<C extends OpenAILikeClient> {
               await this.client.chat.completions.create(params)
             : await this.client.chat.completions.create(params)
 
-          return result as ReturnTypeBasedOnParams<C, P>
+          return result as ReturnTypeBasedOnParams<typeof this.client, P>
         }
       }
     }
   }
 }
 
-export type OAIClientExtended<C extends OpenAILikeClient> = OpenAILikeClient & Instructor<C>
+export type InstructorClient<C extends SupportedInstructorClient = OpenAI> = Instructor<C> &
+  OpenAILikeClient<C>
 
 /**
  * Creates an instance of the `Instructor` class.
  * @param {OpenAILikeClient} client - The OpenAI client.
  * @param {string} mode - The mode of operation.
  * @param {boolean} debug - Whether to log debug messages.
- * @returns {OAIClientExtended} The extended OpenAI client.
+ * @returns {InstructorClient} The extended OpenAI client.
  *
  * @example
  * import createInstructor from "@instructor-ai/instructor"
@@ -338,22 +344,20 @@ export type OAIClientExtended<C extends OpenAILikeClient> = OpenAILikeClient & I
  * @param args
  * @returns
  */
-export default function <C extends OpenAILikeClient = OpenAI>(args: {
-  client: C
+export default function <C extends SupportedInstructorClient = OpenAI>(args: {
+  client: OpenAILikeClient<C>
   mode: Mode
   debug?: boolean
-}): OAIClientExtended<C> {
+}): InstructorClient<C> {
   const instructor = new Instructor<C>(args)
-
   const instructorWithProxy = new Proxy(instructor, {
     get: (target, prop, receiver) => {
       if (prop in target) {
         return Reflect.get(target, prop, receiver)
       }
-
       return Reflect.get(target.client, prop, receiver)
     }
   })
 
-  return instructorWithProxy as OAIClientExtended<C>
+  return instructorWithProxy as InstructorClient<C>
 }

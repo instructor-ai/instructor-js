@@ -1,4 +1,6 @@
 import Instructor from "@/index"
+import { omit } from "@/lib"
+import { describe, expect, test } from "bun:test"
 import { createLLMClient } from "llm-polyglot"
 import z from "zod"
 
@@ -6,31 +8,228 @@ const anthropicClient = createLLMClient({
   provider: "anthropic"
 })
 
-const instructor = Instructor<typeof anthropicClient>({
-  client: anthropicClient,
-  debug: true,
-  mode: "MD_JSON"
-})
+describe("LLMClient Anthropic Provider - mode: TOOLS", () => {
+  const instructor = Instructor<typeof anthropicClient>({
+    client: anthropicClient,
+    mode: "TOOLS"
+  })
 
-const complete = await instructor.chat.completions.create({
-  model: "claude-3-opus-20240229",
-  max_tokens: 1000,
-  stream: true,
-  response_model: {
-    schema: z.object({
-      response: z.string()
-    }),
-    name: "response"
-  },
-  messages: [
-    {
-      role: "user",
-      content: "hey how are you"
+  test("basic completion", async () => {
+    const completion = await instructor.chat.completions.create({
+      model: "claude-3-opus-20240229",
+      max_tokens: 1000,
+      messages: [
+        {
+          role: "user",
+          content: "My name is Dimitri Kennedy."
+        }
+      ],
+      response_model: {
+        name: "get_name",
+        schema: z.object({
+          name: z.string()
+        })
+      }
+    })
+
+    expect(omit(["_meta"], completion)).toEqual({ name: "Dimitri Kennedy" })
+  })
+
+  test("complex schema - streaming", async () => {
+    const completion = await instructor.chat.completions.create({
+      model: "claude-3-opus-20240229",
+      max_tokens: 1000,
+      stream: true,
+      messages: [
+        {
+          role: "user",
+          content: `User Data Submission:
+
+            First Name: John
+            Last Name: Doe
+            Contact Details:
+            Email: john.doe@example.com
+            Phone Number: 555-1234
+            Job History:
+            
+            Company Name: Acme Corp
+            Role: Software Engineer
+            Years: 5
+            Company Name: Globex Inc.
+            Role: Lead Developer
+            Years: 3
+            Skills:
+            
+            Programming
+            Leadership
+            Communication
+            `
+        }
+      ],
+      response_model: {
+        name: "process_user_data",
+        schema: z.object({
+          userDetails: z.object({
+            firstName: z.string(),
+            lastName: z.string(),
+            contactDetails: z.object({
+              email: z.string(),
+              phoneNumber: z.string().optional()
+            })
+          }),
+          jobHistory: z.array(
+            z.object({
+              companyName: z.string(),
+              role: z.string(),
+              years: z.number().optional()
+            })
+          ),
+          skills: z.array(z.string())
+        })
+      }
+    })
+
+    let final = {}
+    for await (const result of completion) {
+      final = result
     }
-  ]
+
+    //@ts-expect-error - lazy
+    expect(omit(["_meta"], final)).toEqual({
+      userDetails: {
+        firstName: "John",
+        lastName: "Doe",
+        contactDetails: {
+          email: "john.doe@example.com",
+          phoneNumber: "555-1234"
+        }
+      },
+      jobHistory: [
+        {
+          companyName: "Acme Corp",
+          role: "Software Engineer",
+          years: 5
+        },
+        {
+          companyName: "Globex Inc.",
+          role: "Lead Developer",
+          years: 3
+        }
+      ],
+      skills: ["Programming", "Leadership", "Communication"]
+    })
+  })
 })
 
-for await (const data of complete) {
-  console.clear()
-  console.log(data)
-}
+describe("LLMClient Anthropic Provider - mode: MD_JSON", () => {
+  const instructor = Instructor({
+    client: anthropicClient,
+    mode: "MD_JSON"
+  })
+
+  test("basic completion", async () => {
+    const completion = await instructor.chat.completions.create({
+      model: "claude-3-opus-20240229",
+      max_tokens: 1000,
+      messages: [
+        {
+          role: "user",
+          content: "My name is Dimitri Kennedy."
+        }
+      ],
+      response_model: {
+        name: "get_name",
+        schema: z.object({
+          name: z.string()
+        })
+      }
+    })
+
+    expect(completion).toEqual({ name: "Dimitri Kennedy" })
+  })
+
+  test("complex schema - streaming", async () => {
+    const completion = await instructor.chat.completions.create({
+      model: "claude-3-opus-20240229",
+      max_tokens: 1000,
+      stream: true,
+      messages: [
+        {
+          role: "user",
+          content: `User Data Submission:
+
+            First Name: John
+            Last Name: Doe
+            Contact Details:
+            Email: john.doe@example.com
+            Phone Number: 555-1234
+            Job History:
+            
+            Company Name: Acme Corp
+            Role: Software Engineer
+            Years: 5
+            Company Name: Globex Inc.
+            Role: Lead Developer
+            Years: 3
+            Skills:
+            
+            Programming
+            Leadership
+            Communication
+            `
+        }
+      ],
+      response_model: {
+        name: "process_user_data",
+        schema: z.object({
+          userDetails: z.object({
+            firstName: z.string(),
+            lastName: z.string(),
+            contactDetails: z.object({
+              email: z.string(),
+              phoneNumber: z.string().optional()
+            })
+          }),
+          jobHistory: z.array(
+            z.object({
+              companyName: z.string(),
+              role: z.string(),
+              years: z.number().optional()
+            })
+          ),
+          skills: z.array(z.string())
+        })
+      }
+    })
+
+    let final = {}
+    for await (const result of completion) {
+      final = result
+    }
+
+    //@ts-expect-error - lazy
+    expect(omit(["_meta"], final)).toEqual({
+      userDetails: {
+        firstName: "John",
+        lastName: "Doe",
+        contactDetails: {
+          email: "john.doe@example.com",
+          phoneNumber: "555-1234"
+        }
+      },
+      jobHistory: [
+        {
+          companyName: "Acme Corp",
+          role: "Software Engineer",
+          years: 5
+        },
+        {
+          companyName: "Globex Inc.",
+          role: "Lead Developer",
+          years: 3
+        }
+      ],
+      skills: ["Programming", "Leadership", "Communication"]
+    })
+  })
+})

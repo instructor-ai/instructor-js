@@ -1,11 +1,11 @@
-import { OAIClientExtended } from "@/instructor"
+import { InstructorClient } from "@/instructor"
 import OpenAI from "openai"
 import { RefinementCtx, z } from "zod"
 
 type AsyncSuperRefineFunction = (data: string, ctx: RefinementCtx) => Promise<void>
 
 export const LLMValidator = (
-  instructor: OAIClientExtended,
+  instructor: InstructorClient,
   statement: string,
   params: Omit<OpenAI.ChatCompletionCreateParams, "messages">
 ): AsyncSuperRefineFunction => {
@@ -42,9 +42,13 @@ export const LLMValidator = (
   }
 }
 
-export const moderationValidator = (client: OAIClientExtended | OpenAI) => {
+export const moderationValidator = (client: InstructorClient) => {
   return async (value: string, ctx: z.RefinementCtx) => {
     try {
+      if (!(client instanceof OpenAI)) {
+        throw new Error("ModerationValidator only supports OpenAI clients")
+      }
+
       const response = await client.moderations.create({ input: value })
       const flaggedResults = response.results.filter(result => result.flagged)
 

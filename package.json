@@ -51,7 +51,7 @@
   },
   "homepage": "https://github.com/instructor-ai/instructor-js#readme",
   "dependencies": {
-    "zod-stream": "1.0.0",
+    "zod-stream": "1.0.1",
     "zod-validation-error": "^2.1.0"
   },
   "peerDependencies": {
@@ -74,7 +74,7 @@
     "eslint-plugin-only-warn": "^1.1.0",
     "eslint-plugin-prettier": "^5.1.2",
     "husky": "^8.0.3",
-    "llm-polyglot": "^0.0.1--alpha.0",
+    "llm-polyglot": "^0.0.1",
     "prettier": "latest",
     "ts-inference-check": "^0.3.0",
     "tsup": "^8.0.1",
