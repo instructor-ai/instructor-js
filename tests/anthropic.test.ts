@@ -25,7 +25,7 @@ describe("LLMClient Anthropic Provider - mode: TOOLS", () => {
         }
       ],
       response_model: {
-        name: "get_name",
+        name: "extract_name",
         schema: z.object({
           name: z.string()
         })
