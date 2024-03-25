@@ -5,7 +5,8 @@ import { createLLMClient } from "llm-polyglot"
 import z from "zod"
 
 const anthropicClient = createLLMClient({
-  provider: "anthropic"
+  provider: "anthropic",
+  apiKey: process.env.ANTHROPIC_API_KEY
 })
 
 describe("LLMClient Anthropic Provider - mode: TOOLS", () => {
