@@ -1,5 +1,17 @@
 # @instructor-ai/instructor
 
+## 1.0.0
+
+### Major Changes
+
+- [#144](https://github.com/instructor-ai/instructor-js/pull/144) [`d0275ff`](https://github.com/instructor-ai/instructor-js/commit/d0275ff3b91d87d05a72c98001a49222e3cba348) Thanks [@roodboi](https://github.com/roodboi)! - updating all types to better support non openai clients - this changes some of the previously exported types and adds a few new ones
+
+- [#125](https://github.com/instructor-ai/instructor-js/pull/125) [`c205286`](https://github.com/instructor-ai/instructor-js/commit/c205286dccdbc6feacfd2aeeca0e0ba449631a57) Thanks [@roodboi](https://github.com/roodboi)! - Updating zod-stream major and stream output types - this change moves the internal properties tacked onto the stream output from many \_properties to one \_meta object with the properties nested - this also adds explicit types so when used in ts projects it doesnt yell.
+
+### Minor Changes
+
+- [#132](https://github.com/instructor-ai/instructor-js/pull/132) [`f65672c`](https://github.com/instructor-ai/instructor-js/commit/f65672cfe443e37cb32ee721aa406ca093125ffb) Thanks [@roodboi](https://github.com/roodboi)! - adding meta to standard completions as well and including usage - also added more verbose debug logs and new provider specific transformers to handle discrepencies in various apis
+
 ## 0.0.7
 
 ### Patch Changes
