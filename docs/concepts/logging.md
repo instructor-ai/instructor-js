@@ -1,4 +1,4 @@
-In order to see the requests made to OpenAI and the responses, you can set debug to true when initializing Instructor. This will show the requests and responses made to OpenAI. This can be useful for debugging and understanding the requests and responses made to OpenAI. I would love some contributions that make this a lot cleaner, but for now this is the fastest way to see the prompts.
+In order to see the requests made to OpenAI and the responses, you can set debug to true when initializing Instructor. This will show the requests and responses made to OpenAI. This can be useful for debugging and understanding the requests and responses made to OpenAI.
 
 ```typescript
 const oai = new OpenAI({
