@@ -260,7 +260,7 @@ const UserSchema = z.object({
 
 async function extractUser() {
   const client = new OpenAI({
-    baseURL: "https://api.endpoints.anyscale.com/v1",
+    baseURL: "https://api.together.xyz/v1",
     apiKey: process.env.TOGETHER_API_KEY
   })
 
