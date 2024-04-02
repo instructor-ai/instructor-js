@@ -371,16 +371,16 @@ Instructor is built on top of several powerful packages from the [Island AI](htt
 
 ### zod-stream
 
-[zod-stream](https://github.com/hack-dance/island-ai/tree/main/packages/zod-stream) is a client module that interfaces directly with LLM streams. It utilizes Schema-Stream for efficient parsing and is equipped with tools for processing raw responses from OpenAI, categorizing them by mode (function, tools, JSON, etc.), and ensuring proper error handling and stream conversion. It's ideal for API integration delivering structured LLM response streams.
+[zod-stream](https://github.com/hack-dance/island-ai/tree/main/public-packages/zod-stream) is a client module that interfaces directly with LLM streams. It utilizes Schema-Stream for efficient parsing and is equipped with tools for processing raw responses from OpenAI, categorizing them by mode (function, tools, JSON, etc.), and ensuring proper error handling and stream conversion. It's ideal for API integration delivering structured LLM response streams.
 
 ### schema-stream
 
-[schema-stream](https://github.com/hack-dance/island-ai/tree/main/packages/schema-stream) is a JSON streaming parser that incrementally constructs and updates response models based on Zod schemas. It's designed for real-time data processing and incremental model hydration.
+[schema-stream](https://github.com/hack-dance/island-ai/tree/main/public-packages/schema-stream) is a JSON streaming parser that incrementally constructs and updates response models based on Zod schemas. It's designed for real-time data processing and incremental model hydration.
 
 
 ### llm-polyglot
 
-[llm-polyglot](https://github.com/hack-dance/island-ai/tree/main/packages/llm-client) is a library that provides a unified interface for interacting with various language models across different providers, such as OpenAI, Anthropic, Azure, and Cohere. It simplifies the process of working with multiple LLM providers and enables seamless integration with Instructor.
+[llm-polyglot](https://github.com/hack-dance/island-ai/tree/main/public-packages/llm-client) is a library that provides a unified interface for interacting with various language models across different providers, such as OpenAI, Anthropic, Azure, and Cohere. It simplifies the process of working with multiple LLM providers and enables seamless integration with Instructor.
 
 Instructor leverages the power of these Island AI packages to deliver a seamless and efficient experience for structured data extraction and streaming with LLMs. The collaboration between Dimitri Kennedy, the creator of Island AI, and Jason Liu, the author of the original Instructor Python package, has led to the development of the TypeScript version of Instructor, which introduces the concept of partial JSON streaming from LLM's.
 
