@@ -18,6 +18,8 @@
     "isolatedModules": true,
     "incremental": true,
     "tsBuildInfoFile": "tsconfig.tsbuildinfo",
+    "declaration": true,
+    "declarationMap": true,
     "paths": {
       "@/*": [
         "./src/*"
