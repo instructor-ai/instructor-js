@@ -165,7 +165,10 @@ class Instructor<C extends SupportedInstructorClient> {
       )
 
       try {
-        const data = JSON.parse(parsedCompletion) as z.infer<T> & { _meta?: CompletionMeta }
+        const data = JSON.parse(
+          // TODO: Stopgap for known LLM control character issues - Jason Liu
+          parsedCompletion.replace(/[\x00-\x1F\x7F-\x9F]/g, "")
+        ) as z.infer<T> & { _meta?: CompletionMeta }
         return { ...data, _meta: { usage: completion?.usage ?? undefined } }
       } catch (error) {
         this.log("error", "failed to parse completion", parsedCompletion, this.mode)
