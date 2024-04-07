@@ -361,7 +361,7 @@ export type InstructorClient<C extends GenericClient | OpenAI> = Instructor<C> &
  * @param args
  * @returns
  */
-export default function <C extends GenericClient | OpenAI>(args: {
+export default function createInstructor<C extends GenericClient | OpenAI>(args: {
   client: OpenAILikeClient<C>
   mode: Mode
   debug?: boolean
