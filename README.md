@@ -82,7 +82,7 @@ The main class for creating an Instructor client.
 
 **createInstructor**
 ```typescript
-function createInstructor<C extends SupportedInstructorClient = OpenAI>(args: {
+function createInstructor<C extends GenericClient | OpenAI>(args: {
   client: OpenAILikeClient<C>;
   mode: Mode;
   debug?: boolean;
@@ -100,7 +100,13 @@ Returns the extended OpenAI-Like client.
 
 **chat.completions.create**
 ```typescript
-chat.completions.create<T extends z.AnyZodObject>(params: ChatCompletionCreateParamsWithModel<T>): Promise<z.infer<T> & { _meta?: CompletionMeta }>
+chat.completions.create<
+        T extends z.AnyZodObject,
+        P extends T extends z.AnyZodObject ? ChatCompletionCreateParamsWithModel<T>
+        : ClientTypeChatCompletionParams<OpenAILikeClient<C>> & { response_model: never }
+      >(
+        params: P
+      ): Promise<ReturnTypeBasedOnParams<typeof this.client, P>>
 ```
 When response_model is present in the params, creates a chat completion with structured extraction based on the provided schema - otherwise will proxy back to the provided client.
 

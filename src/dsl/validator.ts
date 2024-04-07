@@ -2,10 +2,12 @@ import { InstructorClient } from "@/instructor"
 import OpenAI from "openai"
 import { RefinementCtx, z } from "zod"
 
+import { GenericClient } from ".."
+
 type AsyncSuperRefineFunction = (data: string, ctx: RefinementCtx) => Promise<void>
 
-export const LLMValidator = (
-  instructor: InstructorClient,
+export const LLMValidator = <C extends GenericClient | OpenAI>(
+  instructor: InstructorClient<C>,
   statement: string,
   params: Omit<OpenAI.ChatCompletionCreateParams, "messages">
 ): AsyncSuperRefineFunction => {
@@ -42,7 +44,9 @@ export const LLMValidator = (
   }
 }
 
-export const moderationValidator = (client: InstructorClient) => {
+export const moderationValidator = <C extends GenericClient | OpenAI>(
+  client: InstructorClient<C>
+) => {
   return async (value: string, ctx: z.RefinementCtx) => {
     try {
       if (!(client instanceof OpenAI)) {
