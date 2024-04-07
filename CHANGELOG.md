@@ -1,5 +1,11 @@
 # @instructor-ai/instructor
 
+## 1.1.0
+
+### Minor Changes
+
+- [#153](https://github.com/instructor-ai/instructor-js/pull/153) [`76ef059`](https://github.com/instructor-ai/instructor-js/commit/76ef0591a1e34b73923d0c21afcf9e09e99b6b7c) Thanks [@roodboi](https://github.com/roodboi)! - updated client types to be more flexible - added tests for latest anthropic updates and llm-polyglot major
+
 ## 1.0.0
 
 ### Major Changes
