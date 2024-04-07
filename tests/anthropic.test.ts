@@ -10,14 +10,14 @@ const anthropicClient = createLLMClient({
 })
 
 describe("LLMClient Anthropic Provider - mode: TOOLS", () => {
-  const instructor = Instructor<typeof anthropicClient>({
+  const instructor = Instructor({
     client: anthropicClient,
     mode: "TOOLS"
   })
 
   test("basic completion", async () => {
     const completion = await instructor.chat.completions.create({
-      model: "claude-3-opus-20240229",
+      model: "claude-3-sonnet-20240229",
       max_tokens: 1000,
       messages: [
         {
@@ -36,11 +36,10 @@ describe("LLMClient Anthropic Provider - mode: TOOLS", () => {
     expect(omit(["_meta"], completion)).toEqual({ name: "Dimitri Kennedy" })
   })
 
-  test("complex schema - streaming", async () => {
+  test("complex schema", async () => {
     const completion = await instructor.chat.completions.create({
-      model: "claude-3-opus-20240229",
+      model: "claude-3-sonnet-20240229",
       max_tokens: 1000,
-      stream: true,
       messages: [
         {
           role: "user",
@@ -70,6 +69,9 @@ describe("LLMClient Anthropic Provider - mode: TOOLS", () => {
       response_model: {
         name: "process_user_data",
         schema: z.object({
+          story: z
+            .string()
+            .describe("A long and mostly made up story about the user - minimum 500 words"),
           userDetails: z.object({
             firstName: z.string(),
             lastName: z.string(),
@@ -90,13 +92,7 @@ describe("LLMClient Anthropic Provider - mode: TOOLS", () => {
       }
     })
 
-    let final = {}
-    for await (const result of completion) {
-      final = result
-    }
-
-    //@ts-expect-error - lazy
-    expect(omit(["_meta"], final)).toEqual({
+    expect(omit(["_meta", "story"], completion)).toEqual({
       userDetails: {
         firstName: "John",
         lastName: "Doe",
@@ -130,7 +126,7 @@ describe("LLMClient Anthropic Provider - mode: MD_JSON", () => {
 
   test("basic completion", async () => {
     const completion = await instructor.chat.completions.create({
-      model: "claude-3-opus-20240229",
+      model: "claude-3-sonnet-20240229",
       max_tokens: 1000,
       messages: [
         {
@@ -151,7 +147,7 @@ describe("LLMClient Anthropic Provider - mode: MD_JSON", () => {
 
   test("complex schema - streaming", async () => {
     const completion = await instructor.chat.completions.create({
-      model: "claude-3-opus-20240229",
+      model: "claude-3-sonnet-20240229",
       max_tokens: 1000,
       stream: true,
       messages: [

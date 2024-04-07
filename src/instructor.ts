@@ -1,11 +1,11 @@
 import {
   ChatCompletionCreateParamsWithModel,
   GenericChatCompletion,
+  GenericClient,
   InstructorConfig,
   LogLevel,
   OpenAILikeClient,
-  ReturnTypeBasedOnParams,
-  SupportedInstructorClient
+  ReturnTypeBasedOnParams
 } from "@/types"
 import OpenAI from "openai"
 import { z } from "zod"
@@ -24,7 +24,7 @@ import { ClientTypeChatCompletionParams, CompletionMeta } from "./types"
 
 const MAX_RETRIES_DEFAULT = 0
 
-class Instructor<C extends SupportedInstructorClient> {
+class Instructor<C extends GenericClient | OpenAI> {
   readonly client: OpenAILikeClient<C>
   readonly mode: Mode
   readonly provider: Provider
@@ -41,10 +41,12 @@ class Instructor<C extends SupportedInstructorClient> {
     this.debug = debug
 
     const provider =
-      this.client?.baseURL.includes(NON_OAI_PROVIDER_URLS.ANYSCALE) ? PROVIDERS.ANYSCALE
-      : this.client?.baseURL.includes(NON_OAI_PROVIDER_URLS.TOGETHER) ? PROVIDERS.TOGETHER
-      : this.client?.baseURL.includes(NON_OAI_PROVIDER_URLS.OAI) ? PROVIDERS.OAI
-      : this.client?.baseURL.includes(NON_OAI_PROVIDER_URLS.ANTHROPIC) ? PROVIDERS.ANTHROPIC
+      typeof this.client?.baseURL === "string" ?
+        this.client?.baseURL.includes(NON_OAI_PROVIDER_URLS.ANYSCALE) ? PROVIDERS.ANYSCALE
+        : this.client?.baseURL.includes(NON_OAI_PROVIDER_URLS.TOGETHER) ? PROVIDERS.TOGETHER
+        : this.client?.baseURL.includes(NON_OAI_PROVIDER_URLS.OAI) ? PROVIDERS.OAI
+        : this.client?.baseURL.includes(NON_OAI_PROVIDER_URLS.ANTHROPIC) ? PROVIDERS.ANTHROPIC
+        : PROVIDERS.OTHER
       : PROVIDERS.OTHER
 
     this.provider = provider
@@ -114,8 +116,8 @@ class Instructor<C extends SupportedInstructorClient> {
     let completionParams = withResponseModel({
       params: {
         ...params,
-        stream: false
-      },
+        stream: params.stream ?? false
+      } as OpenAI.ChatCompletionCreateParams,
       mode: this.mode,
       response_model
     })
@@ -141,12 +143,18 @@ class Instructor<C extends SupportedInstructorClient> {
         }
       }
 
-      let completion: GenericChatCompletion | null = null
+      let completion
 
       try {
-        completion = (await this.client.chat.completions.create(
-          resolvedParams
-        )) as GenericChatCompletion
+        if (this.client.chat?.completions?.create) {
+          const result = await this.client.chat.completions.create({
+            ...resolvedParams,
+            stream: false
+          })
+          completion = result as GenericChatCompletion<typeof result>
+        } else {
+          throw new Error("Unsupported client type")
+        }
         this.log("debug", "raw standard completion response: ", completion)
       } catch (error) {
         this.log(
@@ -245,7 +253,7 @@ class Instructor<C extends SupportedInstructorClient> {
       params: {
         ...params,
         stream: true
-      },
+      } as OpenAI.ChatCompletionCreateParams,
       response_model,
       mode: this.mode
     })
@@ -260,13 +268,19 @@ class Instructor<C extends SupportedInstructorClient> {
 
     return streamClient.create({
       completionPromise: async () => {
-        const completion = await this.client.chat.completions.create(completionParams)
-        this.log("debug", "raw stream completion response: ", completion)
+        if (this.client.chat?.completions?.create) {
+          const completion = await this.client.chat.completions.create({
+            ...completionParams,
+            stream: true
+          })
+          this.log("debug", "raw stream completion response: ", completion)
 
-        return OAIStream({
-          //TODO: we need to move away from strict openai types - need to cast here but should update to be more flexible
-          res: completion as AsyncIterable<OpenAI.ChatCompletionChunk>
-        })
+          return OAIStream({
+            res: completion as unknown as AsyncIterable<OpenAI.ChatCompletionChunk>
+          })
+        } else {
+          throw new Error("Unsupported client type")
+        }
       },
       response_model
     })
@@ -289,7 +303,7 @@ class Instructor<C extends SupportedInstructorClient> {
       create: async <
         T extends z.AnyZodObject,
         P extends T extends z.AnyZodObject ? ChatCompletionCreateParamsWithModel<T>
-        : ClientTypeChatCompletionParams<typeof this.client> & { response_model: never }
+        : ClientTypeChatCompletionParams<OpenAILikeClient<C>> & { response_model: never }
       >(
         params: P
       ): Promise<ReturnTypeBasedOnParams<typeof this.client, P>> => {
@@ -308,20 +322,23 @@ class Instructor<C extends SupportedInstructorClient> {
             >
           }
         } else {
-          const result =
-            this.isStandardStream(params) ?
-              await this.client.chat.completions.create(params)
-            : await this.client.chat.completions.create(params)
+          if (this.client.chat?.completions?.create) {
+            const result =
+              this.isStandardStream(params) ?
+                await this.client.chat.completions.create(params)
+              : await this.client.chat.completions.create(params)
 
-          return result as ReturnTypeBasedOnParams<typeof this.client, P>
+            return result as unknown as ReturnTypeBasedOnParams<OpenAILikeClient<C>, P>
+          } else {
+            throw new Error("Completion method is undefined")
+          }
         }
       }
     }
   }
 }
 
-export type InstructorClient<C extends SupportedInstructorClient = OpenAI> = Instructor<C> &
-  OpenAILikeClient<C>
+export type InstructorClient<C extends GenericClient | OpenAI> = Instructor<C> & OpenAILikeClient<C>
 
 /**
  * Creates an instance of the `Instructor` class.
@@ -344,7 +361,7 @@ export type InstructorClient<C extends SupportedInstructorClient = OpenAI> = Ins
  * @param args
  * @returns
  */
-export default function <C extends SupportedInstructorClient = OpenAI>(args: {
+export default function <C extends GenericClient | OpenAI>(args: {
   client: OpenAILikeClient<C>
   mode: Mode
   debug?: boolean
@@ -355,6 +372,7 @@ export default function <C extends SupportedInstructorClient = OpenAI>(args: {
       if (prop in target) {
         return Reflect.get(target, prop, receiver)
       }
+
       return Reflect.get(target.client, prop, receiver)
     }
   })
