@@ -303,7 +303,7 @@ By varying the provider, model, and mode arguments when calling extractUser, you
 
 ### Using Non-OpenAI Providers with llm-polyglot
 
-Instructor supports integration with providers that don't adhere to the OpenAI SDK, such as Anthropic, Azure, and Cohere, through the `llm-polyglot` library maintained by @dimitrikennedy. This library provides a unified interface for interacting with various language models across different providers.
+Instructor supports integration with providers that don't adhere to the OpenAI SDK, such as Anthropic, Azure, and Cohere, through the [`llm-polyglot`](https://github.com/hack-dance/island-ai/tree/main/public-packages/llm-client) library maintained by @dimitrikennedy. This library provides a unified interface for interacting with various language models across different providers.
 
 ```typescript
 import { createLLMClient } from "llm-polyglot"
@@ -361,7 +361,7 @@ Finally, we log the extracted user information.
 
 By leveraging the llm-polyglot library, Instructor enables seamless integration with a wide range of providers beyond those that follow the OpenAI SDK. This allows you to take advantage of the unique capabilities and models offered by different providers while still benefiting from the structured extraction and validation features of Instructor.
 
-For additional support and information on using other providers with [llm-polyglot](https://github.com/hack-dance/island-ai/tree/main/packages/llm-client), please refer to the library's documentation and examples.
+For additional support and information on using other providers with [llm-polyglot](https://github.com/hack-dance/island-ai/tree/main/public-packages/llm-client), please refer to the library's documentation and examples.
 
 
 ## More Examples
