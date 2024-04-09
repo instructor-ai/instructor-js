@@ -6,7 +6,8 @@ import z from "zod"
 
 const anthropicClient = createLLMClient({
   provider: "anthropic",
-  apiKey: process.env.ANTHROPIC_API_KEY
+  apiKey: process.env.ANTHROPIC_API_KEY,
+  logLevel: "debug"
 })
 
 describe("LLMClient Anthropic Provider - mode: TOOLS", () => {
@@ -173,6 +174,8 @@ describe("LLMClient Anthropic Provider - mode: MD_JSON", () => {
             Programming
             Leadership
             Communication
+
+            
             `
         }
       ],
@@ -194,7 +197,10 @@ describe("LLMClient Anthropic Provider - mode: MD_JSON", () => {
               years: z.number().optional()
             })
           ),
-          skills: z.array(z.string())
+          skills: z.array(z.string()),
+          summaryOfWorldWarOne: z
+            .string()
+            .describe("A detailed summary of World War One and its major events - min 500 words")
         })
       }
     })
@@ -205,7 +211,7 @@ describe("LLMClient Anthropic Provider - mode: MD_JSON", () => {
     }
 
     //@ts-expect-error - lazy
-    expect(omit(["_meta"], final)).toEqual({
+    expect(omit(["_meta", "summaryOfWorldWarOne"], final)).toEqual({
       userDetails: {
         firstName: "John",
         lastName: "Doe",
