@@ -273,6 +273,7 @@ class Instructor<C extends GenericClient | OpenAI> {
             ...completionParams,
             stream: true
           })
+
           this.log("debug", "raw stream completion response: ", completion)
 
           return OAIStream({
