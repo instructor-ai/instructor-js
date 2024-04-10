@@ -1,5 +1,11 @@
 # @instructor-ai/instructor
 
+## 1.1.1
+
+### Patch Changes
+
+- [#157](https://github.com/instructor-ai/instructor-js/pull/157) [`c272342`](https://github.com/instructor-ai/instructor-js/commit/c272342c9baa8631990afa66bcb7dafb3c81f78b) Thanks [@roodboi](https://github.com/roodboi)! - updates zod-stream dep to get control charachter filtering on teh raw stream
+
 ## 1.1.0
 
 ### Minor Changes
