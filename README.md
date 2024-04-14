@@ -38,11 +38,6 @@ import Instructor from "@instructor-ai/instructor";
 import OpenAI from "openai"
 import { z } from "zod"
 
-const UserSchema = z.object({
-  age: z.number(),
-  name: z.string()
-})
-
 const oai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY ?? undefined,
   organization: process.env.OPENAI_ORG_ID ?? undefined
