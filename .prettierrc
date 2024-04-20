@@ -1,5 +1,4 @@
 {
-  "$schema": "https://json.schemastore.org/prettierrc",
   "endOfLine": "lf",
   "semi": false,
   "trailingComma": "none",
@@ -29,5 +28,6 @@
   ],
   "printWidth": 100,
   "proseWrap": "never",
-  "quoteProps": "consistent"
+  "quoteProps": "consistent",
+  "experimentalTernaries": true
 }

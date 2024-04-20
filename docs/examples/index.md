@@ -14,3 +14,5 @@
 - [How are complex queries decomposed into subqueries for a single request?](./query_decomposition.md)
 - [How are action items and dependencies generated from transcripts?](./action_items.md)
 - [How is AI self-assessment implemented with llm_validator?](./self_correction.md)
+- [How are exact citations retrieved using regular expressions and smart prompting?](./validated_citations.md)
+- [How to enable OpenAI's moderation](./content_moderation.md)

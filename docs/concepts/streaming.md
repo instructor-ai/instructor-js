@@ -4,14 +4,6 @@ To see an example of streaming in production checkout this [example](https://ss.
 
 !!! warning "Important: Changes in Response Behavior with Streaming Enabled"
 
-Enabling streaming alters the nature of the response you receive:
-
-**Response Type**: When streaming is enabled, the response becomes an Async Generator. This generator produces incremental updates until the final result is achieved.
-
-**Handling the Data**: As the Async Generator yields results, you can iterate over these incremental updates. It's important to note that the data from each yield is a complete snapshot of the current extraction state and is immediately usable.
-
-**Final Value**: The last value yielded by the generator represents the completed extraction. This value should be used as the final result.
-
 **Example**: Extracting Conference Information
 
 The following TypeScript example demonstrates how to use an Async Generator for streaming responses. It includes a schema definition for extraction and iterates over a stream of data to incrementally update and display the extracted information.
@@ -21,35 +13,12 @@ import Instructor from "@/instructor"
 import OpenAI from "openai"
 import { z } from "zod"
 
-
-const textBlock = `
-In our recent online meeting, participants from various backgrounds joined to discuss the upcoming tech conference. The names and contact details of the participants were as follows:
-
-- Name: John Doe, Email: johndoe@email.com, Twitter: @TechGuru44
-- Name: Jane Smith, Email: janesmith@email.com, Twitter: @DigitalDiva88
-- Name: Alex Johnson, Email: alexj@email.com, Twitter: @CodeMaster2023
-- Name: Emily Clark, Email: emilyc@email.com, Twitter: @InnovateQueen
-- Name: Ron Stewart, Email: ronstewart@email.com, Twitter: @RoboticsRon5
-- Name: Sarah Lee, Email: sarahlee@email.com, Twitter: @AI_Aficionado
-- Name: Mike Brown, Email: mikeb@email.com, Twitter: @FutureTechLeader
-- Name: Lisa Green, Email: lisag@email.com, Twitter: @CyberSavvy101
-- Name: David Wilson, Email: davidw@email.com, Twitter: @GadgetGeek77
-- Name: Daniel Kim, Email: danielk@email.com, Twitter: @DataDrivenDude
-
-During the meeting, we agreed on several key points. The conference will be held on March 15th, 2024, at the Grand Tech Arena located at 4521 Innovation Drive. Dr. Emily Johnson, a renowned AI researcher, will be our keynote speaker.
-
-The budget for the event is set at $50,000, covering venue costs, speaker fees, and promotional activities. Each participant is expected to contribute an article to the conference blog by February 20th.
-
-A follow-up meeting is scheduled for January 25th at 3 PM GMT to finalize the agenda and confirm the list of speakers.
-`
-
-
 const ExtractionValuesSchema = z.object({
   users: z
     .array(
       z.object({
         name: z.string(),
-        handle: z.string(),
+        email: z.string(),
         twitter: z.string()
       })
     )
@@ -59,8 +28,6 @@ const ExtractionValuesSchema = z.object({
   budget: z.number(),
   deadline: z.string().min(1)
 })
-
-type Extraction = Partial<z.infer<typeof ExtractionValuesSchema>>
 
 const oai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY ?? undefined,
@@ -72,39 +39,63 @@ const client = Instructor({
   mode: "TOOLS"
 })
 
+
+const textBlock = `
+In our recent online meeting, participants from various backgrounds joined to discuss the upcoming tech conference.
+The names and contact details of the participants were as follows:
+
+- Name: John Doe, Email: johndoe@email.com, Twitter: @TechGuru44
+- Name: Jane Smith, Email: janesmith@email.com, Twitter: @DigitalDiva88
+- Name: Alex Johnson, Email: alexj@email.com, Twitter: @CodeMaster2023
+- Name: Emily Clark, Email: emilyc@email.com, Twitter: @InnovateQueen
+...
+
+During the meeting, we agreed on several key points. The conference will be held on March 15th, 2024,
+at the Grand Tech Arena located at 4521 Innovation Drive. Dr. Emily Johnson, a renowned AI researcher, will be our keynote speaker.
+
+The budget for the event is set at $50,000, covering venue costs, speaker fees, and promotional activities.
+Each participant is expected to contribute an article to the conference blog by February 20th.
+
+A follow-up meeting is scheduled for January 25th at 3 PM GMT to finalize the agenda and confirm the list of speakers.
+`
+
 const extractionStream = await client.chat.completions.create({
   messages: [{ role: "user", content: textBlock }],
-  model: "gpt-4-1106-preview",
-  response_model: { schema ExtractionValuesSchema },
-  max_retries: 3,
-  stream: true
+  model: "gpt-4-turbo",
+  response_model: {
+    schema: ExtractionValuesSchema,
+    name: "value extraction"
+  },
+  stream: true,
+  seed: 1
 })
-
-let extraction: Extraction = {}
 
 for await (const result of extractionStream) {
   try {
-    extraction = result
     console.clear()
-    console.table(extraction)
+    console.log(result)
   } catch (e) {
     console.log(e)
     break
   }
 }
-
-console.clear()
-console.log("completed extraction:")
-console.table(extraction)
-
 ```
+
+![](https://jxnl.github.io/instructor/img/partial.gif)
+
+Enabling streaming alters the nature of the response you receive:
+
+**Response Type**: When streaming is enabled, the response becomes an Async Generator. This generator produces incremental updates until the final result is achieved.
+
+**Handling the Data**: As the Async Generator yields results, you can iterate over these incremental updates. It's important to note that the data from each yield is a complete snapshot of the current extraction state and is immediately usable.
+
+**Final Value**: The last value yielded by the generator represents the completed extraction. This value should be used as the final result.
 
 ## Understanding OpenAI Completion Requests and Streaming Responses
 
 **Server-Sent Events (SSE) and Async Generators**
 
 OpenAI's completion requests return responses using Server-Sent Events (SSE), a protocol used to push real-time updates from a server to a client. In this context, the Async Generator in our TypeScript example closely mirrors the behavior of SSE. Each yield from the Async Generator corresponds to an update from the server, providing a continuous stream of data until the completion of the request.
-
 
 ## Streaming to the Browser or other clients
 

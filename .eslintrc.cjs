@@ -1,18 +1,17 @@
+/** @type {import("eslint").Linter.Config} */
+
 module.exports = {
   $schema: "https://json.schemastore.org/eslintrc",
   root: true,
-  parserOptions: {
-    project: true,
-    tsconfigRootDir: __dirname
-  },
+  parser: "@typescript-eslint/parser",
+  plugins: ["@typescript-eslint", "prettier"],
   extends: [
-    "eslint:recommended",
     "plugin:@typescript-eslint/recommended",
-    "prettier",
+    "plugin:prettier/recommended"
   ],
-  parser: '@typescript-eslint/parser',
-  plugins: ['@typescript-eslint'],
   rules: {
+    "import/no-anonymous-default-export": "off",
+    "prettier/prettier": "error",
     "linebreak-style": "off",
     "no-prototype-builtins": "off",
     "semi": "off",
@@ -28,12 +27,18 @@ module.exports = {
       }
     ]
   },
+  overrides: [
+    {
+      extends: ["plugin:@typescript-eslint/disable-type-checked"],
+      files: ["./**/*.mjs", "*.js"]
+    }
+  ],
   ignorePatterns: [
     "node_modules/",
     "dist/",
     "coverage/",
     "docs/",
-    ".eslintrc.js",
+    ".eslintrc.cjs",
     "package.json",
     "tsconfig.json"
   ]

@@ -4,12 +4,13 @@
   "editor.formatOnType": false,
   "editor.formatOnPaste": false,
   "editor.trimAutoWhitespace": true,
-  "editor.formatOnSave": true,
+  "editor.formatOnSave": false,
   "[javascript, javascriptreact, typescript, typescriptreact]": {
     "editor.formatOnSave": false
   },
   "editor.codeActionsOnSave": {
-    "source.fixAll": "explicit"
+    "source.fixAll": "always",
+    "source.fixAll.eslint": "always"
   },
   "[html]": {
     "editor.defaultFormatter": "GitHub.copilot"
@@ -33,6 +34,9 @@
     "typescript",
     "typescriptreact"
   ],
+  "eslint.options": {
+    "overrideConfigFile": "./.eslintrc.cjs"
+  },
   "eslint.debug": true,
   "github-actions.workflows.pinned.workflows": [
     ".github/workflows/release.yml"

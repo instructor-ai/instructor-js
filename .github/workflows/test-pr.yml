@@ -1,24 +1,33 @@
-name: Test Main
+
+name: Test PR
 on:
-  push:
+  pull_request_target:
     branches:
       - main
 jobs:
-  test-main:
-    if: github.repository == 'instructor-ai/instructor-js' && github.ref == 'refs/heads/main'
+  approve:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Approval required.
+      run: echo For security reasons, all pull requests need to be approved first before running any automated CI.
+    
+  test-branch:
     name: run-tests
     runs-on: ubuntu-latest
-    environment: TEST-MAIN
+    needs: [approve]
+    environment: OPENAI
     env:
       OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
       ANYSCALE_API_KEY: ${{ secrets.ANYSCALE_API_KEY }}
-      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
       TOGETHER_API_KEY: ${{ secrets.TOGETHER_API_KEY }}
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
 
     steps:
       - uses: actions/checkout@v3
         with:
-          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 2
 
       - name: Setup bun
         uses: oven-sh/setup-bun@v1
@@ -36,3 +45,4 @@ jobs:
       - run: bun run type-check
       - run: bun run lint
       - run: bun test --timeout=25000
+  

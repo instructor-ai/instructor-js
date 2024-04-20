@@ -1,7 +1,7 @@
 ---
 draft: False
 date: 2024-01-01
-slug: patching
+slug: anyscale 
 tags:
   - patching
   - open source
@@ -15,11 +15,13 @@ Open-source LLMS are gaining popularity, and the release of Anyscale's Mistral m
 
 By the end of this blog post, you will learn how to effectively utilize instructor with Anyscale. But before we proceed, let's first explore the concept of patching.
 
+<!-- more -->
+
 ## Understanding Modes
 
-Instructor's patch enhances a openai api it with the following features, you can learn more about them [here](../../concepts/modes.md), for anyscale they support `JSON_SCHEMA` and `FUNCTIONS` modes. and with instructor we'll be able to use the following features:
+Instructor's patch enhances a openai api it with the following features, you can learn more about them [here](../../concepts/patching.md), for anyscale they support `JSON_SCHEMA` and `TOOLS` modes. and with instructor we'll be able to use the following features:
 
-- `response_model` in `create` calls that returns a pydantic model
+- `response_model` in `create` calls that returns a Zod schema
 - `max_retries` in `create` calls that retries the call if it fails by using a backoff strategy
 
 ## Anyscale
@@ -32,7 +34,7 @@ The good news is that Anyscale employs the same OpenAI client, and its models su
 
 Let's explore one of the models available in Anyscale's extensive collection!
 
-```ts
+```js
 import Instructor from "@/instructor"
 import OpenAI from "openai"
 import { z } from "zod"
@@ -82,4 +84,5 @@ console.log(user)
 }
  */
 ```
+
 You can find more information about Anyscale's output mode support [here](https://docs.endpoints.anyscale.com/).

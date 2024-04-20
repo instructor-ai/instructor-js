@@ -1,21 +1,22 @@
-import { OAIClientExtended } from "@/instructor"
-import type { ChatCompletionCreateParams } from "openai/resources/chat/completions.mjs"
+import { InstructorClient } from "@/instructor"
+import OpenAI from "openai"
 import { RefinementCtx, z } from "zod"
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type AsyncSuperRefineFunction = (data: any, ctx: RefinementCtx) => Promise<any>
+import { GenericClient } from ".."
 
-export const LLMValidator = (
-  instructor: OAIClientExtended,
+type AsyncSuperRefineFunction = (data: string, ctx: RefinementCtx) => Promise<void>
+
+export const LLMValidator = <C extends GenericClient | OpenAI>(
+  instructor: InstructorClient<C>,
   statement: string,
-  params: Omit<ChatCompletionCreateParams, "messages">
+  params: Omit<OpenAI.ChatCompletionCreateParams, "messages">
 ): AsyncSuperRefineFunction => {
   const schema = z.object({
     isValid: z.boolean(),
     reason: z.string().optional()
   })
 
-  const fn = async (value, ctx) => {
+  return async (value, ctx) => {
     const validated = await instructor.chat.completions.create({
       max_retries: 0,
       ...params,
@@ -37,9 +38,40 @@ export const LLMValidator = (
     if (!validated.isValid) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message: validated.reason
+        message: validated?.reason ?? "Unknown reason"
       })
     }
   }
-  return fn
+}
+
+export const moderationValidator = (client: InstructorClient<OpenAI>) => {
+  return async (value: string, ctx: z.RefinementCtx) => {
+    try {
+      const response = await client.moderations.create({ input: value })
+      const flaggedResults = response.results.filter(result => result.flagged)
+
+      if (flaggedResults.length > 0) {
+        const flaggedCategories: string[] = []
+        flaggedResults.forEach(result => {
+          Object.keys(result.categories).forEach(category => {
+            if (result.categories[category] === true) {
+              flaggedCategories.push(category)
+            }
+          })
+        })
+
+        if (flaggedCategories.length > 0) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: `Moderation error, \`${value}\` was flagged for ${flaggedCategories.join(", ")}`
+          })
+        }
+      }
+    } catch (error) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: `Unexpected error during moderation: ${error instanceof Error ? error.message : "Unknown error"}`
+      })
+    }
+  }
 }
