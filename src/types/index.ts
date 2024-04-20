@@ -1,4 +1,3 @@
-import EventEmitter from "node:events"
 import OpenAI from "openai"
 import { Stream } from "openai/streaming"
 import { z } from "zod"
@@ -91,12 +90,11 @@ export type ReturnTypeBasedOnParams<C, P> =
       response_model: ResponseModel<infer T>
     }
   ) ?
-    Promise<AsyncGenerator<Partial<z.infer<T>> & { _meta?: CompletionMeta }, void, unknown>> &
-      EventEmitter
+    Promise<AsyncGenerator<Partial<z.infer<T>> & { _meta?: CompletionMeta }, void, unknown>>
   : P extends { response_model: ResponseModel<infer T> } ?
-    Promise<z.infer<T> & { _meta?: CompletionMeta }> & EventEmitter
+    Promise<z.infer<T> & { _meta?: CompletionMeta }>
   : C extends OpenAI ?
     P extends { stream: true } ?
       Stream<OpenAI.Chat.Completions.ChatCompletionChunk>
     : OpenAI.Chat.Completions.ChatCompletion
-  : Promise<unknown> & EventEmitter
+  : Promise<unknown>
