@@ -7,8 +7,7 @@ const openAi = new OpenAI({ apiKey: process.env.OPENAI_API_KEY ?? "" })
 
 const instructor = Instructor({
   client: openAi,
-  mode: "TOOLS",
-  debug: true
+  mode: "TOOLS"
 })
 
 const statement = "Do not say questionable things"
@@ -17,7 +16,7 @@ const QuestionAnswer = z.object({
   question: z.string(),
   answer: z.string().superRefine(
     LLMValidator(instructor, statement, {
-      model: "gpt-4"
+      model: "gpt-4-turbo"
     })
   )
 })
@@ -26,7 +25,7 @@ const question = "What is the meaning of life?"
 
 const check = async (context: string) => {
   return await instructor.chat.completions.create({
-    model: "gpt-3.5-turbo",
+    model: "gpt-4-turbo",
     max_retries: 2,
     response_model: { schema: QuestionAnswer, name: "Question and Answer" },
     messages: [
