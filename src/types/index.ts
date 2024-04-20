@@ -1,3 +1,4 @@
+import EventEmitter from "node:events"
 import OpenAI from "openai"
 import { Stream } from "openai/streaming"
 import { z } from "zod"
@@ -15,6 +16,10 @@ export type GenericCreateParams<M = unknown> = Omit<
   messages: M[]
   stream?: boolean
   max_tokens?: number | null
+  [key: string]: unknown
+}
+
+export type GenericRequestOptions = Partial<OpenAI.RequestOptions> & {
   [key: string]: unknown
 }
 
@@ -42,6 +47,9 @@ export type GenericClient = {
 
 export type ClientTypeChatCompletionParams<C> =
   C extends OpenAI ? OpenAI.ChatCompletionCreateParams : GenericCreateParams
+
+export type ClientTypeChatCompletionRequestOptions<C> =
+  C extends OpenAI ? OpenAI.RequestOptions : GenericRequestOptions
 
 export type ClientType<C> =
   C extends OpenAI ? "openai"
@@ -83,11 +91,12 @@ export type ReturnTypeBasedOnParams<C, P> =
       response_model: ResponseModel<infer T>
     }
   ) ?
-    Promise<AsyncGenerator<Partial<z.infer<T>> & { _meta?: CompletionMeta }, void, unknown>>
+    Promise<AsyncGenerator<Partial<z.infer<T>> & { _meta?: CompletionMeta }, void, unknown>> &
+      EventEmitter
   : P extends { response_model: ResponseModel<infer T> } ?
-    Promise<z.infer<T> & { _meta?: CompletionMeta }>
+    Promise<z.infer<T> & { _meta?: CompletionMeta }> & EventEmitter
   : C extends OpenAI ?
     P extends { stream: true } ?
       Stream<OpenAI.Chat.Completions.ChatCompletionChunk>
     : OpenAI.Chat.Completions.ChatCompletion
-  : Promise<unknown>
+  : Promise<unknown> & EventEmitter
