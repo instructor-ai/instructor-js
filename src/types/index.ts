@@ -56,9 +56,7 @@ export type ClientType<C> =
   : never
 
 export type OpenAILikeClient<C> = C extends OpenAI ? OpenAI : C & GenericClient
-
 export type SupportedInstructorClient = GenericClient | OpenAI
-
 export type LogLevel = "debug" | "info" | "warn" | "error"
 
 export type CompletionMeta = Partial<ZCompletionMeta> & {

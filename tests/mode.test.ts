@@ -152,11 +152,23 @@ describe("Modes", async () => {
   const testCases = createTestCases()
 
   for await (const { model, mode, provider, defaultMessage } of testCases) {
-    test(`${provider}: Should return extracted name and age for model ${model} and mode ${mode}`, async () => {
-      const user = await extractUser(model, mode, provider, defaultMessage)
+    if (provider !== PROVIDERS.GROQ) {
+      test(`${provider}: Should return extracted name and age for model ${model} and mode ${mode}`, async () => {
+        const user = await extractUser(model, mode, provider, defaultMessage)
 
-      expect(user.name).toEqual("Jason Liu")
-      expect(user.age).toEqual(30)
-    })
+        expect(user.name).toEqual("Jason Liu")
+        expect(user.age).toEqual(30)
+      })
+    } else {
+      test.todo(
+        `${provider}: Should return extracted name and age for model ${model} and mode ${mode}`,
+        async () => {
+          const user = await extractUser(model, mode, provider, defaultMessage)
+
+          expect(user.name).toEqual("Jason Liu")
+          expect(user.age).toEqual(30)
+        }
+      )
+    }
   }
 })

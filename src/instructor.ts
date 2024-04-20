@@ -184,7 +184,17 @@ class Instructor<C extends GenericClient | OpenAI> {
         const data = JSON.parse(parsedCompletion) as z.infer<T> & { _meta?: CompletionMeta }
         return { ...data, _meta: { usage: completion?.usage ?? undefined } }
       } catch (error) {
-        this.log("error", "failed to parse completion", parsedCompletion, this.mode)
+        this.log(
+          "error",
+          "failed to parse completion",
+          parsedCompletion,
+          this.mode,
+          "attempt: ",
+          attempts,
+          "max attempts: ",
+          max_retries
+        )
+
         throw error
       }
     }
