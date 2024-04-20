@@ -1,14 +1,11 @@
 import Instructor from "@/instructor"
-import readline from 'readline';
-import { OpenAI } from "openai";
-
+import { OpenAI } from "openai"
 import { z } from "zod"
 
-
 const getSystem = () => {
-  const currentDate = new Date();
-  const formattedDate = currentDate.toLocaleDateString();
-  const time = currentDate.toLocaleTimeString();
+  const currentDate = new Date()
+  const formattedDate = currentDate.toLocaleDateString()
+  const time = currentDate.toLocaleTimeString()
   const systemPrompt = `
   You are a world class query understanding algorithm that is able to:
 
@@ -31,31 +28,56 @@ const getSystem = () => {
     * If there are instructions on how to process the response given the search results include them here. For example, if you want to summarize a transcript, you should first search for the transcript and the additional instructions should include the instructions to summarize. 
 
   The current date is ${formattedDate} and the current time is ${time}.
-  `;
+  `
 
-  return systemPrompt;
-};
-
+  return systemPrompt
+}
 
 const SearchQuery = z.object({
-  rewrittenQuery: z.string().optional().describe("Rewrite the query to be specific to the context. This will be used to do semantic search, so make sure it is specific to the context."),
-  questionType: z.array(z.string().describe("The type of question that is being asked. This will be used to determine the type of answer that is expected. MUST be one of the following: PERSONAL_DATA, INTERNET, TRANSCRIPTS")),
-  minDate: z.string().optional().describe("YYYY/MM/DD Format, The earliest date of the context that is relevant to the query, null if the query is not time sensitive"),
-  maxDate: z.string().optional().describe("YYYY/MM/DD Format, The latest date of the context that is relevant to the query, null if the query is not time sensitive"),
+  rewrittenQuery: z
+    .string()
+    .optional()
+    .describe(
+      "Rewrite the query to be specific to the context. This will be used to do semantic search, so make sure it is specific to the context."
+    ),
+  questionType: z.array(
+    z
+      .string()
+      .describe(
+        "The type of question that is being asked. This will be used to determine the type of answer that is expected. MUST be one of the following: PERSONAL_DATA, INTERNET, TRANSCRIPTS"
+      )
+  ),
+  minDate: z
+    .string()
+    .optional()
+    .describe(
+      "YYYY/MM/DD Format, The earliest date of the context that is relevant to the query, null if the query is not time sensitive"
+    ),
+  maxDate: z
+    .string()
+    .optional()
+    .describe(
+      "YYYY/MM/DD Format, The latest date of the context that is relevant to the query, null if the query is not time sensitive"
+    )
   // keywords: z.array(z.string()).describe("Keywords that are relevant to a Full Text Search Engine"),
 })
 
 const Response = z.object({
-  message: z.string().optional().describe("The response to the message, if you need to make a search query, provide it below."),
-  query: z.array(SearchQuery.describe("If you need additional information, please provide it here. If you do not need additional information, please leave this blank.")),
+  message: z
+    .string()
+    .optional()
+    .describe("The response to the message, if you need to make a search query, provide it below."),
+  query: z.array(
+    SearchQuery.describe(
+      "If you need additional information, please provide it here. If you do not need additional information, please leave this blank."
+    )
+  )
   // additionalInstructions: z.string().optional().describe("If you need additional information, please provide it here. If you do not need additional information, please leave this blank."),
 })
 
-
 const oai = new OpenAI({
-  apiKey: process.env.OPENAI_KEY,
-});
-
+  apiKey: process.env.OPENAI_KEY
+})
 
 const client = Instructor({
   client: oai,
@@ -64,15 +86,15 @@ const client = Instructor({
 
 type Extraction = Partial<z.infer<typeof SearchQuery>>
 
-
-const runExtractionStream = async (query: string) => {
-  const systemPrompt = getSystem();
+export const runExtractionStream = async (query: string) => {
+  const systemPrompt = getSystem()
 
   let extraction: Extraction = {}
   const extractionStream = await client.chat.completions.create({
     messages: [
-      { "role": "system", content: systemPrompt },
-      { role: "user", content: query }],
+      { role: "system", content: systemPrompt },
+      { role: "user", content: query }
+    ],
     model: "gpt-4",
     response_model: {
       schema: SearchQuery,
@@ -81,7 +103,6 @@ const runExtractionStream = async (query: string) => {
     stream: true,
     seed: 1
   })
-
 
   for await (const result of extractionStream) {
     try {
@@ -93,17 +114,16 @@ const runExtractionStream = async (query: string) => {
       break
     }
   }
-
 }
 
-
 const runExtraction = async (query: string) => {
-  const systemPrompt = getSystem();
+  const systemPrompt = getSystem()
 
   const extraction = await client.chat.completions.create({
     messages: [
-      { "role": "system", content: systemPrompt },
-      { role: "user", content: query }],
+      { role: "system", content: systemPrompt },
+      { role: "user", content: query }
+    ],
     model: "gpt-4",
     response_model: {
       schema: Response,
@@ -112,7 +132,7 @@ const runExtraction = async (query: string) => {
     seed: 1
   })
 
-  console.log(JSON.stringify({ query, extraction }, null, 2));
+  console.log(JSON.stringify({ query, extraction }, null, 2))
 }
 
 const failingQuestions = [
@@ -128,10 +148,9 @@ const failingQuestions = [
   "I recently looked up a Royal Caribbean cruise. What price did it show me?",
   "Please summarize in detail Monday, the 17th of April 2023, starting from 10:00am and highlight any key aspects, todos and so on. Leave out any information about FASD/FAS/PFAS.",
   "what was the name of the standup tool i saw recently",
-  "Can you summarize the transcript from 11:00AM to present?",
-];
+  "Can you summarize the transcript from 11:00AM to present?"
+]
 
-
-failingQuestions.forEach((question) => {
+failingQuestions.forEach(question => {
   runExtraction(question)
 })
