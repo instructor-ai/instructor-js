@@ -8,6 +8,7 @@ export const PROVIDERS = {
   ANYSCALE: "ANYSCALE",
   TOGETHER: "TOGETHER",
   ANTHROPIC: "ANTHROPIC",
+  GROQ: "GROQ",
   OTHER: "OTHER"
 } as const
 
@@ -20,14 +21,16 @@ export const PROVIDER_SUPPORTED_MODES: {
   [PROVIDERS.OAI]: [MODE.FUNCTIONS, MODE.TOOLS, MODE.JSON, MODE.MD_JSON],
   [PROVIDERS.ANYSCALE]: [MODE.TOOLS, MODE.JSON, MODE.JSON_SCHEMA, MODE.MD_JSON],
   [PROVIDERS.TOGETHER]: [MODE.TOOLS, MODE.JSON, MODE.JSON_SCHEMA, MODE.MD_JSON],
-  [PROVIDERS.ANTHROPIC]: [MODE.MD_JSON, MODE.TOOLS]
+  [PROVIDERS.ANTHROPIC]: [MODE.MD_JSON, MODE.TOOLS],
+  [PROVIDERS.GROQ]: [MODE.TOOLS, MODE.FUNCTIONS, MODE.MD_JSON]
 } as const
 
 export const NON_OAI_PROVIDER_URLS = {
   [PROVIDERS.ANYSCALE]: "api.endpoints.anyscale",
   [PROVIDERS.TOGETHER]: "api.together.xyz",
   [PROVIDERS.OAI]: "api.openai.com",
-  [PROVIDERS.ANTHROPIC]: "api.anthropic.com"
+  [PROVIDERS.ANTHROPIC]: "api.anthropic.com",
+  [PROVIDERS.GROQ]: "api.groq.com"
 } as const
 
 export const PROVIDER_PARAMS_TRANSFORMERS = {
@@ -96,6 +99,7 @@ export const PROVIDER_SUPPORTED_MODES_BY_MODEL = {
     [MODE.MD_JSON]: ["*"]
   },
   [PROVIDERS.TOGETHER]: {
+    [MODE.MD_JSON]: ["*"],
     [MODE.JSON_SCHEMA]: [
       "mistralai/Mixtral-8x7B-Instruct-v0.1",
       "mistralai/Mistral-7B-Instruct-v0.1",
@@ -108,6 +112,7 @@ export const PROVIDER_SUPPORTED_MODES_BY_MODEL = {
     ]
   },
   [PROVIDERS.ANYSCALE]: {
+    [MODE.MD_JSON]: ["*"],
     [MODE.JSON_SCHEMA]: [
       "mistralai/Mistral-7B-Instruct-v0.1",
       "mistralai/Mixtral-8x7B-Instruct-v0.1"
@@ -117,5 +122,9 @@ export const PROVIDER_SUPPORTED_MODES_BY_MODEL = {
   [PROVIDERS.ANTHROPIC]: {
     [MODE.MD_JSON]: ["*"],
     [MODE.TOOLS]: ["*"]
+  },
+  [PROVIDERS.GROQ]: {
+    [MODE.TOOLS]: ["llama2-70b-4096", "mixtral-8x7b-32768", "gemma-7b-it"],
+    [MODE.MD_JSON]: ["*"]
   }
 }

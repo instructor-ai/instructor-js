@@ -62,7 +62,7 @@ class Instructor<C extends GenericClient | OpenAI> {
     }
 
     if (!isModeSupported) {
-      throw new Error(`Mode ${this.mode} is not supported by provider ${this.provider}`)
+      this.log("warn", `Mode ${this.mode} may not be supported by provider ${this.provider}`)
     }
   }
 
