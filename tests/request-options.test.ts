@@ -42,7 +42,6 @@ describe("callWithTimeout", () => {
     try {
       await quickTimeout()
     } catch (e) {
-      console.log("WTF", e)
       expect(e).toBeInstanceOf(Error)
     }
   })
