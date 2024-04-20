@@ -158,6 +158,7 @@ class Instructor<C extends GenericClient | OpenAI> {
             },
             requestOptions
           )
+
           completion = result as GenericChatCompletion<typeof result>
         } else {
           throw new Error("Unsupported client type -- no completion method found.")
@@ -210,7 +211,7 @@ class Instructor<C extends GenericClient | OpenAI> {
           }
         }
 
-        return data
+        return validation.data
       } catch (error) {
         if (!(error instanceof ZodError)) {
           throw error
@@ -226,8 +227,13 @@ class Instructor<C extends GenericClient | OpenAI> {
           this.log(
             "warn",
             `response model: ${response_model.name} - Validation issues: `,
-            validationIssues
+            validationIssues,
+            " - Attempt: ",
+            attempts,
+            " - Max attempts: ",
+            max_retries
           )
+
           attempts++
           return await makeCompletionCallWithRetries()
         } else {
