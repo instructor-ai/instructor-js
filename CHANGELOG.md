@@ -1,5 +1,11 @@
 # @instructor-ai/instructor
 
+## 1.1.2
+
+### Patch Changes
+
+- [#162](https://github.com/instructor-ai/instructor-js/pull/162) [`287aa27`](https://github.com/instructor-ai/instructor-js/commit/287aa27d92450d73dd300de7e84927d94cae9220) Thanks [@roodboi](https://github.com/roodboi)! - add groq to supported providers - remove error on validation and warn instead so we dont fail if we are out of date on the mappings
+
 ## 1.1.1
 
 ### Patch Changes
