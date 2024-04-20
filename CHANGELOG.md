@@ -1,5 +1,11 @@
 # @instructor-ai/instructor
 
+## 1.2.0
+
+### Minor Changes
+
+- [#164](https://github.com/instructor-ai/instructor-js/pull/164) [`6942d65`](https://github.com/instructor-ai/instructor-js/commit/6942d652b7750fac4306c4d713399cdc03e86a9b) Thanks [@roodboi](https://github.com/roodboi)! - adding request option pass through + handling non validation errors a little bit better and not retrying if not validation error specifically
+
 ## 1.1.2
 
 ### Patch Changes
