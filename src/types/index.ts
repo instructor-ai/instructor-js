@@ -18,6 +18,10 @@ export type GenericCreateParams<M = unknown> = Omit<
   [key: string]: unknown
 }
 
+export type GenericRequestOptions = Partial<OpenAI.RequestOptions> & {
+  [key: string]: unknown
+}
+
 export type GenericChatCompletion<T = unknown> = Partial<OpenAI.Chat.Completions.ChatCompletion> & {
   [key: string]: unknown
   choices?: T
@@ -43,15 +47,16 @@ export type GenericClient = {
 export type ClientTypeChatCompletionParams<C> =
   C extends OpenAI ? OpenAI.ChatCompletionCreateParams : GenericCreateParams
 
+export type ClientTypeChatCompletionRequestOptions<C> =
+  C extends OpenAI ? OpenAI.RequestOptions : GenericRequestOptions
+
 export type ClientType<C> =
   C extends OpenAI ? "openai"
   : C extends GenericClient ? "generic"
   : never
 
 export type OpenAILikeClient<C> = C extends OpenAI ? OpenAI : C & GenericClient
-
 export type SupportedInstructorClient = GenericClient | OpenAI
-
 export type LogLevel = "debug" | "info" | "warn" | "error"
 
 export type CompletionMeta = Partial<ZCompletionMeta> & {

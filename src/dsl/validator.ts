@@ -44,15 +44,9 @@ export const LLMValidator = <C extends GenericClient | OpenAI>(
   }
 }
 
-export const moderationValidator = <C extends GenericClient | OpenAI>(
-  client: InstructorClient<C>
-) => {
+export const moderationValidator = (client: InstructorClient<OpenAI>) => {
   return async (value: string, ctx: z.RefinementCtx) => {
     try {
-      if (!(client instanceof OpenAI)) {
-        throw new Error("ModerationValidator only supports OpenAI clients")
-      }
-
       const response = await client.moderations.create({ input: value })
       const flaggedResults = response.results.filter(result => result.flagged)
 

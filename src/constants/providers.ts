@@ -1,8 +1,9 @@
 import { omit } from "@/lib"
 import OpenAI from "openai"
 import { z } from "zod"
-import { MODE, withResponseModel, type Mode } from "zod-stream"
+import { withResponseModel, MODE as ZMODE, type Mode } from "zod-stream"
 
+export const MODE = ZMODE
 export const PROVIDERS = {
   OAI: "OAI",
   ANYSCALE: "ANYSCALE",
@@ -11,7 +12,6 @@ export const PROVIDERS = {
   GROQ: "GROQ",
   OTHER: "OTHER"
 } as const
-
 export type Provider = keyof typeof PROVIDERS
 
 export const PROVIDER_SUPPORTED_MODES: {
@@ -34,6 +34,19 @@ export const NON_OAI_PROVIDER_URLS = {
 } as const
 
 export const PROVIDER_PARAMS_TRANSFORMERS = {
+  [PROVIDERS.GROQ]: {
+    [MODE.TOOLS]: function groqToolsParamsTransformer<
+      T extends z.AnyZodObject,
+      P extends OpenAI.ChatCompletionCreateParams
+    >(params: ReturnType<typeof withResponseModel<T, "TOOLS", P>>) {
+      if (params.tools.some(tool => tool) && params.stream) {
+        console.warn("Streaming may not be supported when using tools in Groq, try MD_JSON instead")
+        return params
+      }
+
+      return params
+    }
+  },
   [PROVIDERS.ANYSCALE]: {
     [MODE.JSON_SCHEMA]: function removeAdditionalPropertiesKeyJSONSchema<
       T extends z.AnyZodObject,
@@ -90,12 +103,7 @@ export const PROVIDER_SUPPORTED_MODES_BY_MODEL = {
   [PROVIDERS.OAI]: {
     [MODE.FUNCTIONS]: ["*"],
     [MODE.TOOLS]: ["*"],
-    [MODE.JSON]: [
-      "gpt-3.5-turbo-1106",
-      "gpt-4-1106-preview",
-      "gpt-4-0125-preview",
-      "gpt-4-turbo-preview"
-    ],
+    [MODE.JSON]: ["gpt-3.5-turbo-1106", "gpt-4-turbo", "gpt-4-0125-preview", "gpt-4-turbo-preview"],
     [MODE.MD_JSON]: ["*"]
   },
   [PROVIDERS.TOGETHER]: {
@@ -124,7 +132,7 @@ export const PROVIDER_SUPPORTED_MODES_BY_MODEL = {
     [MODE.TOOLS]: ["*"]
   },
   [PROVIDERS.GROQ]: {
-    [MODE.TOOLS]: ["llama2-70b-4096", "mixtral-8x7b-32768", "gemma-7b-it"],
+    [MODE.TOOLS]: ["mixtral-8x7b-32768", "gemma-7b-it"],
     [MODE.MD_JSON]: ["*"]
   }
 }

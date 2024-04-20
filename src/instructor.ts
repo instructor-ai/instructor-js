@@ -1,5 +1,6 @@
 import {
   ChatCompletionCreateParamsWithModel,
+  ClientTypeChatCompletionRequestOptions,
   GenericChatCompletion,
   GenericClient,
   InstructorConfig,
@@ -8,7 +9,7 @@ import {
   ReturnTypeBasedOnParams
 } from "@/types"
 import OpenAI from "openai"
-import { z } from "zod"
+import { z, ZodError } from "zod"
 import ZodStream, { OAIResponseParser, OAIStream, withResponseModel, type Mode } from "zod-stream"
 import { fromZodError } from "zod-validation-error"
 
@@ -102,11 +103,14 @@ class Instructor<C extends GenericClient | OpenAI> {
     }
   }
 
-  private async chatCompletionStandard<T extends z.AnyZodObject>({
-    max_retries = MAX_RETRIES_DEFAULT,
-    response_model,
-    ...params
-  }: ChatCompletionCreateParamsWithModel<T>): Promise<z.infer<T>> {
+  private async chatCompletionStandard<T extends z.AnyZodObject>(
+    {
+      max_retries = MAX_RETRIES_DEFAULT,
+      response_model,
+      ...params
+    }: ChatCompletionCreateParamsWithModel<T>,
+    requestOptions?: ClientTypeChatCompletionRequestOptions<C>
+  ): Promise<z.infer<T>> {
     let attempts = 0
     let validationIssues = ""
     let lastMessage: OpenAI.ChatCompletionMessageParam | null = null
@@ -147,13 +151,17 @@ class Instructor<C extends GenericClient | OpenAI> {
 
       try {
         if (this.client.chat?.completions?.create) {
-          const result = await this.client.chat.completions.create({
-            ...resolvedParams,
-            stream: false
-          })
+          const result = await this.client.chat.completions.create(
+            {
+              ...resolvedParams,
+              stream: false
+            },
+            requestOptions
+          )
+
           completion = result as GenericChatCompletion<typeof result>
         } else {
-          throw new Error("Unsupported client type")
+          throw new Error("Unsupported client type -- no completion method found.")
         }
         this.log("debug", "raw standard completion response: ", completion)
       } catch (error) {
@@ -176,7 +184,17 @@ class Instructor<C extends GenericClient | OpenAI> {
         const data = JSON.parse(parsedCompletion) as z.infer<T> & { _meta?: CompletionMeta }
         return { ...data, _meta: { usage: completion?.usage ?? undefined } }
       } catch (error) {
-        this.log("error", "failed to parse completion", parsedCompletion, this.mode)
+        this.log(
+          "error",
+          "failed to parse completion",
+          parsedCompletion,
+          this.mode,
+          "attempt: ",
+          attempts,
+          "max attempts: ",
+          max_retries
+        )
+
         throw error
       }
     }
@@ -202,19 +220,30 @@ class Instructor<C extends GenericClient | OpenAI> {
             throw new Error("Validation failed.")
           }
         }
+
         return validation.data
       } catch (error) {
+        if (!(error instanceof ZodError)) {
+          throw error
+        }
+
         if (attempts < max_retries) {
           this.log(
             "debug",
             `response model: ${response_model.name} - Retrying, attempt: `,
             attempts
           )
+
           this.log(
             "warn",
             `response model: ${response_model.name} - Validation issues: `,
-            validationIssues
+            validationIssues,
+            " - Attempt: ",
+            attempts,
+            " - Max attempts: ",
+            max_retries
           )
+
           attempts++
           return await makeCompletionCallWithRetries()
         } else {
@@ -222,6 +251,7 @@ class Instructor<C extends GenericClient | OpenAI> {
             "debug",
             `response model: ${response_model.name} - Max attempts reached: ${attempts}`
           )
+
           this.log(
             "error",
             `response model: ${response_model.name} - Validation issues: `,
@@ -236,13 +266,10 @@ class Instructor<C extends GenericClient | OpenAI> {
     return makeCompletionCallWithRetries()
   }
 
-  private async chatCompletionStream<T extends z.AnyZodObject>({
-    max_retries,
-    response_model,
-    ...params
-  }: ChatCompletionCreateParamsWithModel<T>): Promise<
-    AsyncGenerator<Partial<T> & { _meta?: CompletionMeta }, void, unknown>
-  > {
+  private async chatCompletionStream<T extends z.AnyZodObject>(
+    { max_retries, response_model, ...params }: ChatCompletionCreateParamsWithModel<T>,
+    requestOptions?: ClientTypeChatCompletionRequestOptions<C>
+  ): Promise<AsyncGenerator<Partial<T> & { _meta?: CompletionMeta }, void, unknown>> {
     if (max_retries) {
       this.log("warn", "max_retries is not supported for streaming completions")
     }
@@ -269,10 +296,13 @@ class Instructor<C extends GenericClient | OpenAI> {
     return streamClient.create({
       completionPromise: async () => {
         if (this.client.chat?.completions?.create) {
-          const completion = await this.client.chat.completions.create({
-            ...completionParams,
-            stream: true
-          })
+          const completion = await this.client.chat.completions.create(
+            {
+              ...completionParams,
+              stream: true
+            },
+            requestOptions
+          )
 
           this.log("debug", "raw stream completion response: ", completion)
 
@@ -306,18 +336,19 @@ class Instructor<C extends GenericClient | OpenAI> {
         P extends T extends z.AnyZodObject ? ChatCompletionCreateParamsWithModel<T>
         : ClientTypeChatCompletionParams<OpenAILikeClient<C>> & { response_model: never }
       >(
-        params: P
+        params: P,
+        requestOptions?: ClientTypeChatCompletionRequestOptions<C>
       ): Promise<ReturnTypeBasedOnParams<typeof this.client, P>> => {
         this.validateModelModeSupport(params)
 
         if (this.isChatCompletionCreateParamsWithModel(params)) {
           if (params.stream) {
-            return this.chatCompletionStream(params) as ReturnTypeBasedOnParams<
+            return this.chatCompletionStream(params, requestOptions) as ReturnTypeBasedOnParams<
               typeof this.client,
               P & { stream: true }
             >
           } else {
-            return this.chatCompletionStandard(params) as ReturnTypeBasedOnParams<
+            return this.chatCompletionStandard(params, requestOptions) as ReturnTypeBasedOnParams<
               typeof this.client,
               P
             >
@@ -326,8 +357,8 @@ class Instructor<C extends GenericClient | OpenAI> {
           if (this.client.chat?.completions?.create) {
             const result =
               this.isStandardStream(params) ?
-                await this.client.chat.completions.create(params)
-              : await this.client.chat.completions.create(params)
+                await this.client.chat.completions.create(params, requestOptions)
+              : await this.client.chat.completions.create(params, requestOptions)
 
             return result as unknown as ReturnTypeBasedOnParams<OpenAILikeClient<C>, P>
           } else {

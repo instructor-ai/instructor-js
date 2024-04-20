@@ -6,8 +6,7 @@ import z from "zod"
 
 const anthropicClient = createLLMClient({
   provider: "anthropic",
-  apiKey: process.env.ANTHROPIC_API_KEY,
-  logLevel: "debug"
+  apiKey: process.env.ANTHROPIC_API_KEY
 })
 
 describe("LLMClient Anthropic Provider - mode: TOOLS", () => {

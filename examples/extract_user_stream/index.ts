@@ -53,7 +53,7 @@ let extraction = {}
 
 const extractionStream = await client.chat.completions.create({
   messages: [{ role: "user", content: textBlock }],
-  model: "gpt-4-1106-preview",
+  model: "gpt-4-turbo",
   response_model: {
     schema: ExtractionValuesSchema,
     name: "value extraction"
