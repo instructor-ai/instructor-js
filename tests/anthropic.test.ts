@@ -142,7 +142,7 @@ describe("LLMClient Anthropic Provider - mode: MD_JSON", () => {
       }
     })
 
-    expect(completion).toEqual({ name: "Dimitri Kennedy" })
+    expect(omit(["_meta"], completion)).toEqual({ name: "Dimitri Kennedy" })
   })
 
   test("complex schema - streaming", async () => {
