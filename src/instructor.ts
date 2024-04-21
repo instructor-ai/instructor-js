@@ -221,7 +221,7 @@ class Instructor<C extends GenericClient | OpenAI> {
           }
         }
 
-        return validation.data
+        return { ...validation.data, _meta: data._meta }
       } catch (error) {
         if (!(error instanceof ZodError)) {
           throw error
