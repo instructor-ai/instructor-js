@@ -1,5 +1,11 @@
 # @instructor-ai/instructor
 
+## 1.2.1
+
+### Patch Changes
+
+- [#166](https://github.com/instructor-ai/instructor-js/pull/166) [`ddfe257`](https://github.com/instructor-ai/instructor-js/commit/ddfe2572c672708fb9ad20ad6726cb3af07c5148) Thanks [@roodboi](https://github.com/roodboi)! - make sure we pass through \_meta on non stream completions
+
 ## 1.2.0
 
 ### Minor Changes
