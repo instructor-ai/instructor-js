@@ -60,7 +60,7 @@ const client = Instructor({
 
 ## JSON Schema Mode
 
-JSON Schema mode uses OpenAI's JSON fromat for responses. by setting `response_format={"type": "json_object", schema:response_model.model_json_schema()}` in the `chat.completions.create` method. This is only available for select clients (e.g. llama-cpp-python, Anyscale, Together)
+JSON Schema mode uses OpenAI's JSON format for responses. by setting `response_format={"type": "json_object", schema:response_model.model_json_schema()}` in the `chat.completions.create` method. This is only available for select clients (e.g. llama-cpp-python, Anyscale, Together)
 
 ```js
 import Instructor from "@instructor-ai/instructor"
