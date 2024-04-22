@@ -141,6 +141,7 @@ nav:
     - Self Correction: 'examples/self_correction.md'
     - Citing Sources: 'examples/validated_citations.md'
     - Content Moderation: 'examples/content_moderation.md'
+    - Expanding Search Queries (RAG): 'examples/segmenting_search.md'
   - Blog:
     - "blog/index.md"
   
