@@ -1,5 +1,47 @@
 # @instructor-ai/instructor
 
+## 1.2.1
+
+### Patch Changes
+
+- [#166](https://github.com/instructor-ai/instructor-js/pull/166) [`ddfe257`](https://github.com/instructor-ai/instructor-js/commit/ddfe2572c672708fb9ad20ad6726cb3af07c5148) Thanks [@roodboi](https://github.com/roodboi)! - make sure we pass through \_meta on non stream completions
+
+## 1.2.0
+
+### Minor Changes
+
+- [#164](https://github.com/instructor-ai/instructor-js/pull/164) [`6942d65`](https://github.com/instructor-ai/instructor-js/commit/6942d652b7750fac4306c4d713399cdc03e86a9b) Thanks [@roodboi](https://github.com/roodboi)! - adding request option pass through + handling non validation errors a little bit better and not retrying if not validation error specifically
+
+## 1.1.2
+
+### Patch Changes
+
+- [#162](https://github.com/instructor-ai/instructor-js/pull/162) [`287aa27`](https://github.com/instructor-ai/instructor-js/commit/287aa27d92450d73dd300de7e84927d94cae9220) Thanks [@roodboi](https://github.com/roodboi)! - add groq to supported providers - remove error on validation and warn instead so we dont fail if we are out of date on the mappings
+
+## 1.1.1
+
+### Patch Changes
+
+- [#157](https://github.com/instructor-ai/instructor-js/pull/157) [`c272342`](https://github.com/instructor-ai/instructor-js/commit/c272342c9baa8631990afa66bcb7dafb3c81f78b) Thanks [@roodboi](https://github.com/roodboi)! - updates zod-stream dep to get control charachter filtering on teh raw stream
+
+## 1.1.0
+
+### Minor Changes
+
+- [#153](https://github.com/instructor-ai/instructor-js/pull/153) [`76ef059`](https://github.com/instructor-ai/instructor-js/commit/76ef0591a1e34b73923d0c21afcf9e09e99b6b7c) Thanks [@roodboi](https://github.com/roodboi)! - updated client types to be more flexible - added tests for latest anthropic updates and llm-polyglot major
+
+## 1.0.0
+
+### Major Changes
+
+- [#144](https://github.com/instructor-ai/instructor-js/pull/144) [`d0275ff`](https://github.com/instructor-ai/instructor-js/commit/d0275ff3b91d87d05a72c98001a49222e3cba348) Thanks [@roodboi](https://github.com/roodboi)! - updating all types to better support non openai clients - this changes some of the previously exported types and adds a few new ones
+
+- [#125](https://github.com/instructor-ai/instructor-js/pull/125) [`c205286`](https://github.com/instructor-ai/instructor-js/commit/c205286dccdbc6feacfd2aeeca0e0ba449631a57) Thanks [@roodboi](https://github.com/roodboi)! - Updating zod-stream major and stream output types - this change moves the internal properties tacked onto the stream output from many \_properties to one \_meta object with the properties nested - this also adds explicit types so when used in ts projects it doesnt yell.
+
+### Minor Changes
+
+- [#132](https://github.com/instructor-ai/instructor-js/pull/132) [`f65672c`](https://github.com/instructor-ai/instructor-js/commit/f65672cfe443e37cb32ee721aa406ca093125ffb) Thanks [@roodboi](https://github.com/roodboi)! - adding meta to standard completions as well and including usage - also added more verbose debug logs and new provider specific transformers to handle discrepencies in various apis
+
 ## 0.0.7
 
 ### Patch Changes

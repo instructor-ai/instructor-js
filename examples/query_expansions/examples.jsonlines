@@ -1,0 +1,192 @@
+{
+  "query": "What is 10 + 10?",
+  "extraction": {
+    "message": "20",
+    "query": []
+  }
+}
+{
+  "query": "Please summarize the action items from today's meeting",
+  "extraction": {
+    "query": [
+      {
+        "rewrittenQuery": "summarize action items from meeting on 1/19/2024",
+        "questionType": [
+          "TRANSCRIPTS",
+          "ACTIVITY_LOG"
+        ],
+        "minDate": "1/19/2024",
+        "maxDate": "1/19/2024"
+      }
+    ]
+  }
+}
+{
+  "query": "Give a summary of the daily standup today with Bart. The spoken language is Dutch",
+  "extraction": {
+    "query": [
+      {
+        "rewrittenQuery": "Summary of the daily standup meeting with Bart on 1/19/2024 in Dutch language",
+        "questionType": [
+          "TRANSCRIPTS"
+        ],
+        "minDate": "1/19/2024",
+        "maxDate": "1/19/2024"
+      }
+    ]
+  }
+}
+{
+  "query": "What did I do last week? Write at least 10 bullet points",
+  "extraction": {
+    "query": [
+      {
+        "rewrittenQuery": "Activity log for the user between 1/12/2024 and 1/19/2024",
+        "questionType": [
+          "ACTIVITY_LOG"
+        ],
+        "minDate": "1/12/2024",
+        "maxDate": "1/19/2024"
+      }
+    ]
+  }
+}
+{
+  "query": "I recently looked up a Royal Caribbean cruise. What price did it show me?",
+  "extraction": {
+    "query": [
+      {
+        "rewrittenQuery": "What was the price of the Royal Caribbean cruise when recently searched?",
+        "questionType": [
+          "ACTIVITY_LOG"
+        ],
+        "minDate": "1/9/2024",
+        "maxDate": "1/19/2024"
+      }
+    ]
+  }
+}
+{
+  "query": "what was the name of the standup tool i saw recently",
+  "extraction": {
+    "query": [
+      {
+        "rewrittenQuery": "What is the name of the latest standup software or tool that I recently viewed or explored?",
+        "questionType": [
+          "PERSONAL_DATA",
+          "ACTIVITY_LOG"
+        ],
+        "minDate": "01/01/2024",
+        "maxDate": "01/19/2024"
+      }
+    ]
+  }
+}
+{
+  "query": "Can you summarize the transcript from 11:00AM to present?",
+  "extraction": {
+    "query": [
+      {
+        "rewrittenQuery": "show transcript from 11:00AM to 9:14:57 PM on 1/19/2024",
+        "questionType": [
+          "TRANSCRIPTS"
+        ],
+        "minDate": "1/19/2024 11:00:00 AM",
+        "maxDate": "1/19/2024 9:14:57 PM"
+      }
+    ]
+  }
+}
+{
+  "query": "What was I doing last week?",
+  "extraction": {
+    "query": [
+      {
+        "rewrittenQuery": "Activity log for the user from the date range of 1/12/2024 to 1/18/2024",
+        "questionType": [
+          "ACTIVITY_LOG"
+        ],
+        "minDate": "1/12/2024",
+        "maxDate": "1/18/2024"
+      }
+    ]
+  }
+}
+{
+  "query": "Summarize the meeting with Pinterest this morning",
+  "extraction": {
+    "query": [
+      {
+        "rewrittenQuery": "Summary of the morning meeting with Pinterest on 1/19/2024",
+        "questionType": [
+          "TRANSCRIPTS",
+          "ACTIVITY_LOG"
+        ],
+        "minDate": "1/19/2024 12:00:00 AM",
+        "maxDate": "1/19/2024 11:59:59 AM"
+      }
+    ]
+  }
+}
+{
+  "query": "Did he mention anything else about the terminal in the past 2 weeks? Please write 3 action items in the form of bullet points",
+  "extraction": {
+    "message": "Please create a summary of the mentions in the form of 3 action items in bullet point format once you find the relevant data",
+    "query": [
+      {
+        "rewrittenQuery": "Reports, conversation transcripts, notes or audio visual records where he has mentioned the terminal within the past 2 weeks",
+        "questionType": [
+          "TRANSCRIPTS",
+          "ACTIVITY_LOG"
+        ],
+        "minDate": "1/5/2024",
+        "maxDate": "1/19/2024"
+      }
+    ]
+  }
+}
+{
+  "query": "Can you summarize the transcript from 11:00AM to present?",
+  "extraction": {
+    "query": [
+      {
+        "rewrittenQuery": "show transcript from 11:00AM to 9:14:57 PM on 1/19/2024",
+        "questionType": [
+          "TRANSCRIPTS"
+        ],
+        "minDate": "1/19/2024 11:00:00 AM",
+        "maxDate": "1/19/2024 9:14:57 PM"
+      }
+    ]
+  }
+}
+{
+  "query": "Please summarize in detail Monday, the 17th of April 2023, starting from 10:00am and highlight any key aspects, todos and so on. Leave out any information about FASD/FAS/PFAS.",
+  "extraction": {
+    "query": [
+      {
+        "rewrittenQuery": "Detailed summary of activities, key aspects, and tasks scheduled for April 17, 2023, starting from 10:00am excluding any data related to FASD, FAS or PFAS",
+        "questionType": [
+          "ACTIVITY_LOG"
+        ],
+        "minDate": "2023-04-17T10:00:00",
+        "maxDate": "2023-04-17T23:59:59"
+      }
+    ]
+  }
+}
+{
+  "query": "How was my day?",
+  "extraction": {
+    "query": [
+      {
+        "rewrittenQuery": "Summarize the user's activities and interactions for the date January 19, 2024",
+        "questionType": [
+          "ACTIVITY_LOG"
+        ],
+        "minDate": "1/19/2024",
+        "maxDate": "1/19/2024"
+      }
+    ]
+  }
+}

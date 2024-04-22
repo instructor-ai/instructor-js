@@ -1,9 +1,9 @@
 site_name: Instructor (JS)
 site_author: Jason Liu
-site_description: Enhancing OpenAI function calling with Zod 
+site_description: Structured LLM outputs with Zod
 repo_name: instructor
 repo_url: https://github.com/instructor-ai/instructor-js
-site_url: https://instructor-ai.github.io/instructor-js/
+site_url: https://js.useinstructor.com/
 edit_uri: edit/main/docs/
 copyright: Copyright &copy; 2024 Jason Liu
 theme:
@@ -124,16 +124,15 @@ nav:
   - Introduction: 
     - Welcome To Instructor: 'index.md'
     - Why use Instructor?: 'why.md'
+    - Schema: 'concepts/schema.md'
+    - Patching: 'concepts/patching.md'
+    - Streaming: 'concepts/streaming.md'
+    - Logging: 'concepts/logging.md'
+    - Prompting Tips: 'tips/prompting.md'
+    - Philosophy: 'concepts/philosophy.md'
     - Help with Instructor: 'help.md'
     - Installation: 'installation.md'
     - Contributing: 'contributing.md'
-  - Tips:
-    - Tips: 'tips/prompting.md'
-  - Concepts: 
-    - Philosophy: 'concepts/philosophy.md'
-    - Modes: 'concepts/modes.md'
-    - Schema: 'concepts/schema.md'
-    - Streaming: 'concepts/streaming.md'
   - Cookbook:
     - Overview: 'examples/index.md'
     - Classification: 'examples/classification.md'
@@ -167,14 +166,6 @@ plugins:
       post_date_format: yyyy/MM/dd
       post_url_format: "{date}/{slug}"
       authors_file: "{blog}/.authors.yml"
-  - rss:
-      match_path: blog/posts/.* 
-      date_from_meta:
-        as_creation: date
-      categories:
-        - categories
-        - tags 
-      enabled: !ENV [CI, false]
 extra:
   analytics:
     provider: google

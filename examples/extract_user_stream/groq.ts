@@ -39,28 +39,26 @@ const ExtractionValuesSchema = z.object({
   deadline: z.string().min(1)
 })
 
-const oai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY ?? undefined,
-  organization: process.env.OPENAI_ORG_ID ?? undefined
+export const groq = new OpenAI({
+  baseURL: "https://api.groq.com/openai/v1",
+  apiKey: process.env["GROQ_API_KEY"]
 })
 
 const client = Instructor({
-  client: oai,
-  mode: "TOOLS"
+  client: groq,
+  mode: "MD_JSON"
 })
 
 let extraction = {}
 
 const extractionStream = await client.chat.completions.create({
   messages: [{ role: "user", content: textBlock }],
-  model: "gpt-4-turbo",
+  model: "llama3-70b-8192",
   response_model: {
     schema: ExtractionValuesSchema,
     name: "value extraction"
   },
-  max_retries: 3,
-  stream: true,
-  seed: 1
+  stream: true
 })
 
 for await (const result of extractionStream) {

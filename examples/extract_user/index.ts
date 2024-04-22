@@ -29,6 +29,7 @@ const user = await client.chat.completions.create({
 })
 
 console.log(user)
+
 // {
 //  age: 30,
 //  name: "Jason Liu",

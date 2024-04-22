@@ -38,10 +38,6 @@ const QueryPlanSchema = z.object({
 })
 ```
 
-!!! warning "Graph Generation"
-
-    Notice that this example produces a flat list of items with dependencies that resemble a graph, while Zod allows for recursive definitions, it's much easier and less confusing for the model to generate flat schemas rather than recursive schemas. If you want to see a recursive example, see [recursive schemas](recursive.md)
-
 ## Planning a Query Plan
 
 Now, let's demonstrate how to plan and execute a query plan using the defined models and the OpenAI API.
@@ -69,7 +65,7 @@ const createQueryPlan = async (question: string): Promise<QueryPlan | undefined>
         "content": `Consider: ${question}\nGenerate the correct query plan.`,
       },
     ],
-    model: "gpt-4-1106-preview",
+    model: "gpt-4-turbo",
     response_model: { schema: QueryPlanSchema },
     max_tokens: 1000,
     temperature: 0.0,
