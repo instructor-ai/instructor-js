@@ -103,7 +103,7 @@ export const PROVIDER_SUPPORTED_MODES_BY_MODEL = {
   [PROVIDERS.OAI]: {
     [MODE.FUNCTIONS]: ["*"],
     [MODE.TOOLS]: ["*"],
-    [MODE.JSON]: ["gpt-3.5-turbo-1106", "gpt-4-turbo", "gpt-4-0125-preview", "gpt-4-turbo-preview"],
+    [MODE.JSON]: ["gpt-3.5-turbo-1106", "gpt-4o", "gpt-4-0125-preview", "gpt-4o-preview"],
     [MODE.MD_JSON]: ["*"]
   },
   [PROVIDERS.TOGETHER]: {

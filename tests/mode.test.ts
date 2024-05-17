@@ -6,7 +6,7 @@ import { type Mode } from "zod-stream"
 
 import { MODE, Provider, PROVIDER_SUPPORTED_MODES_BY_MODEL, PROVIDERS } from "@/constants/providers"
 
-const default_oai_model = "gpt-4-turbo"
+const default_oai_model = "gpt-4o"
 const default_anyscale_model = "mistralai/Mixtral-8x7B-Instruct-v0.1"
 const default_together_model = "mistralai/Mixtral-8x7B-Instruct-v0.1"
 const default_groq_model = "llama3-70b-8192"

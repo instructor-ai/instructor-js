@@ -45,7 +45,7 @@ const extractActionItems = async (data: string) => {
         content: `Create the action items for the following transcript: ${data}`
       }
     ],
-    model: "gpt-4-turbo",
+    model: "gpt-4o",
     response_model: { schema: ActionItemsSchema, name: "ActionItems" },
     max_tokens: 1000,
     temperature: 0.0,

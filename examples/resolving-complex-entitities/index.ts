@@ -59,7 +59,7 @@ const askAi = async (input: string) => {
         content: input
       }
     ],
-    model: "gpt-4",
+    model: "gpt-4o",
     response_model: { schema: DocumentExtractionSchema, name: "Document Extraction" },
     max_retries: 3,
     seed: 1

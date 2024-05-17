@@ -61,7 +61,7 @@ A follow-up meeting is scheduled for January 25th at 3 PM GMT to finalize the ag
 
 const extractionStream = await client.chat.completions.create({
   messages: [{ role: "user", content: textBlock }],
-  model: "gpt-4-turbo",
+  model: "gpt-4o",
   response_model: {
     schema: ExtractionValuesSchema,
     name: "value extraction"

@@ -26,7 +26,7 @@ describe("callWithTimeout", () => {
       const user = await client.chat.completions.create(
         {
           messages: [{ role: "user", content: "Jason Liu is 30 years old" }],
-          model: "gpt-4-turbo",
+          model: "gpt-4o",
           response_model: { schema: UserSchema, name: "User" },
           max_retries: 3,
           seed: 1

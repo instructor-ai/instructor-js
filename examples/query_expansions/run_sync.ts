@@ -95,7 +95,7 @@ export const runExtractionStream = async (query: string) => {
       { role: "system", content: systemPrompt },
       { role: "user", content: query }
     ],
-    model: "gpt-4",
+    model: "gpt-4o",
     response_model: {
       schema: SearchQuery,
       name: "value_extraction"
@@ -124,7 +124,7 @@ const runExtraction = async (query: string) => {
       { role: "system", content: systemPrompt },
       { role: "user", content: query }
     ],
-    model: "gpt-4",
+    model: "gpt-4o",
     response_model: {
       schema: Response,
       name: "Respond"

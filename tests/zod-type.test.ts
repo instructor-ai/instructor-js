@@ -16,7 +16,7 @@ async function extractUser({ schema }) {
 
   const user = await client.chat.completions.create({
     messages: [{ role: "user", content: "do nothing" }],
-    model: "gpt-4-turbo",
+    model: "gpt-4o",
     response_model: { schema: schema, name: "User" }
   })
 
