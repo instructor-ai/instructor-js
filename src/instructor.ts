@@ -31,6 +31,7 @@ class Instructor<C extends GenericClient | OpenAI> {
   readonly mode: Mode
   readonly provider: Provider
   readonly debug: boolean = false
+  readonly retryAllErrors: boolean = false
   readonly logger?: <T extends unknown[]>(level: LogLevel, ...args: T) => void
 
   /**
@@ -38,10 +39,17 @@ class Instructor<C extends GenericClient | OpenAI> {
    * @param {OpenAILikeClient} client - An OpenAI-like client.
    * @param {string} mode - The mode of operation.
    */
-  constructor({ client, mode, debug = false, logger = undefined }: InstructorConfig<C>) {
+  constructor({
+    client,
+    mode,
+    debug = false,
+    logger = undefined,
+    retryAllErrors = false
+  }: InstructorConfig<C>) {
     this.client = client
     this.mode = mode
     this.debug = debug
+    this.retryAllErrors = retryAllErrors
     this.logger = logger ?? undefined
 
     const provider =
@@ -230,7 +238,7 @@ class Instructor<C extends GenericClient | OpenAI> {
 
         return { ...validation.data, _meta: data?._meta ?? {} }
       } catch (error) {
-        if (!(error instanceof ZodError)) {
+        if (!this.retryAllErrors && !(error instanceof ZodError)) {
           throw error
         }
 
