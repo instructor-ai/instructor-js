@@ -31,16 +31,26 @@ class Instructor<C extends GenericClient | OpenAI> {
   readonly mode: Mode
   readonly provider: Provider
   readonly debug: boolean = false
+  readonly retryAllErrors: boolean = false
+  readonly logger?: <T extends unknown[]>(level: LogLevel, ...args: T) => void
 
   /**
    * Creates an instance of the `Instructor` class.
    * @param {OpenAILikeClient} client - An OpenAI-like client.
    * @param {string} mode - The mode of operation.
    */
-  constructor({ client, mode, debug = false }: InstructorConfig<C>) {
+  constructor({
+    client,
+    mode,
+    debug = false,
+    logger = undefined,
+    retryAllErrors = false
+  }: InstructorConfig<C>) {
     this.client = client
     this.mode = mode
     this.debug = debug
+    this.retryAllErrors = retryAllErrors
+    this.logger = logger ?? undefined
 
     const provider =
       typeof this.client?.baseURL === "string" ?
@@ -83,6 +93,10 @@ class Instructor<C extends GenericClient | OpenAI> {
   }
 
   private log<T extends unknown[]>(level: LogLevel, ...args: T) {
+    if (this.logger) {
+      this.logger(level, ...args)
+    }
+
     if (!this.debug && level === "debug") {
       return
     }
@@ -224,7 +238,7 @@ class Instructor<C extends GenericClient | OpenAI> {
 
         return { ...validation.data, _meta: data?._meta ?? {} }
       } catch (error) {
-        if (!(error instanceof ZodError)) {
+        if (!this.retryAllErrors && !(error instanceof ZodError)) {
           throw error
         }
 
@@ -428,11 +442,9 @@ export type InstructorClient<C extends GenericClient | OpenAI> = Instructor<C> &
  * @param args
  * @returns
  */
-export default function createInstructor<C extends GenericClient | OpenAI>(args: {
-  client: OpenAILikeClient<C>
-  mode: Mode
-  debug?: boolean
-}): InstructorClient<C> {
+export default function createInstructor<C extends GenericClient | OpenAI>(
+  args: InstructorConfig<C>
+): InstructorClient<C> {
   const instructor = new Instructor<C>(args)
   const instructorWithProxy = new Proxy(instructor, {
     get: (target, prop, receiver) => {

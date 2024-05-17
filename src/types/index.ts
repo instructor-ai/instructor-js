@@ -71,6 +71,8 @@ export interface InstructorConfig<C> {
   client: OpenAILikeClient<C>
   mode: Mode
   debug?: boolean
+  logger?: <T extends unknown[]>(level: LogLevel, ...args: T) => void
+  retryAllErrors?: boolean
 }
 
 export type InstructorChatCompletionParams<T extends z.AnyZodObject> = {
