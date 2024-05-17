@@ -1,4 +1,3 @@
-import { stdout } from "process"
 import Instructor from "@/instructor"
 import { describe, expect, spyOn, test } from "bun:test"
 import OpenAI from "openai"
