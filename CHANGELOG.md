@@ -1,5 +1,14 @@
 # @instructor-ai/instructor
 
+## 1.3.0
+
+### Minor Changes
+
+- [#176](https://github.com/instructor-ai/instructor-js/pull/176) [`6dd4255`](https://github.com/instructor-ai/instructor-js/commit/6dd42554e89d36c93132eace2dd67951297831bd) Thanks [@roodboi](https://github.com/roodboi)! - add ability to include usage from streams by teeing stream when option is present
+
+- [#177](https://github.com/instructor-ai/instructor-js/pull/177) [`09f04d1`](https://github.com/instructor-ai/instructor-js/commit/09f04d1ff7a943679a7c49e4b20a23827cbdaae4) Thanks [@roodboi](https://github.com/roodboi)! - add new option for providing custom logger
+  add new option for retrying on any error
+
 ## 1.2.1
 
 ### Patch Changes
