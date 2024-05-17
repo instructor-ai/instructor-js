@@ -46,16 +46,20 @@ async function extractUser() {
 
   const extractionStream = await client.chat.completions.create({
     messages: [{ role: "user", content: textBlock }],
-    model: "gpt-4-turbo",
+    model: "gpt-4o",
     response_model: { schema: ExtractionValuesSchema, name: "Extr" },
     max_retries: 3,
     stream: true,
+    stream_options: {
+      include_usage: true
+    },
     seed: 1
   })
 
   let extraction: Extraction = {}
 
   for await (const result of extractionStream) {
+    console.log(result)
     try {
       extraction = result
       expect(result).toHaveProperty("users")
@@ -65,6 +69,7 @@ async function extractUser() {
     }
   }
 
+  console.log(extraction)
   return extraction
 }
 

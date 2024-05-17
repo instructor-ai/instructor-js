@@ -38,7 +38,7 @@ const createQueryPlan = async (question: string) => {
         content: `Consider: ${question}\nGenerate the correct query plan.`
       }
     ],
-    model: "gpt-4-turbo",
+    model: "gpt-4o",
     response_model: { schema: QueryPlanSchema, name: "Query Plan Decomposition" },
     max_tokens: 1000,
     temperature: 0.0,

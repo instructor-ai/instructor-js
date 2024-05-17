@@ -73,7 +73,7 @@ const runExtraction = async (query: string) => {
       { role: "system", content: systemPrompt },
       { role: "user", content: query }
     ],
-    model: "gpt-4",
+    model: "gpt-4o",
     response_model: {
       schema: ExtractionValuesSchema,
       name: "value_extraction"

@@ -44,7 +44,7 @@ const question = "What is the meaning of life?"
 const context = "According to the devil the meaning of live is to live a life of sin and debauchery."
 
 await instructor.chat.completions.create({
-    model: "gpt-4",
+    model: "gpt-4o",
     max_retries: 0,
     response_model: { schema: QuestionAnswer, name: "Question and Answer" },
     messages: [
@@ -82,14 +82,14 @@ const QuestionAnswer = z.object({
   question: z.string(),
   answer: z.string().superRefine(
     LLMValidator(instructor, statement, {
-      model: "gpt-4"
+      model: "gpt-4o"
     })
   )
 })
 
 try {
   await instructor.chat.completions.create({
-    model: "gpt-4",
+    model: "gpt-4o",
     max_retries: 0,
     response_model: { schema: QuestionAnswer, name: "Question and Answer" },
     messages: [
@@ -132,7 +132,7 @@ By adding the `max_retries` parameter, we can retry the request with corrections
 ```ts
 try {
   await instructor.chat.completions.create({
-    model: "gpt-4",
+    model: "gpt-4o",
     max_retries: 2,
     response_model: { schema: QuestionAnswer, name: "Question and Answer" },
     messages: [

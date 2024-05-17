@@ -16,7 +16,7 @@ const QuestionAnswer = z.object({
   question: z.string(),
   answer: z.string().superRefine(
     LLMValidator(instructor, statement, {
-      model: "gpt-4-turbo"
+      model: "gpt-4o"
     })
   )
 })
@@ -25,7 +25,7 @@ const question = "What is the meaning of life?"
 
 const check = async (context: string) => {
   return await instructor.chat.completions.create({
-    model: "gpt-4-turbo",
+    model: "gpt-4o",
     max_retries: 2,
     response_model: { schema: QuestionAnswer, name: "Question and Answer" },
     messages: [

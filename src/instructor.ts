@@ -9,6 +9,7 @@ import {
   ReturnTypeBasedOnParams
 } from "@/types"
 import OpenAI from "openai"
+import { Stream } from "openai/streaming.mjs"
 import { z, ZodError } from "zod"
 import ZodStream, { OAIResponseParser, OAIStream, withResponseModel, type Mode } from "zod-stream"
 import { fromZodError } from "zod-validation-error"
@@ -266,10 +267,10 @@ class Instructor<C extends GenericClient | OpenAI> {
     return makeCompletionCallWithRetries()
   }
 
-  private async chatCompletionStream<T extends z.AnyZodObject>(
+  private async *chatCompletionStream<T extends z.AnyZodObject>(
     { max_retries, response_model, ...params }: ChatCompletionCreateParamsWithModel<T>,
     requestOptions?: ClientTypeChatCompletionRequestOptions<C>
-  ): Promise<AsyncGenerator<Partial<T> & { _meta?: CompletionMeta }, void, unknown>> {
+  ): AsyncGenerator<Partial<T> & { _meta?: CompletionMeta }, void, unknown> {
     if (max_retries) {
       this.log("warn", "max_retries is not supported for streaming completions")
     }
@@ -293,7 +294,16 @@ class Instructor<C extends GenericClient | OpenAI> {
       debug: this.debug ?? false
     })
 
-    return streamClient.create({
+    async function checkForUsage(reader: Stream<OpenAI.ChatCompletionChunk>) {
+      for await (const chunk of reader) {
+        if ("usage" in chunk) {
+          streamUsage = chunk.usage as CompletionMeta["usage"]
+        }
+      }
+    }
+
+    let streamUsage: CompletionMeta["usage"] | undefined
+    const structuredStream = await streamClient.create({
       completionPromise: async () => {
         if (this.client.chat?.completions?.create) {
           const completion = await this.client.chat.completions.create(
@@ -306,6 +316,21 @@ class Instructor<C extends GenericClient | OpenAI> {
 
           this.log("debug", "raw stream completion response: ", completion)
 
+          if (
+            this.provider === "OAI" &&
+            completionParams?.stream &&
+            "stream_options" in completionParams &&
+            completion instanceof Stream
+          ) {
+            const [completion1, completion2] = completion.tee()
+
+            checkForUsage(completion1)
+
+            return OAIStream({
+              res: completion2
+            })
+          }
+
           return OAIStream({
             res: completion as unknown as AsyncIterable<OpenAI.ChatCompletionChunk>
           })
@@ -315,6 +340,16 @@ class Instructor<C extends GenericClient | OpenAI> {
       },
       response_model
     })
+
+    for await (const chunk of structuredStream) {
+      yield {
+        ...chunk,
+        _meta: {
+          usage: streamUsage ?? undefined,
+          ...(chunk?._meta ?? {})
+        }
+      }
+    }
   }
 
   private isChatCompletionCreateParamsWithModel<T extends z.AnyZodObject>(

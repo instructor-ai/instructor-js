@@ -19,7 +19,7 @@ const QA = z.object({
   question: z.string(),
   answer: z.string().superRefine(
     LLMValidator(instructor, statement, {
-      model: "gpt-4-turbo"
+      model: "gpt-4o"
     })
   )
 })
@@ -60,7 +60,7 @@ describe("Validator Tests", async () => {
 
     try {
       await instructor.chat.completions.create({
-        model: "gpt-4-turbo",
+        model: "gpt-4o",
         max_retries: 0,
         response_model: { schema: QA, name: "Question and Answer" },
         messages: [
@@ -92,7 +92,7 @@ describe("Validator Tests", async () => {
     const context = "Happiness is the meaning of life."
 
     const output = await instructor.chat.completions.create({
-      model: "gpt-4-turbo",
+      model: "gpt-4o",
       max_retries: 2,
       response_model: { schema: QA, name: "Question and Answer" },
       messages: [

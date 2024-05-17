@@ -88,7 +88,7 @@ export type ReturnTypeBasedOnParams<C, P> =
       response_model: ResponseModel<infer T>
     }
   ) ?
-    Promise<AsyncGenerator<Partial<z.infer<T>> & { _meta?: CompletionMeta }, void, unknown>>
+    AsyncGenerator<Partial<z.infer<T>> & { _meta?: CompletionMeta }, void, unknown>
   : P extends { response_model: ResponseModel<infer T> } ?
     Promise<z.infer<T> & { _meta?: CompletionMeta }>
   : C extends OpenAI ?

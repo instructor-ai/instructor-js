@@ -33,7 +33,7 @@ describe("Inference Checking", () => {
   test("no response_model, no stream", async () => {
     const user = await client.chat.completions.create({
       messages: [{ role: "user", content: "Jason Liu is 30 years old" }],
-      model: "gpt-4-turbo",
+      model: "gpt-4o",
       seed: 1,
       stream: false
     })
@@ -44,7 +44,7 @@ describe("Inference Checking", () => {
   test("no response_model, stream", async () => {
     const userStream = await client.chat.completions.create({
       messages: [{ role: "user", content: "Jason Liu is 30 years old" }],
-      model: "gpt-4-turbo",
+      model: "gpt-4o",
       seed: 1,
       stream: true
     })
@@ -57,7 +57,7 @@ describe("Inference Checking", () => {
   test("response_model, no stream", async () => {
     const user = await client.chat.completions.create({
       messages: [{ role: "user", content: "Jason Liu is 30 years old" }],
-      model: "gpt-4-turbo",
+      model: "gpt-4o",
       response_model: { schema: UserSchema, name: "User" },
       seed: 1,
       stream: false
@@ -71,7 +71,7 @@ describe("Inference Checking", () => {
   test("response_model, stream", async () => {
     const userStream = await client.chat.completions.create({
       messages: [{ role: "user", content: "Jason Liu is 30 years old" }],
-      model: "gpt-4-turbo",
+      model: "gpt-4o",
       response_model: { schema: UserSchema, name: "User" },
       seed: 1,
       stream: true
@@ -94,7 +94,7 @@ describe("Inference Checking", () => {
   test("response_model, stream, max_retries", async () => {
     const userStream = await client.chat.completions.create({
       messages: [{ role: "user", content: "Jason Liu is 30 years old" }],
-      model: "gpt-4-turbo",
+      model: "gpt-4o",
       response_model: { schema: UserSchema, name: "User" },
       seed: 1,
       stream: true,
@@ -118,7 +118,7 @@ describe("Inference Checking", () => {
   test("response_model, no stream, max_retries", async () => {
     const user = await client.chat.completions.create({
       messages: [{ role: "user", content: "Jason Liu is 30 years old" }],
-      model: "gpt-4-turbo",
+      model: "gpt-4o",
       response_model: { schema: UserSchema, name: "User" },
       seed: 1,
       max_retries: 3
