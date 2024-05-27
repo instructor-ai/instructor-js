@@ -9,7 +9,7 @@ import {
   ReturnTypeBasedOnParams
 } from "@/types"
 import OpenAI from "openai"
-import { Stream } from "openai/streaming.mjs"
+import { Stream } from "openai/streaming"
 import { z, ZodError } from "zod"
 import ZodStream, { OAIResponseParser, OAIStream, withResponseModel, type Mode } from "zod-stream"
 import { fromZodError } from "zod-validation-error"
