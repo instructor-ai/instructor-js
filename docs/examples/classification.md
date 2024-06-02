@@ -56,7 +56,7 @@ async function classify(data: string): Promise<SimpleClassification> {
   return classification
 }
 
-const classification = await createClassification(
+const classification = await classify(
   "Hello there I'm a nigerian prince and I want to give you money"
 )
 
@@ -99,7 +99,7 @@ async function multi_classify(data: string): Promise<MultiClassification> {
   return classification 
 }
 
-const classification = await createClassification(
+const classification = await multi_classify(
   "My account is locked and I can't access my billing info. Phone is also broken"
 )
 
