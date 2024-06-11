@@ -39,7 +39,7 @@ export type GenericClient = {
   baseURL?: string
   chat?: {
     completions?: {
-      create?: (params: GenericCreateParams) => Promise<unknown>
+      create?: <P extends GenericCreateParams>(params: P) => Promise<unknown>
     }
   }
 }
@@ -55,7 +55,7 @@ export type ClientType<C> =
   : C extends GenericClient ? "generic"
   : never
 
-export type OpenAILikeClient<C> = C extends OpenAI ? OpenAI : C & GenericClient
+export type OpenAILikeClient<C> = OpenAI | (C & GenericClient)
 export type SupportedInstructorClient = GenericClient | OpenAI
 export type LogLevel = "debug" | "info" | "warn" | "error"
 
@@ -68,7 +68,7 @@ export type Mode = ZMode
 export type ResponseModel<T extends z.AnyZodObject> = ZResponseModel<T>
 
 export interface InstructorConfig<C> {
-  client: OpenAILikeClient<C>
+  client: C
   mode: Mode
   debug?: boolean
   logger?: <T extends unknown[]>(level: LogLevel, ...args: T) => void
