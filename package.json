@@ -75,7 +75,7 @@
     "eslint-plugin-only-warn": "^1.1.0",
     "eslint-plugin-prettier": "^5.1.2",
     "husky": "^8.0.3",
-    "llm-polyglot": "1.0.1",
+    "llm-polyglot": "2.0.0",
     "openai": "4.50.0",
     "prettier": "latest",
     "ts-inference-check": "^0.3.0",
