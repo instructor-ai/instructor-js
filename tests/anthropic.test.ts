@@ -118,15 +118,16 @@ describe("LLMClient Anthropic Provider - mode: TOOLS", () => {
   })
 })
 
-describe("LLMClient Anthropic Provider - mode: MD_JSON", () => {
+describe("LLMClient Anthropic Provider - mode: TOOLS - stream", () => {
   const instructor = Instructor({
     client: anthropicClient,
-    mode: "MD_JSON"
+    mode: "TOOLS"
   })
 
   test("basic completion", async () => {
     const completion = await instructor.chat.completions.create({
       model: "claude-3-sonnet-20240229",
+      stream: true,
       max_tokens: 1000,
       messages: [
         {
@@ -135,17 +136,24 @@ describe("LLMClient Anthropic Provider - mode: MD_JSON", () => {
         }
       ],
       response_model: {
-        name: "get_name",
+        name: "extract_name",
         schema: z.object({
           name: z.string()
         })
       }
     })
 
-    expect(omit(["_meta"], completion)).toEqual({ name: "Dimitri Kennedy" })
+    let final = {}
+
+    for await (const result of completion) {
+      final = result
+    }
+
+    //@ts-expect-error ignore for testing
+    expect(omit(["_meta"], final)).toEqual({ name: "Dimitri Kennedy" })
   })
 
-  test("complex schema - streaming", async () => {
+  test("complex schema", async () => {
     const completion = await instructor.chat.completions.create({
       model: "claude-3-sonnet-20240229",
       max_tokens: 1000,
@@ -173,14 +181,15 @@ describe("LLMClient Anthropic Provider - mode: MD_JSON", () => {
             Programming
             Leadership
             Communication
-
-            
             `
         }
       ],
       response_model: {
         name: "process_user_data",
         schema: z.object({
+          story: z
+            .string()
+            .describe("A long and mostly made up story about the user - minimum 500 words"),
           userDetails: z.object({
             firstName: z.string(),
             lastName: z.string(),
@@ -196,21 +205,19 @@ describe("LLMClient Anthropic Provider - mode: MD_JSON", () => {
               years: z.number().optional()
             })
           ),
-          skills: z.array(z.string()),
-          summaryOfWorldWarOne: z
-            .string()
-            .describe("A detailed summary of World War One and its major events - min 500 words")
+          skills: z.array(z.string())
         })
       }
     })
 
     let final = {}
+
     for await (const result of completion) {
       final = result
     }
 
-    //@ts-expect-error - lazy
-    expect(omit(["_meta", "summaryOfWorldWarOne"], final)).toEqual({
+    //@ts-expect-error ignore for testing
+    expect(omit(["_meta", "story"], final)).toEqual({
       userDetails: {
         firstName: "John",
         lastName: "Doe",
