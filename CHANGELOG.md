@@ -1,5 +1,11 @@
 # @instructor-ai/instructor
 
+## 1.4.0
+
+### Minor Changes
+
+- [#182](https://github.com/instructor-ai/instructor-js/pull/182) [`0a5bbd8`](https://github.com/instructor-ai/instructor-js/commit/0a5bbd8082915bcc8c4686d34fec5d5f034ebd9c) Thanks [@roodboi](https://github.com/roodboi)! - update client types to better support non oai clients + updates to allow for passing usage properties into meta from non-oai clients
+
 ## 1.3.0
 
 ### Minor Changes
