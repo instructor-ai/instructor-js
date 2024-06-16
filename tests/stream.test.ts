@@ -59,7 +59,6 @@ async function extractUser() {
   let extraction: Extraction = {}
 
   for await (const result of extractionStream) {
-    console.log(result)
     try {
       extraction = result
       expect(result).toHaveProperty("users")
