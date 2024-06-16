@@ -22,11 +22,12 @@ import {
   PROVIDER_SUPPORTED_MODES_BY_MODEL,
   PROVIDERS
 } from "./constants/providers"
+import { iterableTee } from "./lib"
 import { ClientTypeChatCompletionParams, CompletionMeta } from "./types"
 
 const MAX_RETRIES_DEFAULT = 0
 
-class Instructor<C extends GenericClient | OpenAI> {
+class Instructor<C> {
   readonly client: OpenAILikeClient<C>
   readonly mode: Mode
   readonly provider: Provider
@@ -46,7 +47,17 @@ class Instructor<C extends GenericClient | OpenAI> {
     logger = undefined,
     retryAllErrors = false
   }: InstructorConfig<C>) {
-    this.client = client
+    if (!isGenericClient(client) && !(client instanceof OpenAI)) {
+      throw new Error("Client does not match the required structure")
+    }
+
+    if (client instanceof OpenAI) {
+      this.client = client as OpenAI
+    } else {
+      this.client = client as C & GenericClient
+    }
+
+    // this.client = client
     this.mode = mode
     this.debug = debug
     this.retryAllErrors = retryAllErrors
@@ -308,7 +319,9 @@ class Instructor<C extends GenericClient | OpenAI> {
       debug: this.debug ?? false
     })
 
-    async function checkForUsage(reader: Stream<OpenAI.ChatCompletionChunk>) {
+    async function checkForUsage(
+      reader: Stream<OpenAI.ChatCompletionChunk> | AsyncIterable<OpenAI.ChatCompletionChunk>
+    ) {
       for await (const chunk of reader) {
         if ("usage" in chunk) {
           streamUsage = chunk.usage as CompletionMeta["usage"]
@@ -337,6 +350,24 @@ class Instructor<C extends GenericClient | OpenAI> {
             completion instanceof Stream
           ) {
             const [completion1, completion2] = completion.tee()
+
+            checkForUsage(completion1)
+
+            return OAIStream({
+              res: completion2
+            })
+          }
+
+          //check if async iterator
+          if (
+            this.provider !== "OAI" &&
+            completionParams?.stream &&
+            completion?.[Symbol.asyncIterator]
+          ) {
+            const [completion1, completion2] = await iterableTee(
+              completion as AsyncIterable<OpenAI.ChatCompletionChunk>,
+              2
+            )
 
             checkForUsage(completion1)
 
@@ -419,7 +450,7 @@ class Instructor<C extends GenericClient | OpenAI> {
   }
 }
 
-export type InstructorClient<C extends GenericClient | OpenAI> = Instructor<C> & OpenAILikeClient<C>
+export type InstructorClient<C> = Instructor<C> & OpenAILikeClient<C>
 
 /**
  * Creates an instance of the `Instructor` class.
@@ -442,9 +473,7 @@ export type InstructorClient<C extends GenericClient | OpenAI> = Instructor<C> &
  * @param args
  * @returns
  */
-export default function createInstructor<C extends GenericClient | OpenAI>(
-  args: InstructorConfig<C>
-): InstructorClient<C> {
+export default function createInstructor<C>(args: InstructorConfig<C>): InstructorClient<C> {
   const instructor = new Instructor<C>(args)
   const instructorWithProxy = new Proxy(instructor, {
     get: (target, prop, receiver) => {
@@ -457,4 +486,18 @@ export default function createInstructor<C extends GenericClient | OpenAI>(
   })
 
   return instructorWithProxy as InstructorClient<C>
+}
+//eslint-disable-next-line @typescript-eslint/no-explicit-any
+function isGenericClient(client: any): client is GenericClient {
+  return (
+    typeof client === "object" &&
+    client !== null &&
+    "baseURL" in client &&
+    "chat" in client &&
+    typeof client.chat === "object" &&
+    "completions" in client.chat &&
+    typeof client.chat.completions === "object" &&
+    "create" in client.chat.completions &&
+    typeof client.chat.completions.create === "function"
+  )
 }
