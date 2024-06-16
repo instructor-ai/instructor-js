@@ -1,5 +1,15 @@
 # @instructor-ai/instructor
 
+## 1.5.0
+
+### Minor Changes
+
+- [#179](https://github.com/instructor-ai/instructor-js/pull/179) [`1b56bd1`](https://github.com/instructor-ai/instructor-js/commit/1b56bd18e0c7c02da94ee70e7837a155c3502b5c) Thanks [@morgante](https://github.com/morgante)! - Restore CommonJS compatibility for OpenAI streaming
+
+### Patch Changes
+
+- [`9486edb`](https://github.com/instructor-ai/instructor-js/commit/9486edb470295067ee7a537fc409132dceba5d10) Thanks [@roodboi](https://github.com/roodboi)! - update mjs import from openai
+
 ## 1.4.0
 
 ### Minor Changes
