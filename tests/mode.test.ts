@@ -4,21 +4,16 @@ import OpenAI from "openai"
 import { z } from "zod"
 import { type Mode } from "zod-stream"
 
-import { MODE, Provider, PROVIDER_SUPPORTED_MODES_BY_MODEL, PROVIDERS } from "@/constants/providers"
+import { Provider, PROVIDER_SUPPORTED_MODES_BY_MODEL, PROVIDERS } from "@/constants/providers"
 
 const default_oai_model = "gpt-4o"
-const default_anyscale_model = "mistralai/Mixtral-8x7B-Instruct-v0.1"
-const default_together_model = "mistralai/Mixtral-8x7B-Instruct-v0.1"
+const default_together_model = "meta-llama/Llama-3.2-90B-Vision-Instruct-Turbo"
 const default_groq_model = "llama3-70b-8192"
 
 const provider_config = {
   [PROVIDERS.OAI]: {
     baseURL: "https://api.openai.com/v1",
     apiKey: process.env.OPENAI_API_KEY
-  },
-  [PROVIDERS.ANYSCALE]: {
-    baseURL: "https://api.endpoints.anyscale.com/v1",
-    apiKey: process.env.ANYSCALE_API_KEY
   },
   [PROVIDERS.TOGETHER]: {
     baseURL: "https://api.together.xyz",
@@ -55,25 +50,6 @@ const createTestCases = (): {
 
   Object.entries(PROVIDER_SUPPORTED_MODES_BY_MODEL).forEach(
     ([provider, modesByModel]: [Provider, Record<Mode, string[]>]) => {
-      if (provider === PROVIDERS.ANYSCALE) {
-        Object.entries(modesByModel).forEach(([mode, models]: [Mode, string[]]) => {
-          if (mode === MODE.MD_JSON) {
-            // Skip MD_JSON for Anyscale - its somewhat supported but super flakey
-            return
-          }
-
-          if (models.includes("*")) {
-            testCases.push({
-              model: default_anyscale_model,
-              mode,
-              provider
-            })
-          } else {
-            models.forEach(model => testCases.push({ model, mode, provider }))
-          }
-        })
-      }
-
       if (provider === PROVIDERS.TOGETHER) {
         Object.entries(modesByModel).forEach(([mode, models]: [Mode, string[]]) => {
           if (models.includes("*")) {

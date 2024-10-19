@@ -107,32 +107,21 @@ export const PROVIDER_SUPPORTED_MODES_BY_MODEL = {
     [MODE.MD_JSON]: ["*"]
   },
   [PROVIDERS.TOGETHER]: {
-    [MODE.MD_JSON]: ["*"],
-    [MODE.JSON_SCHEMA]: [
-      "mistralai/Mixtral-8x7B-Instruct-v0.1",
-      "mistralai/Mistral-7B-Instruct-v0.1",
-      "togethercomputer/CodeLlama-34b-Instruct"
-    ],
-    [MODE.TOOLS]: [
-      "mistralai/Mixtral-8x7B-Instruct-v0.1",
-      "mistralai/Mistral-7B-Instruct-v0.1",
-      "togethercomputer/CodeLlama-34b-Instruct"
-    ]
+    [MODE.MD_JSON]: ["*"]
+    // [MODE.JSON_SCHEMA]: ["*"]
+    // [MODE.TOOLS]: ["*"]
   },
   [PROVIDERS.ANYSCALE]: {
-    [MODE.MD_JSON]: ["*"],
-    [MODE.JSON_SCHEMA]: [
-      "mistralai/Mistral-7B-Instruct-v0.1",
-      "mistralai/Mixtral-8x7B-Instruct-v0.1"
-    ],
-    [MODE.TOOLS]: ["mistralai/Mistral-7B-Instruct-v0.1", "mistralai/Mixtral-8x7B-Instruct-v0.1"]
+    [MODE.MD_JSON]: ["*"]
+    // [MODE.JSON_SCHEMA]: ["*"]
+    // [MODE.TOOLS]: ["*"]
   },
   [PROVIDERS.ANTHROPIC]: {
     [MODE.MD_JSON]: ["*"],
     [MODE.TOOLS]: ["*"]
   },
   [PROVIDERS.GROQ]: {
-    [MODE.TOOLS]: ["mixtral-8x7b-32768", "gemma-7b-it"],
+    [MODE.TOOLS]: ["*"],
     [MODE.MD_JSON]: ["*"]
   }
 }

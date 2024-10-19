@@ -19,7 +19,6 @@ import {
   Provider,
   PROVIDER_PARAMS_TRANSFORMERS,
   PROVIDER_SUPPORTED_MODES,
-  PROVIDER_SUPPORTED_MODES_BY_MODEL,
   PROVIDERS
 } from "./constants/providers"
 import { iterableTee } from "./lib"
@@ -86,20 +85,6 @@ class Instructor<C> {
 
     if (!isModeSupported) {
       this.log("warn", `Mode ${this.mode} may not be supported by provider ${this.provider}`)
-    }
-  }
-
-  private validateModelModeSupport<T extends z.AnyZodObject>(
-    params: ChatCompletionCreateParamsWithModel<T>
-  ) {
-    if (this.provider !== PROVIDERS.OAI) {
-      const modelSupport = PROVIDER_SUPPORTED_MODES_BY_MODEL[this.provider][this.mode]
-
-      if (!modelSupport.includes("*") && !modelSupport.includes(params.model)) {
-        throw new Error(
-          `Model ${params.model} is not supported by provider ${this.provider} in mode ${this.mode}`
-        )
-      }
     }
   }
 
@@ -419,8 +404,6 @@ class Instructor<C> {
         params: P,
         requestOptions?: ClientTypeChatCompletionRequestOptions<C>
       ): Promise<ReturnTypeBasedOnParams<typeof this.client, P>> => {
-        this.validateModelModeSupport(params)
-
         if (this.isChatCompletionCreateParamsWithModel(params)) {
           if (params.stream) {
             return this.chatCompletionStream(params, requestOptions) as ReturnTypeBasedOnParams<
