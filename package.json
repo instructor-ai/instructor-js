@@ -51,15 +51,15 @@
   },
   "homepage": "https://github.com/instructor-ai/instructor-js#readme",
   "dependencies": {
-    "zod-stream": "1.0.3",
-    "zod-validation-error": "^2.1.0"
+    "zod-stream": "2.0.0",
+    "zod-validation-error": "^3.4.0"
   },
   "peerDependencies": {
-    "openai": ">=4.28.0",
-    "zod": ">=3.22.4"
+    "openai": ">=4.58.0",
+    "zod": ">=3.23.8"
   },
   "devDependencies": {
-    "@anthropic-ai/sdk": "0.22.0",
+    "@anthropic-ai/sdk": "0.29.2",
     "@changesets/changelog-github": "^0.5.0",
     "@changesets/cli": "^2.27.1",
     "@ianvs/prettier-plugin-sort-imports": "4.1.0",
@@ -75,8 +75,8 @@
     "eslint-plugin-only-warn": "^1.1.0",
     "eslint-plugin-prettier": "^5.1.2",
     "husky": "^8.0.3",
-    "llm-polyglot": "2.0.0",
-    "openai": "4.50.0",
+    "llm-polyglot": "2.2.0",
+    "openai": "4.68.1",
     "prettier": "latest",
     "ts-inference-check": "^0.3.0",
     "tsup": "^8.0.1",
