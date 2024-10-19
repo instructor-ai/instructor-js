@@ -35,41 +35,43 @@ The good news is that Anyscale employs the same OpenAI client, and its models su
 Let's explore one of the models available in Together's extensive collection!
 
 ```ts
-import Instructor from "@/instructor"
+import Instructor from "@instructor-ai/instructor"
 import OpenAI from "openai"
 import { z } from "zod"
 
-const property = z.object({
-  name: z.string(),
-  value: z.string()
-}).describe("A property defined by a name and value")
+const property = z
+  .object({
+    name: z.string(),
+    value: z.string(),
+  })
+  .describe("A property defined by a name and value");
 
 const UserSchema = z.object({
   age: z.number(),
   name: z.string(),
-  properties: z.array(property)
+  properties: z.array(property),
 })
 
 const oai = new OpenAI({
-  baseUrl='https://api.together.xyz',
+  baseURL: "https://api.together.xyz",
   apiKey: process.env.TOGETHER_API_KEY ?? undefined,
 })
 
 const client = Instructor({
   client: oai,
-  mode: "JSON_SCHEMA"
+  mode: "JSON_SCHEMA",
 })
 
 const user = await client.chat.completions.create({
   messages: [{ role: "user", content: "Harry Potter" }],
   model: "mistralai/Mixtral-8x7B-Instruct-v0.1",
   response_model: { schema: UserSchema, name: "UserSchema" },
-  max_retries: 3
+  max_retries: 3,
 })
 
-console.log(user)
+console.log(user);
 /**
- * {
+ {
   age: 17,
   name: "Harry Potter",
   properties: [
@@ -82,7 +84,7 @@ console.log(user)
     }
   ],
 }
- */
+ **/
 ```
 
 You can find more information about Togethers's output mode support [here](https://docs.together.ai/docs/json-mode/).
