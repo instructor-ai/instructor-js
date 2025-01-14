@@ -259,7 +259,6 @@ describe("LLMClient google Provider - Grounding", () => {
       stream: false
     })
 
-    console.log("completion", JSON.stringify(completion, null, 2))
     expect(completion.choices?.[0]?.message?.content).toBeTruthy()
   })
 
@@ -289,71 +288,8 @@ describe("LLMClient google Provider - Grounding", () => {
       max_tokens: 1000
     })
 
-    console.log("highThreshold", JSON.stringify(highThreshold, null, 2))
-    console.log("lowThreshold", JSON.stringify(lowThreshold, null, 2))
-
     expect(highThreshold.choices?.[0]?.message?.content).not.toBe(
       lowThreshold.choices?.[0]?.message?.content
     )
   })
 })
-
-// test("cache manager with session and grounding", async () => {
-//   const sessionId = `test-session-${Date.now()}`
-
-//   // Create cache
-//   const cache = await googleClient.cacheManager.create({
-//     model: "gemini-1.5-pro",
-//     max_tokens: 1000,
-//     messages: [
-//       {
-//         role: "system",
-//         content: "You are a helpful assistant that provides structured data about restaurants."
-//       }
-//     ],
-//     ttlSeconds: 3600
-//   })
-
-//   const completion1 = await googleClient.chat.completions.create({
-//     model: "gemini-1.5-pro",
-//     max_tokens: 1000,
-//     groundingThreshold: 0.8,
-//     messages: [
-//       {
-//         role: "user",
-//         content: "What's the best Italian restaurant in Boston's North End for a romantic dinner?"
-//       }
-//     ],
-//     additionalProperties: {
-//       sessionId,
-//       cacheName: cache.name
-//     }
-//   })
-
-//   expect(completion1.choices?.[0]?.message?.content).toBeTruthy()
-
-//   // Follow-up question in same session
-//   const completion2 = await googleClient.chat.completions.create({
-//     model: "gemini-1.5-pro",
-//     max_tokens: 1000,
-//     groundingThreshold: 0.8,
-//     messages: [
-//       {
-//         role: "user",
-//         content: `What are their most popular dishes?`
-//       }
-//     ],
-//     additionalProperties: {
-//       sessionId,
-//       cacheName: cache.name
-//     }
-//   })
-
-//   console.log("completion2", JSON.stringify(completion2, null, 2))
-
-//   expect(completion2.choices?.[0]?.message?.content).toBeTruthy()
-
-//   if (cache?.name) {
-//     await googleClient.cacheManager.delete(cache.name)
-//   }
-// })
