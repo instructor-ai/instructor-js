@@ -1,5 +1,15 @@
 # @instructor-ai/instructor
 
+## 1.6.0
+
+### Minor Changes
+
+- [#193](https://github.com/instructor-ai/instructor-js/pull/193) [`da449de`](https://github.com/instructor-ai/instructor-js/commit/da449de837389ccc30584b8954a64e3cafa22832) Thanks [@roodboi](https://github.com/roodboi)! - update peer deps + remove baseUrl check on generic client type guard
+
+- [#191](https://github.com/instructor-ai/instructor-js/pull/191) [`bf240b2`](https://github.com/instructor-ai/instructor-js/commit/bf240b27c893ee3e6da8f09e1d9c14004eb0d604) Thanks [@roodboi](https://github.com/roodboi)! - Updating core openai/zod stream/zod/anthropic dependencies to latest - updating tests and support validation to better handle changes without warning unnecessarily.
+
+  Peer dependencies will likely need to be updated to match the latest.
+
 ## 1.5.0
 
 ### Minor Changes
