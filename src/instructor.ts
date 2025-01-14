@@ -475,7 +475,6 @@ function isGenericClient(client: any): client is GenericClient {
   return (
     typeof client === "object" &&
     client !== null &&
-    "baseURL" in client &&
     "chat" in client &&
     typeof client.chat === "object" &&
     "completions" in client.chat &&
