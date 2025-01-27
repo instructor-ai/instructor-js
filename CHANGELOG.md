@@ -1,5 +1,11 @@
 # @instructor-ai/instructor
 
+## 1.7.0
+
+### Minor Changes
+
+- [#195](https://github.com/instructor-ai/instructor-js/pull/195) [`3aac90e`](https://github.com/instructor-ai/instructor-js/commit/3aac90e7e965c0769d4ff98aadad78b2aada948b) Thanks [@roodboi](https://github.com/roodboi)! - adding a new mode to support parsing thinking blocks out of markdown json responses (R1)
+
 ## 1.6.0
 
 ### Minor Changes
