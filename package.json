@@ -44,14 +44,17 @@
     "outputs",
     "zod"
   ],
-  "author": "Jason Liu",
+  "contributors": [
+    "Dimitri Kennedy",
+    "Jason Liu"
+  ],
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/instructor-ai/instructor-js/issues"
   },
   "homepage": "https://github.com/instructor-ai/instructor-js#readme",
   "dependencies": {
-    "zod-stream": "2.0.0",
+    "zod-stream": "3.0.0",
     "zod-validation-error": "^3.4.0"
   },
   "peerDependencies": {

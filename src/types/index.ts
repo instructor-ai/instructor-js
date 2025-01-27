@@ -61,9 +61,10 @@ export type LogLevel = "debug" | "info" | "warn" | "error"
 
 export type CompletionMeta = Partial<ZCompletionMeta> & {
   usage?: OpenAI.CompletionUsage
+  thinking?: string
 }
 
-export type Mode = ZMode
+export type Mode = ZMode | "THINKING_MD_JSON"
 
 export type ResponseModel<T extends z.AnyZodObject> = ZResponseModel<T>
 
