@@ -41,7 +41,7 @@ const ExtractionValuesSchema = z.object({
 })
 
 describe("thinking parser - live tests", () => {
-  test("should parse Groq streaming response with thinking tags", async () => {
+  test("should parse r1 response with thinking tags", async () => {
     const groq = new OpenAI({
       apiKey: process.env["GROQ_API_KEY"] ?? undefined,
       baseURL: "https://api.groq.com/openai/v1"
