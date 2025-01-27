@@ -1,9 +1,16 @@
 import { omit } from "@/lib"
 import OpenAI from "openai"
 import { z } from "zod"
-import { withResponseModel, MODE as ZMODE, type Mode } from "zod-stream"
+import { thinkingJsonParser, withResponseModel, MODE as ZMODE } from "zod-stream"
 
-export const MODE = ZMODE
+import { Mode } from "../types"
+
+export const MODE: typeof ZMODE = ZMODE
+
+export const MODE_TO_RESPONSE_PARSER = {
+  [MODE.THINKING_MD_JSON]: thinkingJsonParser
+}
+
 export const PROVIDERS = {
   OAI: "OAI",
   ANYSCALE: "ANYSCALE",
@@ -12,6 +19,7 @@ export const PROVIDERS = {
   GROQ: "GROQ",
   OTHER: "OTHER"
 } as const
+
 export type Provider = keyof typeof PROVIDERS
 
 export const PROVIDER_SUPPORTED_MODES: {
@@ -98,7 +106,8 @@ export const PROVIDER_SUPPORTED_MODES_BY_MODEL = {
     [MODE.TOOLS]: ["*"],
     [MODE.JSON]: ["*"],
     [MODE.MD_JSON]: ["*"],
-    [MODE.JSON_SCHEMA]: ["*"]
+    [MODE.JSON_SCHEMA]: ["*"],
+    [MODE.THINKING_MD_JSON]: ["*"]
   },
   [PROVIDERS.OAI]: {
     [MODE.FUNCTIONS]: ["*"],
@@ -122,6 +131,7 @@ export const PROVIDER_SUPPORTED_MODES_BY_MODEL = {
   },
   [PROVIDERS.GROQ]: {
     [MODE.TOOLS]: ["*"],
-    [MODE.MD_JSON]: ["*"]
+    [MODE.MD_JSON]: ["*"],
+    [MODE.THINKING_MD_JSON]: ["deepseek-r1-distill-llama-70b"]
   }
 }

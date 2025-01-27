@@ -11,10 +11,11 @@ import {
 import OpenAI from "openai"
 import { Stream } from "openai/streaming"
 import { z, ZodError } from "zod"
-import ZodStream, { OAIResponseParser, OAIStream, withResponseModel, type Mode } from "zod-stream"
+import ZodStream, { OAIResponseParser, OAIStream, withResponseModel } from "zod-stream"
 import { fromZodError } from "zod-validation-error"
 
 import {
+  MODE_TO_RESPONSE_PARSER,
   NON_OAI_PROVIDER_URLS,
   Provider,
   PROVIDER_PARAMS_TRANSFORMERS,
@@ -22,7 +23,7 @@ import {
   PROVIDERS
 } from "./constants/providers"
 import { iterableTee } from "./lib"
-import { ClientTypeChatCompletionParams, CompletionMeta } from "./types"
+import { ClientTypeChatCompletionParams, CompletionMeta, Mode } from "./types"
 
 const MAX_RETRIES_DEFAULT = 0
 
@@ -68,6 +69,7 @@ class Instructor<C> {
         : this.client?.baseURL.includes(NON_OAI_PROVIDER_URLS.TOGETHER) ? PROVIDERS.TOGETHER
         : this.client?.baseURL.includes(NON_OAI_PROVIDER_URLS.OAI) ? PROVIDERS.OAI
         : this.client?.baseURL.includes(NON_OAI_PROVIDER_URLS.ANTHROPIC) ? PROVIDERS.ANTHROPIC
+        : this.client?.baseURL.includes(NON_OAI_PROVIDER_URLS.GROQ) ? PROVIDERS.GROQ
         : PROVIDERS.OTHER
       : PROVIDERS.OTHER
 
@@ -187,13 +189,22 @@ class Instructor<C> {
         throw error
       }
 
-      const parsedCompletion = OAIResponseParser(
-        completion as OpenAI.Chat.Completions.ChatCompletion
-      )
+      const responseParser = MODE_TO_RESPONSE_PARSER?.[this.mode] ?? OAIResponseParser
+      const parsedCompletion = responseParser(completion as OpenAI.Chat.Completions.ChatCompletion)
 
       try {
-        const data = JSON.parse(parsedCompletion) as z.infer<T> & { _meta?: CompletionMeta }
-        return { ...data, _meta: { usage: completion?.usage ?? undefined } }
+        const responseJson = parsedCompletion.json ?? parsedCompletion
+        const data = JSON.parse(responseJson) as z.infer<T> & {
+          _meta?: CompletionMeta
+          thinking?: string
+        }
+        return {
+          ...data,
+          _meta: {
+            usage: completion?.usage ?? undefined,
+            thinking: parsedCompletion?.thinking ?? undefined
+          }
+        }
       } catch (error) {
         this.log(
           "error",
